@@ -25,10 +25,10 @@ void GameWindow::renderDO(DrawableObject *d) {
 	}
 }
 
-void GameWindow::render(std::pair<Vector2i, Vector2i> line) {
+void GameWindow::render(std::pair<Vector2f, Vector2f> line) {
 	Vertex l[2];
-	l[0] = Vertex(Vector2f(line.first.x, line.first.y));
-	l[1] = Vertex(Vector2f(line.second.x, line.second.y));
+	l[0] = Vertex(line.first);
+	l[1] = Vertex(line.second);
 	nativeRenderer->draw(l, 2, Lines);
 }
 

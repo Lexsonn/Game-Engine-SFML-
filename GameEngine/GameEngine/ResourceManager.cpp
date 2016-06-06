@@ -12,7 +12,10 @@ void ResourceManager::init() {
 	addTexture("playerAttRec.png");
 }
 
-ResourceManager::~ResourceManager() { }
+ResourceManager::~ResourceManager() { 
+
+}
+
 ResourceManager::ResourceManager() { 
 	init(); 
 }

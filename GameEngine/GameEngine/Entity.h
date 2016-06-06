@@ -65,8 +65,8 @@ public:
 	virtual bool willCollide(unsigned short int _ID, int _dx, int _dy);
 	virtual bool willCollide(Collidable *other, int _dx, int _dy);
 	virtual bool insideCollidable(Collidable *other);
-	virtual Vector2i getOverlap(Entity *other);
-	virtual Vector2i getOverlap(Collidable *other);
+	virtual Vector2f getOverlap(Entity *other);
+	virtual Vector2f getStaticOverlap(Collidable *other);
 protected:
 	std::map<animList, Animation*> animationList;
 	std::vector<SpriteEffect*> spriteEffectList;
@@ -79,5 +79,6 @@ protected:
 	virtual void init();
 	virtual void updateState();
 	virtual void updatePosition();
+	virtual void updatePosition(Vector2f v);
 };
 #endif

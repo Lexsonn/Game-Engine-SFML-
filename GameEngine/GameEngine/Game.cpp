@@ -64,6 +64,16 @@ void Game::render() {
 	if (debug) {
 		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
 		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
+		/* FOR LINE TESTS
+		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
+		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);
+		std::pair<Vector2f, Vector2f> l3; l3.first = Vector2f(200.0f, 90.f); l3.second = Vector2f(250.0f, 20.f);
+		std::pair<Vector2f, Vector2f> l4; l4.first = Vector2f(300.0f, 90.f); l4.second = Vector2f(350.0f, 90.f);
+		window->render(l);
+		window->render(l2);
+		window->render(l3);
+		window->render(l4);
+		*/
 	}
 }
 

@@ -26,9 +26,7 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) {
  *	Check for the given animation name in the animation list. False if not in the list, true otherwise.
  */
 bool Entity::isInAnimList(animList name) {
-	if (animationList[name])
-		return true;
-	return false;
+	return animationList.count(name);
 }
 /*
  *	Add an animation to the animation list.
@@ -47,6 +45,8 @@ Animation *Entity::getCurrentAnimation() {
 }
 
 void Entity::beginUpdate() {
+	//dx = 0;
+	//dy = 0;
 	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->beginUpdate();
 }
@@ -117,6 +117,13 @@ void Entity::updatePosition() {
 	cY = y - cHeight / 2;
 }
 
+void Entity::updatePosition(Vector2f v) {
+	x += v.x;
+	y += v.y;
+	cX = x - cWidth / 2;
+	cY = y - cHeight / 2;
+}
+
 void Entity::moveOutsideCollidable() {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
@@ -140,20 +147,17 @@ void Entity::moveOutsideCollidable() {
 void Entity::moveOutsideCollidable(Collidable *other) {
 	if (other == nullptr)
 		return;
-	Vector2i vec;
+	Vector2f vec;
 	if (insideCollidable(other)) {
-		vec = getOverlap(other);
-		x += vec.x;
-		y += vec.y;
-		cX = x - cWidth / 2;
-		cY = y - cHeight / 2;
+		vec = getStaticOverlap(other);
+		updatePosition(vec);
 	}
 }
 
 void Entity::moveOutsideEntity(Entity *other) {
 	if (other == nullptr)
 		return;
-	Vector2i vec;
+	Vector2f vec;
 	if (insideCollidable(other)) {
 		if (weight > other->weight ){//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
 			vec = other->getOverlap(this);
@@ -163,10 +167,7 @@ void Entity::moveOutsideEntity(Entity *other) {
 			}
 		}
 		vec = getOverlap(other);
-		x += vec.x;
-		y += vec.y;
-		cX = x - cWidth / 2;
-		cY = y - cHeight / 2;
+		updatePosition(vec);
 	}
 }
 
@@ -237,33 +238,33 @@ bool Entity::insideCollidable(Collidable *other) {
 
 /*
  *	To be called after checking if the Entity is inside another Entity object.
- *	Returns a Vector2i of which direction the Entity should move in order to be touching 
+ *	Returns a Vector2f of which direction the Entity should move in order to be touching 
  *	the Collidable object's edge with its own collision box edge.
  */
-Vector2i Entity::getOverlap(Entity* other) {
+Vector2f Entity::getOverlap(Entity* other) {
 	int x = 0, y = 0;
 	int otherLeft = other->cX - 1;						// Left line of other rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of other rectangle
 	int otherTop = other->cY - 1;						// Top line of other rectangle
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of other rectangle
 
-	Vector2i center = Vector2i(other->cX + other->cWidth / 2, other->cY + other->cHeight / 2);
-	Vector2i myCenter = Vector2i(cX + cWidth / 2, cY + cWidth / 2);
+	Vector2f center = Vector2f(other->cX + other->cWidth / 2, other->cY + other->cHeight / 2);
+	Vector2f myCenter = Vector2f(cX + cWidth / 2, cY + cWidth / 2);
 	
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180/3.1415;
 	
-	if (angle <= -45 && angle >= -135) y += 1;	// NORTH
-	if (angle <= -135 || angle >= 135) x += 1;	// WEST
-	if (angle >= 45 && angle <= 135) y -= 1;	// SOUTH
-	if (angle >= -45 && angle <= 45) x -= 1;	// EAST
+	if (angle <= -45 && angle >= -135) y += std::max(1.f, abs(other->dy));	// NORTH
+	if (angle <= -135 || angle >= 135) x += std::max(1.f, abs(other->dx));;	// WEST
+	if (angle >= 45 && angle <= 135) y -= std::max(1.f, abs(other->dy));	// SOUTH
+	if (angle >= -45 && angle <= 45) x -= std::max(1.f, abs(other->dx));	// EAST
 
-	return Vector2i(x, y);
+	return Vector2f(x, y);
 }
 /*
 *	To be called after checking if the Entity is inside a static non-Entity Collidable object.
-*	Returns a Vector2i of the distance needed to move the Entity outside the Collidable object.
+*	Returns a Vector2f of the distance needed to move the Entity outside the Collidable object.
 */
-Vector2i Entity::getOverlap(Collidable* other) {
+Vector2f Entity::getStaticOverlap(Collidable* other) {
 	int x = 0, y = 0;
 	int otherLeft = other->cX - 1;						// Left line of rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle
@@ -271,18 +272,18 @@ Vector2i Entity::getOverlap(Collidable* other) {
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
 	
 	// Quick, dirty checks for which side the Entity has collided on. Doesn't work near corners
-	if (hasCollidedN(other)) { y -= cY + dy - otherBottom;  return Vector2i(x, y); }
-	if (hasCollidedW(other)) { x -= cX + dx - otherRight;  return Vector2i(x, y); }
-	if (hasCollidedS(other)) { y -= cY + dy + cHeight - otherTop; return Vector2i(x, y); }
-	if (hasCollidedE(other)) { x -= cX + dx + cWidth - otherLeft; return Vector2i(x, y); }
+	if (hasCollidedN(other)) { y -= cY + dy - otherBottom;  return Vector2f(x, y); }
+	if (hasCollidedW(other)) { x -= cX + dx - otherRight;  return Vector2f(x, y); }
+	if (hasCollidedS(other)) { y -= cY + dy + cHeight - otherTop; return Vector2f(x, y); }
+	if (hasCollidedE(other)) { x -= cX + dx + cWidth - otherLeft; return Vector2f(x, y); }
 	
 	// Doesn't often get through here, but if an Entity is pushed past the edge of the collidable this is used.
-	Vector2i center = Vector2i(cX + cWidth / 2, cY + cHeight / 2);
+	Vector2f center = Vector2f(cX + cWidth / 2, cY + cHeight / 2);
 	int dist[4];
-	dist[0] = findDistance(Vector2i(otherLeft, otherTop), Vector2i(otherRight, otherTop), center);
-	dist[1] = findDistance(Vector2i(otherLeft, otherTop), Vector2i(otherLeft, otherBottom), center);
-	dist[2] = findDistance(Vector2i(otherLeft, otherBottom), Vector2i(otherRight, otherBottom), center);
-	dist[3] = findDistance(Vector2i(otherRight, otherTop), Vector2i(otherRight, otherBottom), center);
+	dist[0] = findDistance(Vector2f(otherLeft, otherTop), Vector2f(otherRight, otherTop), center);
+	dist[1] = findDistance(Vector2f(otherLeft, otherTop), Vector2f(otherLeft, otherBottom), center);
+	dist[2] = findDistance(Vector2f(otherLeft, otherBottom), Vector2f(otherRight, otherBottom), center);
+	dist[3] = findDistance(Vector2f(otherRight, otherTop), Vector2f(otherRight, otherBottom), center);
 
 	int smallest = std::min(std::min(abs(dist[0]), abs(dist[1])), std::min(abs(dist[2]), abs(dist[3])));
 	
@@ -291,5 +292,5 @@ Vector2i Entity::getOverlap(Collidable* other) {
 	if (smallest == abs(dist[0])) y -= cY + dy + cHeight - otherTop;
 	if (smallest == abs(dist[1])) x -= cX + dx + cWidth - otherLeft;
 	
-	return Vector2i(x, y);
+	return Vector2f(x, y);
 }

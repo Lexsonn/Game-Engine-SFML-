@@ -17,7 +17,7 @@ public:
 	RenderWindow *getNative();
 
 	void renderDO(DrawableObject *d);
-	void render(std::pair<Vector2i, Vector2i> line);
+	void render(std::pair<Vector2f, Vector2f> line);
 	void render(Collidable *c);
 	void render(ResourceManager *rm);
 	void render(CollisionGrid *cg);

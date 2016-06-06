@@ -32,12 +32,6 @@ Slime::Slime(float startX, float startY, ResourceManager *rm) {
 	y = startY;
 	init();
 }
-/*
-void Slime::updatePosition() { 
-	Entity::updatePosition();
-	moveOutsideCollidable();	// Allow for pushing by other Entities being pushed
-}
-*/
 
 void Slime::update() { 
 	int decision = 100;

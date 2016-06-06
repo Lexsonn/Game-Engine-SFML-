@@ -45,11 +45,11 @@ bool Collidable::hasCollidedE(Collidable *other) {
 	return true;
 }
 
-bool Collidable::intersectsLine(std::pair<Vector2i, Vector2i> line) {
-	int left = cX;
-	int right = cX + cWidth;
-	int top = cY;
-	int bottom = cY + cHeight;
+bool Collidable::intersectsLine(std::pair<Vector2f, Vector2f> line) {
+	float left = cX;
+	float right = cX + cWidth;
+	float top = cY;
+	float bottom = cY + cHeight;
 
 	float minX = line.first.x;
 	float maxX = line.second.x;
@@ -94,7 +94,7 @@ bool Collidable::intersectsLine(std::pair<Vector2i, Vector2i> line) {
 	return true;
 }
 
-float Collidable::findDistance(Vector2i l1, Vector2i l2, Vector2i point) {
+float Collidable::findDistance(Vector2f l1, Vector2f l2, Vector2f point) {
 	float diffX = l2.x - l1.x;
 	float diffY = l2.y - l1.y;
 

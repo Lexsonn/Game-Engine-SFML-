@@ -35,8 +35,8 @@ public:
 	bool hasCollidedS(Collidable *other);
 	bool hasCollidedE(Collidable *other);
 	
-	bool intersectsLine(std::pair<Vector2i, Vector2i> point);
+	bool intersectsLine(std::pair<Vector2f, Vector2f> point);
 protected:
-	float findDistance(Vector2i l1, Vector2i l2, Vector2i point);
+	float findDistance(Vector2f l1, Vector2f l2, Vector2f point);
 };
 #endif
