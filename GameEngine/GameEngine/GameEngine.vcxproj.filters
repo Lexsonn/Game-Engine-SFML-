@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Main">
+      <UniqueIdentifier>{5803cc14-4fca-4616-9c0e-933bd68f067e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{796d9a9c-f0ec-44ee-bfe4-78c3d521dd43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{97eb68ed-e4a9-4bc8-a4e5-7219edd45fda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Input">
+      <UniqueIdentifier>{1ccd102e-bf82-4fba-a726-a164a6e9c0eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Input">
+      <UniqueIdentifier>{ce87f27f-f4f8-4ccd-885b-127dfc07190e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Graphics">
+      <UniqueIdentifier>{27cdc225-4c8b-44de-b602-9162fdaa7a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Audio">
+      <UniqueIdentifier>{46ae044c-272b-4540-bf43-bd223068101f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Graphics">
+      <UniqueIdentifier>{2565a5eb-9dea-4727-9fb4-20bc7e7163f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Game World">
+      <UniqueIdentifier>{a0ad2ead-eb48-4f87-a921-773c4965f96b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Game World\Entity">
+      <UniqueIdentifier>{8fb95e0a-2476-4eeb-abb3-d8fcd4935bce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Game World\Entity\Enemies">
+      <UniqueIdentifier>{d6144985-e40b-4aa2-bb88-eaf7ba9d11ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Game World\Objects">
+      <UniqueIdentifier>{41d00d0f-d515-4bea-8080-4c9b5b772ab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Game World">
+      <UniqueIdentifier>{c827ed1b-2145-497b-8bd1-75f917ea5358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Game World\Objects">
+      <UniqueIdentifier>{4573bda3-b868-483c-b5e7-a056183b65d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Game World\Entity">
+      <UniqueIdentifier>{c1a685c3-d713-453b-accf-bad9817f9779}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Game World\Entity\Enemies">
+      <UniqueIdentifier>{95b02dc9-f0c5-4fdc-a9f4-4b42bb5d95ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Game World\Collision">
+      <UniqueIdentifier>{0e811792-13d5-4941-b8e1-a194140f6537}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Game World\Collision">
+      <UniqueIdentifier>{f1ef503b-4933-4e2f-80b8-57f7d24059c3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Source Files\Game\Game World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Game\Game World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllable.cpp">
+      <Filter>Source Files\Game\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InputController.cpp">
+      <Filter>Source Files\Game\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableObject.cpp">
+      <Filter>Source Files\Game\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Game\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteEffect.cpp">
+      <Filter>Source Files\Game\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Slime.cpp">
+      <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="Collidable.cpp">
+      <Filter>Source Files\Game\Game World\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionGrid.cpp">
+      <Filter>Source Files\Game\Game World\Collision</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Game\Game World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\Game\Game World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllable.h">
+      <Filter>Header Files\Game\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="GameWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputController.h">
+      <Filter>Header Files\Game\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawableObject.h">
+      <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimList.h">
+      <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="TexList.h">
+      <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioList.h">
+      <Filter>Header Files\Game\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="States.h">
+      <Filter>Header Files\Game\Game World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteEffect.h">
+      <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Slime.h">
+      <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="AI.h">
+      <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="Collidable.h">
+      <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionGrid.h">
+      <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
