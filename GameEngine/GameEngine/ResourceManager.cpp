@@ -13,7 +13,11 @@ void ResourceManager::init() {
 }
 
 ResourceManager::~ResourceManager() { 
-
+	for (auto tex : textureList) {
+		delete tex.second;
+	}
+	textureList.clear();
+	zOrderedSpriteList.clear();
 }
 
 ResourceManager::ResourceManager() { 
@@ -32,21 +36,22 @@ texList ResourceManager::getTextureType(std::string texPath) {
 	return UNKNOWN_t;
 }
 
-Texture * ResourceManager::getTexture(std::string texPath) {
+Texture *ResourceManager::getTexture(std::string texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	std::cout << "LOADING " << fullpath << " ... ";
 	texList type = getTextureType(texPath);
-	std::cout << type << " ";
 	if (type == UNKNOWN_t) {
 		std::cout << "\nNo such texture " << fullpath << " defined.\n";
 		return nullptr;
 	}
+
 	std::cout << "checking... ";
 	std::map<texList, Texture*>::iterator it = textureList.find(type);
 	if (it == textureList.end()) {
 		std::cout << "Texture not found.\n";
 		return nullptr;
 	}
+
 	std::cout << "returning...\n";
 	return textureList[type];
 }
@@ -58,10 +63,10 @@ bool ResourceManager::addTexture(std::string texPath) {
 		std::cout << "No such texture " << fullpath << " defined.\n";
 		return false;
 	}
-
+	
 	Texture *tx = new Texture();
 	if (!tx->loadFromFile(fullpath)) { // Load new texture from path
-		std::cout << "No image " << fullpath << " found!\n";
+		std::cout << "No texture " << fullpath << " found!\n";
 		delete tx;
 		return false;
 	}
@@ -77,19 +82,31 @@ bool ResourceManager::addTexture(std::string texPath) {
 }
 
 bool ResourceManager::deleteTexture(std::string texPath) {
+	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
+	std::cout << "DELETING " << fullpath << "... ";
 	texList type = getTextureType(texPath);
-	if (type == UNKNOWN_t)
+	if (type == UNKNOWN_t) {
+		std::cout << "Texture does not exist.\n";
 		return false;
+	}
 
 	std::map<texList, Texture*>::iterator it;
 	it = textureList.find(type);
-	// TODO: DELETE THE TEXTURE MORON. DONT JUST STAND THERE AFTER FINDING IT IN THE GODDAMN MAP
 
-	return false;
+	if (it == textureList.end()) {
+		std::cout << "Texture not found. Perhaps it was already deleted?\n";
+		return false;
+	}
+	
+	delete it->second;
+	textureList.erase(it);
+
+	std::cout << "Texture succesfully deleted\n";
+	return true;
 }
 
-Sound * ResourceManager::loadSound(std::string sfxPath) { return nullptr; }
-Sound * ResourceManager::loadMusic(std::string musicPath) { return nullptr; }
+Sound *ResourceManager::loadSound(std::string sfxPath) { return nullptr; }
+Sound *ResourceManager::loadMusic(std::string musicPath) { return nullptr; }
 
 bool ResourceManager::addSprite(int y, Sprite &spr) {
 	zOrderedSpriteList.insert(std::pair<int, Sprite&>(y, spr));

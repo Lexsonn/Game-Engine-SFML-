@@ -13,7 +13,7 @@
 #include <map>
 
 #define DO_ENTITY 2
-#define DIAG_MOD 0.7071
+#define DIAG_MOD 0.7071f
 
 // Faces for 8 Directions
 enum dir {
@@ -61,7 +61,6 @@ public:
 	void moveOutsideCollidable(Collidable *other);
 	void moveOutsideEntity(Entity *other);
 
-	virtual bool isEntity();
 	virtual bool willCollide(unsigned short int _ID, int _dx, int _dy);
 	virtual bool willCollide(Collidable *other, int _dx, int _dy);
 	virtual bool insideCollidable(Collidable *other);

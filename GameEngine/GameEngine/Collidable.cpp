@@ -13,10 +13,6 @@ bool Collidable::willCollide(Collidable *other, int _dx, int _dy) { return false
 bool Collidable::insideCollidable(Collidable *other) { return false; }
 Vector2i Collidable::getOverlap(Collidable *other) { return Vector2i(0,0); }
 
-bool Collidable::isEntity() {
-	return false;
-}
-
 bool Collidable::hasCollidedN(Collidable *other) {
 	int otherBottom = other->cY + +other->cHeight;
 
@@ -46,10 +42,10 @@ bool Collidable::hasCollidedE(Collidable *other) {
 }
 
 bool Collidable::intersectsLine(std::pair<Vector2f, Vector2f> line) {
-	float left = cX;
-	float right = cX + cWidth;
-	float top = cY;
-	float bottom = cY + cHeight;
+	float left = float(cX);
+	float right = float(cX + cWidth);
+	float top = float(cY);
+	float bottom = float(cY + cHeight);
 
 	float minX = line.first.x;
 	float maxX = line.second.x;

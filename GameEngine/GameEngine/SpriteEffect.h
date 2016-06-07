@@ -27,11 +27,11 @@ public:
 	SpriteEffect();
 	SpriteEffect(Sprite spr, float x, float y, int life, int t);
 	bool update();
-	void setRotationSpeed(int rotSpeed);
+	void setRotationSpeed(float rotSpeed);
 protected:
 	unsigned int type;
 	int currentLife = 100, maxLife = 100;
-	int rotationSpeed = 4;
+	float rotationSpeed = 4;
 
 	void fastFade();	// Default
 	void fade();		// bit 0

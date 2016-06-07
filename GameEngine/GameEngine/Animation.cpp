@@ -16,21 +16,26 @@ Animation::Animation(Texture *t, float x, float y, int w, int h, int frameCount,
 	animationSpeed = speed;
 	repeat = r;
 
+	if (t == nullptr) {
+		frameSize = 0;
+		return;
+	}
+
 	for (int i = 0; i<frameCount; i++)
-		frames.push_back(IntRect(x + i*w, y, w, h));
+		frames.push_back(IntRect(int(x) + i*w, int(y), w, h));
 
 	sprite.setTexture(*t);
-	sprite.setOrigin(w / 2, h / 2);
+	sprite.setOrigin(float(w / 2), float(h / 2));
 	sprite.setTextureRect(frames[0]);
 
 	frameSize = frames.size();
 }
 
-void Animation::setRotation(int angle) {
+void Animation::setRotation(float angle) {
 	sprite.setRotation(angle);
 }
 
-void Animation::rotate(int angle) {
+void Animation::rotate(float angle) {
 	sprite.rotate(angle);
 }
 

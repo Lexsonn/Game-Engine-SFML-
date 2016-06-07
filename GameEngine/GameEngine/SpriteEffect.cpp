@@ -32,12 +32,12 @@ bool SpriteEffect::update() {
 	return true;
 }
 
-void SpriteEffect::setRotationSpeed(int rotSpeed) {
+void SpriteEffect::setRotationSpeed(float rotSpeed) {
 	rotationSpeed = rotSpeed;
 }
 
 void SpriteEffect::fade() {
-	sprite.setColor(Color(255, 255, 255, (float(currentLife) / maxLife) * 255));
+	sprite.setColor(Color(255, 255, 255, int((float(currentLife) / maxLife) * 255)));
 }
 
 void SpriteEffect::rainbow() {
@@ -50,33 +50,33 @@ void SpriteEffect::rainbow() {
 	else if (currentLife > (maxLife * 5)/6) {			// RED 255, 0, 0 to ORANGE 255, 128, 0
 		int numSteps = maxLife - (maxLife*5)/6;
 		int currStep = 1 + numSteps - currentLife + (maxLife * 5) / 6;
-		c.g = 128 * (float(currStep) / numSteps);
+		c.g = int(128 * (float(currStep) / numSteps));
 	}
 	else if (currentLife > (maxLife * 4) / 6) {		// ORANGE 255, 128, 0 to YELLOW 255, 255, 0
 		int numSteps = (maxLife*5)/6 - (maxLife * 4) / 6;
 		int currStep = 1 + numSteps - currentLife + (maxLife*4)/6;
-		c.g = 127 + 128 * (float(currStep) / numSteps);
+		c.g = 127 + int(128 * (float(currStep) / numSteps));
 	}
 	else if (currentLife > (maxLife * 3) / 6) {		// YELLOW 255, 255, 0 to GREEN 0, 255, 0
 		int numSteps = (maxLife * 4) / 6 - (maxLife * 3) / 6;
 		int currStep = 1 + numSteps - currentLife + (maxLife * 3) / 6;
-		c.r = 255 - 255 * (float(currStep) / numSteps);
+		c.r = 255 - int(255 * (float(currStep) / numSteps));
 	}
 	else if(currentLife > (maxLife * 2) / 6) {		// GREEN 0 255, 0 to BLUE 0, 0, 255
 		int numSteps = (maxLife * 3) / 6 - (maxLife * 2) / 6;
 		int currStep = 1 + numSteps - currentLife + (maxLife * 2) / 6;
-		c.g = 255 - 255 * (float(currStep) / numSteps);
-		c.b = 255 * (float(currStep) / numSteps);
+		c.g = 255 - int(255 * (float(currStep) / numSteps));
+		c.b = int(255 * (float(currStep) / numSteps));
 	}
 	else if (currentLife > (maxLife) / 6) {			// BLUE 0, 0, 255 to PURPLE 255, 0, 255
 		int numSteps = (maxLife * 2)/6 - maxLife/6;
 		int currStep = 1 + numSteps - currentLife + maxLife/ 6;
-		c.r = 255 * (float(currStep) / numSteps);
+		c.r = int(255 * (float(currStep) / numSteps));
 	}
 	else {											// PURPLE 255, 0, 255 to RED 255, 0, 0
 		int numSteps = (maxLife) / 6;
 		int currStep = 1 + numSteps - currentLife;
-		c.b = 255 - 255 * (float(currStep) / numSteps);
+		c.b = 255 - int(255 * (float(currStep) / numSteps));
 	}
 
 	sprite.setColor(c);
@@ -91,7 +91,7 @@ void SpriteEffect::fastFade() {
 	if (currentLife < maxLife / 8) {
 		int numSteps = maxLife / 8;
 		int currStep = 1 + numSteps - currentLife;
-		c.a = 255 - 255 * (float(currStep)/numSteps);
+		c.a = 255 - int(255 * (float(currStep)/numSteps));
 		sprite.setColor(c);
 	}
 }

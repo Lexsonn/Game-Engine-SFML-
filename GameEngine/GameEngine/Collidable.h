@@ -25,7 +25,6 @@ public:
 	Collidable();
 	Collidable(int x, int y, int width, int height);
 
-	virtual bool isEntity();
 	virtual bool willCollide(Collidable *other, int _dx, int _dy);
 	virtual bool insideCollidable(Collidable *other);
 	virtual Vector2i getOverlap(Collidable *other);

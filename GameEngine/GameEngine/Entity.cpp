@@ -9,8 +9,8 @@ void Entity::init() {
 	direction = EAST;
 	state = IDLE;
 
-	cX = x - cWidth / 2;
-	cY = y - cHeight / 2;
+	cX = int(x) - cWidth / 2;
+	cY = int(y) - cHeight / 2;
 }
 Entity::~Entity() { }
 Entity::Entity() { }
@@ -26,7 +26,7 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) {
  *	Check for the given animation name in the animation list. False if not in the list, true otherwise.
  */
 bool Entity::isInAnimList(animList name) {
-	return animationList.count(name);
+	return animationList.count(name) != 0;
 }
 /*
  *	Add an animation to the animation list.
@@ -69,17 +69,17 @@ void Entity::endUpdate() {
 				it = spriteEffectList.erase(it);
 			else {
 				it++;
-				rm_master->addSprite(spr->sprite.getPosition().y, spr->sprite);
+				rm_master->addSprite(int(spr->sprite.getPosition().y), spr->sprite);
 			}
 		}
 	}
 	// Allow the entity to be drawn on top of its own sprite effects on same level by inserting last.
-	rm_master->addSprite(y, animationList[currentAnimation]->sprite);
+	rm_master->addSprite(int(y), animationList[currentAnimation]->sprite);
 }
 
 void Entity::render(RenderWindow *window) {
 	// RENDER COLLISION BOX
-	RectangleShape sh(Vector2f(cWidth, cHeight));
+	RectangleShape sh(Vector2f(cWidth * 1.f, cHeight * 1.f));
 	sh.setFillColor(Color(128, 0, 0, 160));
 	sh.setOutlineColor(Color::Red);
 	sh.setOutlineThickness(1.0f);
@@ -113,15 +113,15 @@ bool Entity::updateDirection() {
 void Entity::updatePosition() {
 	x += dx;
 	y += dy;
-	cX = x - cWidth / 2;
-	cY = y - cHeight / 2;
+	cX = int(x) - cWidth / 2;
+	cY = int(y) - cHeight / 2;
 }
 
 void Entity::updatePosition(Vector2f v) {
 	x += v.x;
 	y += v.y;
-	cX = x - cWidth / 2;
-	cY = y - cHeight / 2;
+	cX = int(x) - cWidth / 2;
+	cY = int(y) - cHeight / 2;
 }
 
 void Entity::moveOutsideCollidable() {
@@ -159,9 +159,9 @@ void Entity::moveOutsideEntity(Entity *other) {
 		return;
 	Vector2f vec;
 	if (insideCollidable(other)) {
-		if (weight > other->weight ){//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
+		if (weight > other->weight) {//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
 			vec = other->getOverlap(this);
-			if (!other->willCollide(ID, vec.x, vec.y) ) {
+			if (!other->willCollide(ID, int(vec.x), int(vec.y))) {
 				other->moveOutsideCollidable();
 				return;
 			}
@@ -178,10 +178,10 @@ void Entity::updateState() {}
 
 // COLLIDABLE INHERITANCE ////////////////////////////////////////////////////////////////////////////////////
 
-bool Entity::isEntity() {
-	return true;
-}
-
+/*
+ *	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
+ *	coordinates + _dx and _dy. Returns false otherwise.
+ */
 bool Entity::willCollide(unsigned short int _ID, int _dx, int _dy) {
 	bool c = false;
 	for (int i = 0; i < 4; i++) {
@@ -242,55 +242,55 @@ bool Entity::insideCollidable(Collidable *other) {
  *	the Collidable object's edge with its own collision box edge.
  */
 Vector2f Entity::getOverlap(Entity* other) {
-	int x = 0, y = 0;
+	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of other rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of other rectangle
 	int otherTop = other->cY - 1;						// Top line of other rectangle
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of other rectangle
 
-	Vector2f center = Vector2f(other->cX + other->cWidth / 2, other->cY + other->cHeight / 2);
-	Vector2f myCenter = Vector2f(cX + cWidth / 2, cY + cWidth / 2);
+	Vector2f center = Vector2f((other->cX + other->cWidth / 2)*1.f, (other->cY + other->cHeight / 2)*1.f);
+	Vector2f myCenter = Vector2f((cX + cWidth / 2)*1.f, (cY + cWidth / 2)*1.f);
 	
-	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180/3.1415;
+	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180/3.1415f;
 	
-	if (angle <= -45 && angle >= -135) y += std::max(1.f, abs(other->dy));	// NORTH
-	if (angle <= -135 || angle >= 135) x += std::max(1.f, abs(other->dx));;	// WEST
-	if (angle >= 45 && angle <= 135) y -= std::max(1.f, abs(other->dy));	// SOUTH
-	if (angle >= -45 && angle <= 45) x -= std::max(1.f, abs(other->dx));	// EAST
+	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(abs(other->dy)));	// NORTH
+	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(abs(other->dx)));	// WEST
+	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(abs(other->dy)));	// SOUTH
+	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(abs(other->dx)));	// EAST
 
-	return Vector2f(x, y);
+	return Vector2f(_x*1.f, _y*1.f);
 }
 /*
 *	To be called after checking if the Entity is inside a static non-Entity Collidable object.
 *	Returns a Vector2f of the distance needed to move the Entity outside the Collidable object.
 */
 Vector2f Entity::getStaticOverlap(Collidable* other) {
-	int x = 0, y = 0;
+	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle
 	int otherTop = other->cY - 1;						// Top line of rectangle
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
 	
 	// Quick, dirty checks for which side the Entity has collided on. Doesn't work near corners
-	if (hasCollidedN(other)) { y -= cY + dy - otherBottom;  return Vector2f(x, y); }
-	if (hasCollidedW(other)) { x -= cX + dx - otherRight;  return Vector2f(x, y); }
-	if (hasCollidedS(other)) { y -= cY + dy + cHeight - otherTop; return Vector2f(x, y); }
-	if (hasCollidedE(other)) { x -= cX + dx + cWidth - otherLeft; return Vector2f(x, y); }
+	if (hasCollidedN(other)) { _y -= cY + int(dy) - otherBottom;  return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedW(other)) { _x -= cX + int(dx) - otherRight;  return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedS(other)) { _y -= cY + int(dy) + cHeight - otherTop; return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedE(other)) { _x -= cX + int(dx) + cWidth - otherLeft; return Vector2f(_x*1.f, _y*1.f); }
 	
 	// Doesn't often get through here, but if an Entity is pushed past the edge of the collidable this is used.
-	Vector2f center = Vector2f(cX + cWidth / 2, cY + cHeight / 2);
+	Vector2f center = Vector2f((cX + cWidth / 2)*1.f, (cY + cHeight / 2)*1.f);
 	int dist[4];
-	dist[0] = findDistance(Vector2f(otherLeft, otherTop), Vector2f(otherRight, otherTop), center);
-	dist[1] = findDistance(Vector2f(otherLeft, otherTop), Vector2f(otherLeft, otherBottom), center);
-	dist[2] = findDistance(Vector2f(otherLeft, otherBottom), Vector2f(otherRight, otherBottom), center);
-	dist[3] = findDistance(Vector2f(otherRight, otherTop), Vector2f(otherRight, otherBottom), center);
+	dist[0] = int(findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherTop*1.f), center));
+	dist[1] = int(findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherLeft*1.f, otherBottom*1.f), center));
+	dist[2] = int(findDistance(Vector2f(otherLeft*1.f, otherBottom*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center));
+	dist[3] = int(findDistance(Vector2f(otherRight*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center));
 
 	int smallest = std::min(std::min(abs(dist[0]), abs(dist[1])), std::min(abs(dist[2]), abs(dist[3])));
 	
-	if (smallest == abs(dist[2])) y -= cY + dy - otherBottom;
-	if (smallest == abs(dist[3])) x -= cX + dx - otherRight;
-	if (smallest == abs(dist[0])) y -= cY + dy + cHeight - otherTop;
-	if (smallest == abs(dist[1])) x -= cX + dx + cWidth - otherLeft;
+	if (smallest == abs(dist[2])) _y -= cY + int(dy) - otherBottom;
+	if (smallest == abs(dist[3])) _x -= cX + int(dx) - otherRight;
+	if (smallest == abs(dist[0])) _y -= cY + int(dy) + cHeight - otherTop;
+	if (smallest == abs(dist[1])) _x -= cX + int(dx) + cWidth - otherLeft;
 	
-	return Vector2f(x, y);
+	return Vector2f(_x*1.f, _y*1.f);
 }

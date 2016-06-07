@@ -5,7 +5,7 @@ using namespace sf;
 AI::~AI() { }
 AI::AI() { }
 
-void AI::generateRND(int seed, int maxRange) {
+void AI::generateRND(unsigned int seed, int maxRange) {
 	srand(seed);
 	decisionRange = std::uniform_int_distribution<int>(0, maxRange);
 	//randomNumbers = std::mt19937(rd());

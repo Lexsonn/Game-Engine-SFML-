@@ -1,15 +1,15 @@
 #include "Slime.h"
 
-#define SPEED 0.5
+#define SPEED 0.5f
 
 void Slime::init() {
 	// AI vars
-	generateRND(time(NULL), 99);
-	destination.x = x;
-	destination.y = y;
+	generateRND(int(time(NULL)), 99);
+	destination.x = int(x);
+	destination.y = int(y);
 	setBounds(120, 120, 240, 240);	// Temporary
 	decisionMake = 0;
-	decisionSpeed = 0.05;
+	decisionSpeed = 0.05f;
 	// Entity vars
 	name = "Slime";
 	cWidth = 20;
@@ -92,7 +92,7 @@ void Slime::decideDirection() {
 
 	if (abs(x - destination.x) != 0) {
 		if (abs(int(x - destination.x)) <= SPEED)
-			x = destination.x;
+			x = float(destination.x);
 		else {
 			if (x < destination.x) right = true;
 			else left = true;
@@ -101,7 +101,7 @@ void Slime::decideDirection() {
 
 	if (abs(int(y - destination.y)) != 0) {
 		if (abs(y - destination.y) <= SPEED)
-			y = destination.y;
+			y = float(destination.y);
 		else {
 			if (y < destination.y) down = true;
 			else up = true;

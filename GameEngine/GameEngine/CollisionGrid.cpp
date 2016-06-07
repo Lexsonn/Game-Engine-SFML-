@@ -133,13 +133,13 @@ void CollisionGrid::printList() {
 }
 
 void CollisionGrid::render(RenderWindow *window) {
-	for (int i = 0; i < width; i++) {
-		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i, 0)), Vertex(Vector2f(GRID_WIDTH * i, height * GRID_HEIGHT)) };
+	for (unsigned int i = 0; i < width; i++) {
+		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, height * GRID_HEIGHT * 1.f)) };
 		line[0].color = Color(0, 255, 64); line[1].color = Color(0, 64, 255);
 		window->draw(line, 2, Lines);
 	}
-	for (int i = 0; i < height; i++) {
-		Vertex line[] = { Vertex(Vector2f(0, GRID_HEIGHT * i)), Vertex(Vector2f(width * GRID_WIDTH, GRID_HEIGHT * i)) };
+	for (unsigned int i = 0; i < height; i++) {
+		Vertex line[] = { Vertex(Vector2f(0.f, GRID_HEIGHT * i * 1.f)), Vertex(Vector2f(width * GRID_WIDTH * 1.f, GRID_HEIGHT * i * 1.f)) };
 		line[0].color = Color(0, 255, 64); line[1].color = Color(0, 64, 255);
 		window->draw(line, 2, Lines);
 	}

@@ -33,7 +33,7 @@ void GameWindow::render(std::pair<Vector2f, Vector2f> line) {
 }
 
 void GameWindow::render(Collidable *c) {
-	RectangleShape sh(Vector2f(c->cWidth, c->cHeight));
+	RectangleShape sh(Vector2f(c->cWidth * 1.f, c->cHeight * 1.f));
 	sh.setFillColor(Color(0, 128, 0, 216));
 	sh.setOutlineColor(Color::Green);
 	sh.setOutlineThickness(1.0f);

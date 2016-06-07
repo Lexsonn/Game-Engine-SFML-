@@ -14,8 +14,8 @@ public:
 
 	Animation();
 	Animation(Texture *t, float x, float y, int w, int h, int frameCount, float speed, bool r);
-	void setRotation(int angle);
-	void rotate(int angle);
+	void setRotation(float angle);
+	void rotate(float angle);
 	void setScale(float xScale, float yScale);
 	void setColor(Color color);
 	void setOrigin(float x, float y);

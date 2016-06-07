@@ -12,7 +12,7 @@ public:
 	~AI();
 	AI();
 
-	void generateRND(int seed, int maxRange);
+	void generateRND(unsigned int seed, int maxRange);
 	int getDecision();
 
 	void setBounds(int x, int y, int mX, int mY);

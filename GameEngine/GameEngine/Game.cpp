@@ -73,7 +73,7 @@ void Game::render() {
 		window->render(l2);
 		window->render(l3);
 		window->render(l4);
-		*/
+		//*/
 	}
 }
 
