@@ -288,6 +288,7 @@ void Player::keyPress(Keyboard::Key key) {
 			weight = 20;
 		else
 			weight = 8;
+		std::cout << "GridPos: " << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2] << ", " << gridPos[3] << "\n";
 		/* FOR LINE TESTS
 		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);

@@ -1,7 +1,9 @@
 #include "Game.h"
 #include "Slime.h" // Eventually make a header with all Enemy types
 
-#define _DEBUG_MODE true;
+#define _DEBUG_MODE true
+#define WWIDTH 800	// TEMPORARY
+#define WHEIGHT 800 // TEMPORARY
 
 Game::~Game(void) {}
 Game::Game(RenderWindow* rWindow) {
@@ -9,13 +11,12 @@ Game::Game(RenderWindow* rWindow) {
 	oID = 0;
 	debug = _DEBUG_MODE;
 
-	cGrid = new CollisionGrid();
 	rm_master = new ResourceManager();
-	cGrid = new CollisionGrid(640, 640);
-	window = new GameWindow(rWindow);
+	cGrid = new CollisionGrid(WWIDTH, WHEIGHT);
+	window = new GameWindow(rWindow, WWIDTH*1.f, WHEIGHT*1.f, true);
 	player = new Player(200, 200, rm_master);
 	controller = new InputController();
-	
+
 	addEntity(player);
 	controller->addControllable(player);
 
@@ -55,6 +56,7 @@ void Game::update() {
 	controller->checkKeyState();								// Get Keyboard information
 	for (auto entity : entityList) entity.second->update();		// update every entity.
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity.
+	window->updateView(player);
 }
 
 void Game::render() {

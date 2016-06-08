@@ -29,9 +29,7 @@
 
 int main() {
 	sf::Event event;
-	sf::RenderWindow window(sf::VideoMode(1280, 960), "GAME ENGINE v0.01");
-	sf::View view(sf::FloatRect(0,0, 640, 480));
-	window.setView(view);
+	sf::RenderWindow window(sf::VideoMode(1280, 960), "GAME ENGINE v0.02");
 
 	window.setFramerateLimit(60);
 

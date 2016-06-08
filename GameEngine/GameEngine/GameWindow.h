@@ -8,13 +8,15 @@ using namespace sf;
 
 class GameWindow {
 public:
-	GameWindow(RenderWindow *rWindow);
 	~GameWindow(void);
+	GameWindow(RenderWindow *rWindow, float width, float height, bool isLimited);
 
 	void start();
 	void end();
-
 	RenderWindow *getNative();
+
+	void updateView(Entity *entity);
+	void setViewBounds(float width, float height);
 
 	void renderDO(DrawableObject *d);
 	void render(std::pair<Vector2f, Vector2f> line);
@@ -23,6 +25,12 @@ public:
 	void render(CollisionGrid *cg);
 	void render(CollisionGrid *cg, short int gridPos[]);
 private:
+	float wWidth, wHeight, rectW, rectH;
+	bool limited;
 	RenderWindow *nativeRenderer;
+	View view;
+
+	void boundViewX(float centerX);
+	void boundViewY(float centerY);
 };
 #endif

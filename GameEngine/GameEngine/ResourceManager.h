@@ -4,7 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include "MusicList.h"
 #include "TexList.h"
+#include "SFXList.h"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -25,10 +27,17 @@ public:
 	bool addTexture(std::string texPath);
 	bool deleteTexture(std::string texPath);
 
-	Sound *loadSound(std::string sfxPath);
-	Sound *loadMusic(std::string musicPath);
+	sfxList getSoundType(std::string sfxPath);
+	Sound getSound(std::string sfxPath);
+	bool addSound(std::string sfxPath);
+	bool deleteSound(std::string sfxPath);
 
-	bool addSprite(int y, Sprite &spr);
+	musicList getMusicType(std::string musicPath);
+	Music *getMusic(std::string musicPath);
+	bool addMusic(std::string musicPath);
+	bool deleteMusic(std::string musicPath);
+
+	bool addSprite(int z, Sprite &spr);
 	void clearList();
 
 	void render(RenderWindow *window);
@@ -36,8 +45,9 @@ private:
 	void init();
 
 	std::map<texList, Texture *> textureList;
-	//std::map<sfxList, Sound*> soundList;
-	//std::map<musicList, Sound*> musicList;
+	std::map<sfxList, SoundBuffer> soundList;
+	std::map<musicList, Music *> songList;
+
 	std::multimap<int, Sprite &> zOrderedSpriteList;
 };
 #endif

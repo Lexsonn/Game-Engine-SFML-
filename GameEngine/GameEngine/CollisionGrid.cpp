@@ -3,8 +3,8 @@
 CollisionGrid::~CollisionGrid() { }
 CollisionGrid::CollisionGrid() : width(0), height(0), size(0) { }
 CollisionGrid::CollisionGrid(int worldWidth, int worldHeight) {
-	width = worldWidth / GRID_WIDTH;
-	height = worldHeight / GRID_HEIGHT;
+	width = (worldWidth - 1) / GRID_WIDTH;
+	height = (worldHeight - 1) / GRID_HEIGHT;
 	size = width*(height + 2) + 1;
 
 	std::cout << "Grid list size: " << size << "\n";
@@ -133,13 +133,13 @@ void CollisionGrid::printList() {
 }
 
 void CollisionGrid::render(RenderWindow *window) {
-	for (unsigned int i = 0; i < width; i++) {
-		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, height * GRID_HEIGHT * 1.f)) };
+	for (unsigned int i = 0; i <= width + 1; i++) {
+		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, (height + 1) * GRID_HEIGHT * 1.f)) };
 		line[0].color = Color(0, 255, 64); line[1].color = Color(0, 64, 255);
 		window->draw(line, 2, Lines);
 	}
-	for (unsigned int i = 0; i < height; i++) {
-		Vertex line[] = { Vertex(Vector2f(0.f, GRID_HEIGHT * i * 1.f)), Vertex(Vector2f(width * GRID_WIDTH * 1.f, GRID_HEIGHT * i * 1.f)) };
+	for (unsigned int i = 0; i <= height + 1; i++) {
+		Vertex line[] = { Vertex(Vector2f(0.f, GRID_HEIGHT * i * 1.f)), Vertex(Vector2f((width + 1) * GRID_WIDTH * 1.f, GRID_HEIGHT * i * 1.f)) };
 		line[0].color = Color(0, 255, 64); line[1].color = Color(0, 64, 255);
 		window->draw(line, 2, Lines);
 	}

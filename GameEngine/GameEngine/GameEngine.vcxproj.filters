@@ -149,9 +149,6 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="AudioList.h">
-      <Filter>Header Files\Game\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="States.h">
       <Filter>Header Files\Game\Game World\Entity</Filter>
     </ClInclude>
@@ -169,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="CollisionGrid.h">
       <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="SFXList.h">
+      <Filter>Header Files\Game\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MusicList.h">
+      <Filter>Header Files\Game\Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

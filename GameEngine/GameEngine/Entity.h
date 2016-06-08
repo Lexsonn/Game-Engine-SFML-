@@ -9,7 +9,6 @@
 #include "Animation.h"
 #include "AnimList.h"
 #include "States.h"
-#include <iostream>
 #include <map>
 
 #define DO_ENTITY 2

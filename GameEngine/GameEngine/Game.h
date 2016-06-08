@@ -22,6 +22,7 @@ private:
 	CollisionGrid *cGrid;
 	GameWindow* window;
 	Player *player;
+	View view;
 
 	std::map<unsigned short int, Entity *> entityList;
 	std::map<unsigned short int, Collidable *> objectList;

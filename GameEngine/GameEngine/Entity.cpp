@@ -1,7 +1,5 @@
 #include "Entity.h"
 
-#define DO_TYPE_ENTITY 1;
-
 void Entity::init() { 
 	for (int i = 0; i < 4; i++)
 		gridPos[i] = -1;

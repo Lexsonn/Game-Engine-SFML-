@@ -139,7 +139,7 @@
     <ClInclude Include="AI.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimList.h" />
-    <ClInclude Include="AudioList.h" />
+    <ClInclude Include="MusicList.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollisionGrid.h" />
     <ClInclude Include="Controllable.h" />
@@ -150,6 +150,7 @@
     <ClInclude Include="InputController.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="SFXList.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="SpriteEffect.h" />
     <ClInclude Include="States.h" />
