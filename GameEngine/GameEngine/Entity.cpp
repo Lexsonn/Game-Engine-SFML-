@@ -40,8 +40,7 @@ bool Entity::isInAnimList(animList name) {
  *	Add an animation to the animation list. Does not add if the animation animList is already set.
  */
 void Entity::addAnimation(Animation *anim, animList name) {
-	if (!isInAnimList(name)) 
-		animationList.insert(std::pair<animList, Animation*>(name, anim));
+	animationList.insert(std::pair<animList, Animation*>(name, anim));
 }
 
 Animation *Entity::getCurrentAnimation() {
@@ -347,44 +346,30 @@ Vector2f Entity::getStaticOverlap(Collidable* other) {
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle
 	int otherTop = other->cY - 1;						// Top line of rectangle
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
-	
+	/*
 	// Quick, dirty checks for which side the Entity has collided on. Doesn't work near corners
 	if (hasCollidedN(other)) { _y -= cY - otherBottom;  return Vector2f(_x*1.f, _y*1.f); }
 	if (hasCollidedW(other)) { _x -= cX - otherRight;  return Vector2f(_x*1.f, _y*1.f); }
 	if (hasCollidedS(other)) { _y -= cY + cHeight - otherTop; return Vector2f(_x*1.f, _y*1.f); }
 	if (hasCollidedE(other)) { _x -= cX + cWidth - otherLeft; return Vector2f(_x*1.f, _y*1.f); }
-	
+	//*/
 	// Doesn't often get through here, but if an Entity is pushed past the edge of the collidable this is used.
 	Vector2f center = Vector2f((cX + cWidth / 2)*1.f, (cY + cHeight / 2)*1.f);
-	Vector2f otherCenter = Vector2f((other->cX + other->cWidth/2)*1.f, (other->cY + other->cHeight / 2)*1.f);
+	Vector2f otherCenter = Vector2f((other->cX + other->cWidth / 2)*1.f, (other->cY + other->cHeight / 2)*1.f);
+	Vector2f diff = center - otherCenter;
 
-	float angle = atan2(otherCenter.y - center.y, otherCenter.x - center.x) * 180 / 3.1415f;
-	float angleNE = atan2(otherLeft - otherCenter.x, otherTop - otherCenter.y) * 180 / 3.1415f;
-	float angleNW = atan2(otherCenter.x - otherRight, otherCenter.y - otherTop) * 180 / 3.1415f;
-	float angleSW = atan2(otherCenter.x - otherRight, otherCenter.y - otherBottom) * 180 / 3.1415f;
-	float angleSE = atan2(otherCenter.x - otherLeft, otherCenter.y - otherBottom) * 180 / 3.1415f;
+	float xOverlap = cWidth/2 + other->cWidth/2 - abs(diff.x);
+	float yOverlap = cHeight/2 + other->cHeight/2 - abs(diff.y);
 
-	if (ID == 0)
-		std::cout << "NE: " << angleNE << " NW: " << angleNW << " SW: " << angleSW << " SE: " << angleSE << "\nANGLE: " << angle << "\n";
-
-	if (angle <= angleNE && angle >= angleNW) _y -= cY - otherBottom;
-	if (angle <= angleNW || angle >= angleSW) _x -= cX - otherRight;
-	if (angle >= angleSE && angle <= angleSW) _y -= cY + cHeight - otherTop;
-	if (angle >= angleNE && angle <= angleSE) _x -= cX + cWidth - otherLeft;
-
-	/*
-	float dist[4];
-	dist[0] = findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherTop*1.f), center);
-	dist[1] = findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherLeft*1.f, otherBottom*1.f), center);
-	dist[2] = findDistance(Vector2f(otherLeft*1.f, otherBottom*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center);
-	dist[3] = findDistance(Vector2f(otherRight*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center);
-
-	float smallest = std::min(std::min(abs(dist[0]), abs(dist[1])), std::min(abs(dist[2]), abs(dist[3])));
+	if (xOverlap < yOverlap) {
+		if (diff.x > 0) _x -= cX - otherRight;
+		else _x -= cX + cWidth - otherLeft;
+	}
+	else {
+		if (diff.y > 0) _y -= cY - otherBottom;
+		else _y -= cY + cHeight - otherTop;
+	}
 	
-	if (smallest == abs(dist[2])) _y -= cY - otherBottom;
-	if (smallest == abs(dist[3])) _x -= cX - otherRight;
-	if (smallest == abs(dist[0])) _y -= cY + cHeight - otherTop;
-	if (smallest == abs(dist[1])) _x -= cX + cWidth - otherLeft;
-	//*/
+	
 	return Vector2f(_x*1.f, _y*1.f);
 }

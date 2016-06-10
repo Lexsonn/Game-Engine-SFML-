@@ -154,7 +154,14 @@ void Player::updateState() {
 		break;
 	case ATTACK_BACKSWING: if (absFinished) { state = ATTACK_SWING; } break;
 	case ATTACK_SWING: if (attFinished) { state = ATTACK_RECOVER; } break;
-	case ATTACK_RECOVER: if (recFinished) { state = IDLE; } break;
+	case ATTACK_RECOVER: 
+		if (dashU || dashL || dashD || dashR) {
+			state = DASH;
+			phased = true;
+		}
+		if (recFinished)  
+			state = IDLE;  
+		break;
 	case DASH:
 		dashTimer += DASH_TIMER_SPEED;
 		if (dashTimer > 1) { 

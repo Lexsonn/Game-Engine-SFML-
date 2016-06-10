@@ -39,6 +39,6 @@ public:
 	
 	bool intersectsLine(std::pair<Vector2f, Vector2f> line);
 protected:
-	float findDistance(Vector2f l1, Vector2f l2, Vector2f point);
+	//float findDistance(Vector2f l1, Vector2f l2, Vector2f point);
 };
 #endif

@@ -89,7 +89,7 @@ bool Collidable::intersectsLine(std::pair<Vector2f, Vector2f> line) {
 
 	return true;
 }
-
+/*
 float Collidable::findDistance(Vector2f l1, Vector2f l2, Vector2f point) {
 	float diffX = l2.x - l1.x;
 	float diffY = l2.y - l1.y;
@@ -117,3 +117,4 @@ float Collidable::findDistance(Vector2f l1, Vector2f l2, Vector2f point) {
 
 	return sqrt(diffX * diffX + diffY * diffY);
 }
+//*/
