@@ -9,7 +9,7 @@ Collidable::Collidable(int x, int y, int width, int height) {
 	cWidth = width;
 	cHeight = height;
 }
-bool Collidable::willCollide(Collidable *other, int _dx, int _dy) { return false; }
+
 bool Collidable::insideCollidable(Collidable *other) { return false; }
 Vector2i Collidable::getOverlap(Collidable *other) { return Vector2i(0,0); }
 

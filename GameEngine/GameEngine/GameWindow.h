@@ -14,9 +14,11 @@ public:
 	void start();
 	void end();
 	RenderWindow *getNative();
+	View *getView();
 
 	void updateView(Entity *entity);
 	void setViewBounds(float width, float height);
+	void setLetterboxView();
 
 	void renderDO(DrawableObject *d);
 	void render(std::pair<Vector2f, Vector2f> line);
@@ -25,10 +27,12 @@ public:
 	void render(CollisionGrid *cg);
 	void render(CollisionGrid *cg, short int gridPos[]);
 private:
-	float wWidth, wHeight, rectW, rectH;
+	float rectW, rectH;
 	bool limited;
 	RenderWindow *nativeRenderer;
 	View view;
+
+	std::vector<DrawableObject *> *drawableList;
 
 	void boundViewX(float centerX);
 	void boundViewY(float centerY);

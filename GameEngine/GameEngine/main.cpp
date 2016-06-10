@@ -27,9 +27,11 @@
 #include <SFML/Graphics.hpp>
 #include "Game.h"
 
+using namespace sf;
+
 int main() {
-	sf::Event event;
-	sf::RenderWindow window(sf::VideoMode(1280, 960), "GAME ENGINE v0.02");
+	Event event;
+	RenderWindow window(VideoMode(1280, 960), "GAME ENGINE v0.04");
 
 	window.setFramerateLimit(60);
 
@@ -38,8 +40,10 @@ int main() {
 	while (window.isOpen()) {
 		// Open window for rendering.
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed)
+			if (event.type == Event::Closed)
 				window.close();
+			if (event.type == Event::Resized)
+				game.setLetterBoxView();
 		}
 		// Run the game loop
 		game.runLoop();

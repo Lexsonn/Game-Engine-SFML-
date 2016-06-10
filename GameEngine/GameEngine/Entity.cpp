@@ -1,5 +1,8 @@
 #include "Entity.h"
 
+extern int WWIDTH;
+extern int WHEIGHT;
+
 void Entity::init() { 
 	for (int i = 0; i < 4; i++)
 		gridPos[i] = -1;
@@ -10,7 +13,12 @@ void Entity::init() {
 	cX = int(x) - cWidth / 2;
 	cY = int(y) - cHeight / 2;
 }
-Entity::~Entity() { }
+Entity::~Entity() { // Might have to revisit this
+	for (unsigned int i = 0; i < spriteEffectList.size(); i++)
+		delete spriteEffectList.at(i);
+	
+	spriteEffectList.clear();
+}
 Entity::Entity() { }
 Entity::Entity(ResourceManager *rm) { rm_master = rm; }
 Entity::Entity(float startX, float startY, ResourceManager *rm) { 
@@ -20,22 +28,20 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) {
 	y = startY;
 	init();
 }
+
 /*
  *	Check for the given animation name in the animation list. False if not in the list, true otherwise.
  */
 bool Entity::isInAnimList(animList name) {
 	return animationList.count(name) != 0;
 }
+
 /*
- *	Add an animation to the animation list.
+ *	Add an animation to the animation list. Does not add if the animation animList is already set.
  */
 void Entity::addAnimation(Animation *anim, animList name) {
 	if (!isInAnimList(name)) 
 		animationList.insert(std::pair<animList, Animation*>(name, anim));
-}
-
-int Entity::getDrawableType() {
-	return DO_ENTITY;
 }
 
 Animation *Entity::getCurrentAnimation() {
@@ -43,36 +49,42 @@ Animation *Entity::getCurrentAnimation() {
 }
 
 void Entity::beginUpdate() {
-	//dx = 0;
-	//dy = 0;
 	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->beginUpdate();
 }
 
 void Entity::endUpdate() {
+	// Resolve all collisions resulting from the update() function.
 	moveOutsideCollidable();
 
 	if (!isInAnimList(currentAnimation))
 		return;
 
+	animationList[currentAnimation]->updatePosition(x, y);
 	animationList[currentAnimation]->endUpdate();
-	// If the Entity is not in view, do not draw.
+	
 	if (!isVisible())
 		return;
 	if (!spriteEffectList.empty()) {
-		std::vector<SpriteEffect*>::iterator it;
+		std::vector<SpriteEffect *>::iterator it;
 		for (it = spriteEffectList.begin(); it < spriteEffectList.end(); ) {
-			SpriteEffect * spr = *it;
-			if (!spr->update())
+			SpriteEffect *spr = *it;
+			if (!spr->update()) {
+				delete spr;
 				it = spriteEffectList.erase(it);
+			}
 			else {
-				it++;
 				rm_master->addSprite(int(spr->sprite.getPosition().y), spr->sprite);
+				it++;
 			}
 		}
 	}
 	// Allow the entity to be drawn on top of its own sprite effects on same level by inserting last.
 	rm_master->addSprite(int(y), animationList[currentAnimation]->sprite);
+}
+
+int Entity::getDrawableType() {
+	return DO_ENTITY;
 }
 
 void Entity::render(RenderWindow *window) {
@@ -108,6 +120,69 @@ bool Entity::updateDirection() {
 	return false; // No direction is being held right now.
 }
 
+/*
+ *	Create short line normal to the direction the Entity is facing. The line will be positioned 
+ *	shortly in front of the Entity. Useful for interacting with Entities directly in front of the 
+ *	current Entity.
+ */
+std::pair<Vector2f, Vector2f> Entity::getAccessorLineFromDirection() {
+	std::pair<Vector2f, Vector2f> line;
+	line.first = line.second = Vector2f(-1.f, -1.f);
+	
+	switch (direction) {
+	case EAST: 
+		line.first = Vector2f(x + cWidth / 2 + 4, y - cHeight / 4); 
+		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 4); 
+		break;
+	case NORTHEAST: 
+		line.first = Vector2f(x + cWidth / 2 - 4, y - cHeight / 2 + 4); 
+		line.second = Vector2f(x + cWidth / 2 + 4, y - cHeight / 2 - 4); 
+		break;
+	case NORTH: 
+		line.first = Vector2f(x - cWidth / 4, y - cHeight / 2 - 4);
+		line.second = Vector2f(x + cWidth / 4, y - cHeight / 2 - 4); 
+		break;
+	case NORTHWEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 2 - 4);
+		line.second = Vector2f(x - cWidth / 2 + 4, y - cHeight / 2 + 4);
+		break;
+	case WEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 4);
+		line.second = Vector2f(x - cWidth / 2 - 4, y + cHeight / 4);
+		break;
+	case SOUTHWEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y + cHeight / 2 - 4);
+		line.second = Vector2f(x - cWidth / 2 + 4, y + cHeight / 2 + 4);
+		break;
+	case SOUTH:
+		line.first = Vector2f(x - cWidth / 4, y + cHeight / 2 + 4);
+		line.second = Vector2f(x + cWidth / 4, y + cHeight / 2 + 4);
+		break;
+	case SOUTHEAST:
+		line.first = Vector2f(x + cWidth / 2 - 4, y + cHeight / 2 + 4);
+		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 2 - 4);
+		break;
+	}
+
+	return line;
+}
+
+Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
+	for (int i = 0; i < 4; i++) {
+		if (gridPos[i] >= 0) {
+			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+			range = entityList->equal_range(gridPos[i]);
+			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+				if (it->second->ID != ID) {
+					if (it->second->intersectsLine(line))
+						return it->second;
+				}
+			}
+		}
+	}
+	return nullptr;
+}
+
 void Entity::updatePosition() {
 	x += dx;
 	y += dy;
@@ -125,12 +200,14 @@ void Entity::updatePosition(Vector2f v) {
 void Entity::moveOutsideCollidable() {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
-			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList->equal_range(gridPos[i]);
-			// Cycle through Entities first, since it is permissable to be partially inside one.
-			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-				if (it->second->ID != ID) {
-					moveOutsideEntity(it->second);
+			if (!phased) {
+				std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+				range = entityList->equal_range(gridPos[i]);
+				// Cycle through Entities first, since it is permissable to be partially inside one.
+				for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+					if (it->second->ID != ID) {
+						moveOutsideEntity(it->second);
+					}
 				}
 			}
 			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
@@ -155,6 +232,8 @@ void Entity::moveOutsideCollidable(Collidable *other) {
 void Entity::moveOutsideEntity(Entity *other) {
 	if (other == nullptr)
 		return;
+	if (other->phased)
+		return;
 	Vector2f vec;
 	if (insideCollidable(other)) {
 		if (weight > other->weight) {//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
@@ -169,9 +248,7 @@ void Entity::moveOutsideEntity(Entity *other) {
 	}
 }
 
-// TO BE DEFINED IN CHILD CLASSES ////////////////////////////////////////////////////////////////////////////
-
-void Entity::update() {}
+void Entity::update() { }
 void Entity::updateState() {}
 
 // COLLIDABLE INHERITANCE ////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +274,8 @@ bool Entity::willCollide(unsigned short int _ID, int _dx, int _dy) {
 
 			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID != ID && it->second->ID != _ID) {
-					c = c || willCollide(it->second, _dx, _dy);
+					if (!it->second->phased)
+						c = c || willCollide(it->second, _dx, _dy);
 					if (c) return true;
 				}
 			}
@@ -258,10 +336,11 @@ Vector2f Entity::getOverlap(Entity* other) {
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
+
 /*
-*	To be called after checking if the Entity is inside a static non-Entity Collidable object.
-*	Returns a Vector2f of the distance needed to move the Entity outside the Collidable object.
-*/
+ *	To be called after checking if the Entity is inside a static non-Entity Collidable object.
+ *	Returns a Vector2f of the distance needed to move the Entity outside the Collidable object.
+ */
 Vector2f Entity::getStaticOverlap(Collidable* other) {
 	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of rectangle
@@ -270,25 +349,42 @@ Vector2f Entity::getStaticOverlap(Collidable* other) {
 	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
 	
 	// Quick, dirty checks for which side the Entity has collided on. Doesn't work near corners
-	if (hasCollidedN(other)) { _y -= cY + int(dy) - otherBottom;  return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedW(other)) { _x -= cX + int(dx) - otherRight;  return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedS(other)) { _y -= cY + int(dy) + cHeight - otherTop; return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedE(other)) { _x -= cX + int(dx) + cWidth - otherLeft; return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedN(other)) { _y -= cY - otherBottom;  return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedW(other)) { _x -= cX - otherRight;  return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedS(other)) { _y -= cY + cHeight - otherTop; return Vector2f(_x*1.f, _y*1.f); }
+	if (hasCollidedE(other)) { _x -= cX + cWidth - otherLeft; return Vector2f(_x*1.f, _y*1.f); }
 	
 	// Doesn't often get through here, but if an Entity is pushed past the edge of the collidable this is used.
 	Vector2f center = Vector2f((cX + cWidth / 2)*1.f, (cY + cHeight / 2)*1.f);
-	int dist[4];
-	dist[0] = int(findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherTop*1.f), center));
-	dist[1] = int(findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherLeft*1.f, otherBottom*1.f), center));
-	dist[2] = int(findDistance(Vector2f(otherLeft*1.f, otherBottom*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center));
-	dist[3] = int(findDistance(Vector2f(otherRight*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center));
+	Vector2f otherCenter = Vector2f((other->cX + other->cWidth/2)*1.f, (other->cY + other->cHeight / 2)*1.f);
 
-	int smallest = std::min(std::min(abs(dist[0]), abs(dist[1])), std::min(abs(dist[2]), abs(dist[3])));
+	float angle = atan2(otherCenter.y - center.y, otherCenter.x - center.x) * 180 / 3.1415f;
+	float angleNE = atan2(otherLeft - otherCenter.x, otherTop - otherCenter.y) * 180 / 3.1415f;
+	float angleNW = atan2(otherCenter.x - otherRight, otherCenter.y - otherTop) * 180 / 3.1415f;
+	float angleSW = atan2(otherCenter.x - otherRight, otherCenter.y - otherBottom) * 180 / 3.1415f;
+	float angleSE = atan2(otherCenter.x - otherLeft, otherCenter.y - otherBottom) * 180 / 3.1415f;
+
+	if (ID == 0)
+		std::cout << "NE: " << angleNE << " NW: " << angleNW << " SW: " << angleSW << " SE: " << angleSE << "\nANGLE: " << angle << "\n";
+
+	if (angle <= angleNE && angle >= angleNW) _y -= cY - otherBottom;
+	if (angle <= angleNW || angle >= angleSW) _x -= cX - otherRight;
+	if (angle >= angleSE && angle <= angleSW) _y -= cY + cHeight - otherTop;
+	if (angle >= angleNE && angle <= angleSE) _x -= cX + cWidth - otherLeft;
+
+	/*
+	float dist[4];
+	dist[0] = findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherTop*1.f), center);
+	dist[1] = findDistance(Vector2f(otherLeft*1.f, otherTop*1.f), Vector2f(otherLeft*1.f, otherBottom*1.f), center);
+	dist[2] = findDistance(Vector2f(otherLeft*1.f, otherBottom*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center);
+	dist[3] = findDistance(Vector2f(otherRight*1.f, otherTop*1.f), Vector2f(otherRight*1.f, otherBottom*1.f), center);
+
+	float smallest = std::min(std::min(abs(dist[0]), abs(dist[1])), std::min(abs(dist[2]), abs(dist[3])));
 	
-	if (smallest == abs(dist[2])) _y -= cY + int(dy) - otherBottom;
-	if (smallest == abs(dist[3])) _x -= cX + int(dx) - otherRight;
-	if (smallest == abs(dist[0])) _y -= cY + int(dy) + cHeight - otherTop;
-	if (smallest == abs(dist[1])) _x -= cX + int(dx) + cWidth - otherLeft;
-	
+	if (smallest == abs(dist[2])) _y -= cY - otherBottom;
+	if (smallest == abs(dist[3])) _x -= cX - otherRight;
+	if (smallest == abs(dist[0])) _y -= cY + cHeight - otherTop;
+	if (smallest == abs(dist[1])) _x -= cX + cWidth - otherLeft;
+	//*/
 	return Vector2f(_x*1.f, _y*1.f);
 }

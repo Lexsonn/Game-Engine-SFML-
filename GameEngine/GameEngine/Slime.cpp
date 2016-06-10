@@ -18,6 +18,10 @@ void Slime::init() {
 	currentAnimation = idleE;
 	weight = 10;
 	Entity::init();
+
+	Texture *tx0 = rm_master->getTexture("playerAttRec.png");
+
+	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.75, 0.75);
 }
 
 Slime::~Slime() { }

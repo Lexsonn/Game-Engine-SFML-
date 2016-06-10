@@ -29,6 +29,6 @@ void DrawableObject::setVisible(bool isVisible) {
 	visible = isVisible;
 }
 
-int DrawableObject::getType() {
+int DrawableObject::getDrawableType() {
 	return DO_BASE;
 }

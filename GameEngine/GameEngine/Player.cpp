@@ -1,7 +1,5 @@
 #include "Player.h"
 
-#define SPEED 2.f
-
 void Player::init() {
 	// Initialize inherited variables
 	name = "El";
@@ -87,13 +85,14 @@ void Player::init() {
 	keyWatchlist.push_back((int)Keyboard::Left);
 	keyWatchlist.push_back((int)Keyboard::Down);
 	keyWatchlist.push_back((int)Keyboard::Right);
-	keyWatchlist.push_back((int)Keyboard::LShift);	// Walk modifier
+	keyWatchlist.push_back((int)Keyboard::LShift);	// Run modifier
 	keyWatchlist.push_back((int)Keyboard::Space);	// Attack button
 
 	keyWatchlist.push_back((int)Keyboard::LControl); // TEMP KEYS
 	keyWatchlist.push_back((int)Keyboard::RControl);
 	keyWatchlist.push_back((int)Keyboard::RShift);
 	keyWatchlist.push_back((int)Keyboard::Q);
+	
 	std::cout << "player initialized\n";
 }
 
@@ -135,11 +134,6 @@ void Player::update() {
 	if (oldState != state ) animationList[oldAnimation]->restart();
 
 	updatePosition();
-
-	if (isInAnimList(currentAnimation)) 
-		animationList[currentAnimation]->update(x, y);
-	else 
-		std::cout << "Invalid animation for player, can not update animation.\n";
 }
 
 void Player::updateState() {
@@ -147,11 +141,13 @@ void Player::updateState() {
 	case IDLE:
 	case WALK:
 	case RUN:
-		if (up || left || down || right) {
-			if (shiftHeld)
-				state = WALK;
-			else
-				state = RUN;
+		if (dashU || dashL || dashD || dashR) {
+			state = DASH;
+			phased = true;
+		}
+		else if (up || left || down || right) {
+			if (shiftHeld) state = RUN;
+			else state = WALK;
 		}
 		else
 			state = IDLE;
@@ -159,6 +155,14 @@ void Player::updateState() {
 	case ATTACK_BACKSWING: if (absFinished) { state = ATTACK_SWING; } break;
 	case ATTACK_SWING: if (attFinished) { state = ATTACK_RECOVER; } break;
 	case ATTACK_RECOVER: if (recFinished) { state = IDLE; } break;
+	case DASH:
+		dashTimer += DASH_TIMER_SPEED;
+		if (dashTimer > 1) { 
+			dashTimer = 0; 
+			state = IDLE; 
+			phased = false; dashU = false; dashL = false; dashD = false; dashR = false;
+		} 
+		break;
 	default: std::cout << "What did you do now?\n";
 	}
 }
@@ -237,7 +241,28 @@ void Player::attRec() {
 
 // Player dash behavior
 void Player::dash() {
+	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
+	// at some point.
+	if (updateDashDirection() && (dashTimer < 0.11)) {
+		switch (direction) {
+		case EAST: dx = SPEED * 2.f; dy = 0; break;
+		case NORTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = -SPEED * 2.f * DIAG_MOD; break;
+		case NORTH: dx = 0; dy = -SPEED * 2.f; break;
+		case NORTHWEST: dx = -SPEED * 2.f * DIAG_MOD; dy = -SPEED *2.f * DIAG_MOD; break;
+		case WEST: dx = -SPEED * 2.f; dy = 0; break;
+		case SOUTHWEST: dx = -SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
+		case SOUTH: dx = 0; dy = SPEED * 2.f; break;
+		case SOUTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		currentAnimation = animList(direction + 8);
+		
+	}
 
+	if (int(dashTimer*20) % 2 == 0) {
+		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
+		spriteEffectList.push_back(spr);
+	}
 }
 
 /*
@@ -251,6 +276,25 @@ void Player::flashCurrentSprite(animList oldAnimation) {
 	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
 	// Checking if sprite changed, and resetting the old sprite back to its original color:
 	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
+}
+
+bool Player::updateDashDirection() {
+	if (!dashL && dashR) {	// EAST/NORTHEAST/SOUTHEAST
+		if (!dashU && dashD) { direction = SOUTHEAST; return true; }
+		if (dashU && !dashD) { direction = NORTHEAST; return true; }
+		direction = EAST;
+		return true;
+	}
+	if (dashL && !dashR) {	// WEST/NORTHWEST/SOUTHWEST
+		if (!dashU && dashD) { direction = SOUTHWEST; return true; }
+		if (dashU && !dashD) { direction = NORTHWEST; return true; }
+		direction = WEST;
+		return true;
+	}
+	if (dashU && !dashD) { direction = NORTH; return true; }
+	if (!dashU && dashD) { direction = SOUTH; return true; }
+
+	return false; // No direction is being held right now.
 }
 
 void Player::keyHeld(Keyboard::Key key) {
@@ -277,30 +321,46 @@ void Player::keyHeld(Keyboard::Key key) {
 void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::LShift) shiftHeld = true; 
 	if (key == Keyboard::RShift) { 
-		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 50, 2); 
+		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 50, 16); 
 		spriteEffectList.push_back(spr); 
 		spr->setRotationSpeed(8); 
 	}
 	if (key == Keyboard::LControl) playerHit = true;
 	if (key == Keyboard::RControl) playerHit = false;
 	if (key == Keyboard::Q) {
+		/* ENTITY PUSHING TESTS
 		if (weight != 20)
 			weight = 20;
 		else
 			weight = 8;
-		std::cout << "GridPos: " << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2] << ", " << gridPos[3] << "\n";
-		/* FOR LINE TESTS
+		//*/
+		//* ENTITY INTERACTION TESTS
+		// Access entity at position. For things like text box conversations.
+		std::pair<Vector2f, Vector2f> line = getAccessorLineFromDirection(); 
+		Entity * t = getEntityAt(line);
+
+		if (t == nullptr)
+			return;
+
+		std::cout << "Entity is: " << t->ID << "\n";
+		//*/
+		//std::cout << "GridPos: " << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2] << ", " << gridPos[3] << "\n";
+		/* LINE INTERSECTION TESTS
 		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l3; l3.first = Vector2f(200.0f, 90.f); l3.second = Vector2f(250.0f, 20.f);
 		std::pair<Vector2f, Vector2f> l4; l4.first = Vector2f(300.0f, 90.f); l4.second = Vector2f(350.0f, 90.f);
 		std::cout << "Intersects: " << intersectsLine(l) << " " << intersectsLine(l2) << " " << intersectsLine(l3) << " " << intersectsLine(l4) << "\n";
-		*/
+		//*/
 	}
 	if (key == Keyboard::W) up = true;
 	if (key == Keyboard::A) left = true;
 	if (key == Keyboard::S) down = true;
 	if (key == Keyboard::D) right = true;
+	if (key == Keyboard::Up) { dashU = true; }
+	if (key == Keyboard::Left) { dashL = true; }
+	if (key == Keyboard::Down) { dashD = true; }
+	if (key == Keyboard::Right) { dashR = true; }
 }
 void Player::keyRelease(Keyboard::Key key) {
 	if (key == Keyboard::LShift) shiftHeld = false;
@@ -308,6 +368,10 @@ void Player::keyRelease(Keyboard::Key key) {
 	if (key == Keyboard::A) { left = false; }
 	if (key == Keyboard::S) { down = false; }
 	if (key == Keyboard::D) { right = false; }
+	if (key == Keyboard::Up) { dashU = false; }
+	if (key == Keyboard::Left) { dashL = false; }
+	if (key == Keyboard::Down) { dashD = false; }
+	if (key == Keyboard::Right) { dashR = false; }
 }
 
 void Player::render(RenderWindow *window) {

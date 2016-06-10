@@ -22,6 +22,8 @@ public:
 	~ResourceManager();
 	ResourceManager();
 
+	void setView(View *view);
+
 	texList getTextureType(std::string texPath);
 	Texture *getTexture(std::string texPath);
 	bool addTexture(std::string texPath);
@@ -43,11 +45,14 @@ public:
 	void render(RenderWindow *window);
 private:
 	void init();
+	View *view;
 
 	std::map<texList, Texture *> textureList;
 	std::map<sfxList, SoundBuffer> soundList;
 	std::map<musicList, Music *> songList;
 
 	std::multimap<int, Sprite &> zOrderedSpriteList;
+
+	bool isInsideView(Sprite &spr);
 };
 #endif

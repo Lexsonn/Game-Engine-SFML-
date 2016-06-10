@@ -14,21 +14,22 @@ public:
 
 	Animation();
 	Animation(Texture *t, float x, float y, int w, int h, int frameCount, float speed, bool r);
+
 	void setRotation(float angle);
 	void rotate(float angle);
 	void setScale(float xScale, float yScale);
 	void setColor(Color color);
 	void setOrigin(float x, float y);
 	void moveOrigin(float x, float y);
-	void update(float x, float y);
+
+	void updatePosition(float x, float y);
 	void beginUpdate();
 	void endUpdate();
 	void restart();
 	bool isLastFrame();
 private:
 	bool repeat;
-	float currentFrame;
-	float animationSpeed;
+	float currentFrame, animationSpeed;
 	int frameSize;
 	std::vector<IntRect> frames;
 };

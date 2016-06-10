@@ -11,7 +11,7 @@
 #include "States.h"
 #include <map>
 
-#define DO_ENTITY 2
+#define DO_ENTITY 1
 #define DIAG_MOD 0.7071f
 
 // Faces for 8 Directions
@@ -29,7 +29,6 @@ enum dir {
 class Entity : public DrawableObject, public Collidable {
 public:
 	std::string name;
-	//float x, y;
 	float dx, dy;
 	short int maxLife, life, gridPos[4];
 	unsigned short int ID;
@@ -37,8 +36,8 @@ public:
 	animList currentAnimation;
 	stateList state;
 
-	std::multimap<unsigned short int, Entity* > *entityList;
-	std::multimap<unsigned short int, Collidable* > *objectList;
+	std::multimap<unsigned short int, Entity *> *entityList;
+	std::multimap<unsigned short int, Collidable *> *objectList;
 	
 	~Entity();
 	Entity();
@@ -46,7 +45,7 @@ public:
 	Entity(float startX, float startY, ResourceManager *rm);
 	
 	bool isInAnimList(animList name);
-	void addAnimation(Animation *anim, animList name);		// May not be needed.
+	void addAnimation(Animation *anim, animList name);
 	Animation *getCurrentAnimation();
 
 	void beginUpdate();
@@ -66,13 +65,17 @@ public:
 	virtual Vector2f getOverlap(Entity *other);
 	virtual Vector2f getStaticOverlap(Collidable *other);
 protected:
-	std::map<animList, Animation*> animationList;
-	std::vector<SpriteEffect*> spriteEffectList;
+	std::map<animList, Animation *> animationList;
+	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
 	bool up, left, down, right;
 	bool invulnerable, absFinished, attFinished, recFinished;
 
+	int count;
+
 	bool updateDirection();
+	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
+	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void init();
 	virtual void updateState();

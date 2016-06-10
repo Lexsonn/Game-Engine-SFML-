@@ -4,6 +4,9 @@
 #include "Entity.h"
 #include "Controllable.h"
 
+#define SPEED 2.f
+#define DASH_TIMER_SPEED 0.05f
+
 using namespace sf;
 
 class Player : public Entity, public Controllable {
@@ -19,9 +22,9 @@ public:
 	virtual void update();
 	virtual void render(RenderWindow *window);
 private:
-	bool shiftHeld, dashU, dashL, dashD, dashR, playerHit;
+	bool shiftHeld, playerHit, dashU, dashL, dashD, dashR;
 	short int attackType, maxAttacks;
-	float flashDmg;
+	float flashDmg, dashTimer;
 
 	void walk();
 	void idle();
@@ -32,6 +35,7 @@ private:
 	void dash();
 
 	void flashCurrentSprite(animList oldAnimation);
+	bool updateDashDirection();
 
 	virtual void init();
 	virtual void updateState();

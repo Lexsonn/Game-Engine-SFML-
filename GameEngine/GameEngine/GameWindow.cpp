@@ -2,18 +2,19 @@
 
 using namespace sf;
 
+extern int WWIDTH;
+extern int WHEIGHT;
+
 GameWindow::~GameWindow(void) {}
 GameWindow::GameWindow(RenderWindow* window, float width, float height, bool isLimited) {
 	nativeRenderer = window;
 
-	wWidth = width;
-	wHeight = height;
 	limited = isLimited;
 	rectW = 80;
 	rectH = 60;
 	view = View();
-	view.setCenter(320, 240);
-	view.setSize(640, 480);
+	view.setCenter(width/2, height/2);
+	view.setSize(width, height);
 
 	nativeRenderer->setView(view);
 }
@@ -26,8 +27,12 @@ void GameWindow::end() {
 	nativeRenderer->display();
 }
 
-sf::RenderWindow *GameWindow::getNative() {
+RenderWindow *GameWindow::getNative() {
 	return nativeRenderer;
+}
+
+View *GameWindow::getView() {
+	return &view;
 }
 
 void GameWindow::updateView(Entity *entity) {
@@ -41,6 +46,31 @@ void GameWindow::setViewBounds(float width, float height) {
 	rectH = abs(height);
 }
 
+void GameWindow::setLetterboxView() {
+	int winW = nativeRenderer->getSize().x;
+	int winH = nativeRenderer->getSize().y;
+
+
+	float winRatio = winW / float(winH);
+	float viewRatio = view.getSize().x / view.getSize().y;
+
+	float sizeX, sizeY, posX, posY;
+	sizeX = 1.f; posX = 0.f;
+	sizeY = 1.f; posY = 0.f;
+
+	if (winRatio >= viewRatio) {
+		sizeX = viewRatio / winRatio;
+		posX = (1 - sizeX) / 2.f;
+	}
+
+	else {
+		sizeY = winRatio / viewRatio;
+		posY = (1 - sizeY) / 2.f;
+	}
+
+	view.setViewport(FloatRect(posX, posY, sizeX, sizeY));
+}
+
 void GameWindow::boundViewX(float centerX) {
 	float x, vsX;
 
@@ -49,14 +79,14 @@ void GameWindow::boundViewX(float centerX) {
 
 	if (centerX > x + rectW / 2) 		// Right edge case
 		x += centerX - (x + rectW / 2);
-	else if (centerX < x - rectW / 2) // Left edge case
+	else if (centerX < x - rectW / 2)	// Left edge case
 		x -= (x - rectW / 2) - centerX;
 
 	if (limited) {
 		if (x < vsX / 2)				// Leftmost bound
 			x = vsX / 2;
-		else if (x > wWidth - vsX / 2)	// Rightmost bound
-			x = wWidth - vsX / 2;
+		else if (x > WWIDTH - vsX / 2)	// Rightmost bound
+			x = WWIDTH - vsX / 2;
 	}
 	view.setCenter(x, view.getCenter().y);
 }
@@ -75,8 +105,8 @@ void GameWindow::boundViewY(float centerY) {
 	if (limited) {
 		if (y < vsY / 2)				// Topmost bound
 			y = vsY / 2;
-		else if (y > wHeight - vsY / 2)	// Bottommost bound
-			y = wHeight - vsY / 2;
+		else if (y > WHEIGHT - vsY / 2)	// Bottommost bound
+			y = WHEIGHT - vsY / 2;
 	}
 	view.setCenter(view.getCenter().x, y);
 }

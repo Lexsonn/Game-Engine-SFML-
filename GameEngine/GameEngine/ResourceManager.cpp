@@ -24,6 +24,10 @@ ResourceManager::ResourceManager() {
 	init(); 
 }
 
+void ResourceManager::setView(View *view) {
+	this->view = view;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // TEXTURE MANAGEMENT //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +48,7 @@ Texture *ResourceManager::getTexture(std::string texPath) {
 	std::cout << "LOADING " << fullpath << " ... ";
 	texList type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
-		std::cout << "\nNo such texture defined.\n";
+		std::cout << "No such texture defined.\n";
 		return nullptr;
 	}
 
@@ -120,7 +124,7 @@ Sound ResourceManager::getSound(std::string sfxPath) {
 	std::cout << "LOADING " << fullpath << " ... ";
 	sfxList type = getSoundType(sfxPath);
 	if (type == UNKNOWN_s) {
-		std::cout << "\nNo sound " << fullpath << " defined.\n";
+		std::cout << "No sound " << fullpath << " defined.\n";
 		return Sound();
 	}
 
@@ -193,7 +197,7 @@ Music *ResourceManager::getMusic(std::string musicPath) {
 	std::cout << "LOADING " << fullpath << " ... ";
 	musicList type = getMusicType(musicPath);
 	if (type == UNKNOWN_m) {
-		std::cout << "\nNo music " << fullpath << " defined.\n";
+		std::cout << "No music " << fullpath << " defined.\n";
 		return nullptr;
 	}
 
@@ -258,9 +262,17 @@ bool ResourceManager::deleteMusic(std::string musicPath) {
 // SPRITE DRAW PRIORITY MANAGEMENT /////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+ *	Adds a sprite to the z-ordered sprite list (typically ordered by y alone, but for "flying" objects
+ *	a z value can be added to the y to move it forward) and returns true if the sprite is inside the view. 
+ *	If the sprite is outside the current view, the sprite is not inserted, and the function returns false.
+ */
 bool ResourceManager::addSprite(int z, Sprite &spr) {
-	zOrderedSpriteList.insert(std::pair<int, Sprite&>(z, spr));
-	return true;
+	if (isInsideView(spr)) {
+		zOrderedSpriteList.insert(std::pair<int, Sprite&>(z, spr));
+		return true;
+	}
+	return false;
 }
 
 void ResourceManager::clearList() {
@@ -269,8 +281,18 @@ void ResourceManager::clearList() {
 
 void ResourceManager::render(RenderWindow *window) {
 	std::multimap<int, Sprite&>::iterator it = zOrderedSpriteList.begin();
-	while (it != zOrderedSpriteList.end()) {
-		window->draw(it->second);
-		it++;
-	}
+	while (it != zOrderedSpriteList.end()) 
+		window->draw(it++->second);
+}
+
+bool ResourceManager::isInsideView(Sprite &spr) {
+	FloatRect bound = spr.getGlobalBounds();
+	float vcX, vcY, vsX, vsY;
+
+	vcX = view->getCenter().x;
+	vcY = view->getCenter().y;
+	vsX = view->getSize().x / 2;
+	vsY = view->getSize().y / 2;
+
+	return !((bound.left > vcX + vsX) || (bound.left + bound.width < vcX - vsX) || (bound.top > vcY + vsY) || (bound.top + bound.height < vcY - vsY));
 }

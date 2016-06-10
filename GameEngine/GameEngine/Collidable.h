@@ -4,6 +4,11 @@
 #include <SFML/System.hpp>
 #include <algorithm>
 
+#define GRID_WIDTH 160
+#define GRID_HEIGHT 160
+
+using namespace sf;
+
 /************************* COLLIDABLE TYPE BIT OPERATIONS (32 bits) *****************************\
 *																								*
 *	Default: No collision (0)																	*
@@ -13,19 +18,17 @@
 *																								*
 \************************************************************************************************/
 
-using namespace sf;
-
 class Collidable {
 public:
 	int cX, cY;
 	int cWidth, cHeight;
 	short int weight;
+	bool phased;
 
 	~Collidable();
 	Collidable();
 	Collidable(int x, int y, int width, int height);
 
-	virtual bool willCollide(Collidable *other, int _dx, int _dy);
 	virtual bool insideCollidable(Collidable *other);
 	virtual Vector2i getOverlap(Collidable *other);
 	
@@ -34,7 +37,7 @@ public:
 	bool hasCollidedS(Collidable *other);
 	bool hasCollidedE(Collidable *other);
 	
-	bool intersectsLine(std::pair<Vector2f, Vector2f> point);
+	bool intersectsLine(std::pair<Vector2f, Vector2f> line);
 protected:
 	float findDistance(Vector2f l1, Vector2f l2, Vector2f point);
 };

@@ -15,9 +15,10 @@ public:
 	DrawableObject();
 
 	virtual void render(RenderWindow *window);
+	virtual int getDrawableType();
+	
 	void setVisible(bool isVisible);
 	bool isVisible();
-	virtual int getType();
 
 protected:
 	bool visible;

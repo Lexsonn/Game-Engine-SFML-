@@ -56,7 +56,7 @@ void Animation::setColor(Color c) {
 	sprite.setColor(c);
 }
 
-void Animation::update(float x, float y) {
+void Animation::updatePosition(float x, float y) {
 	sprite.setPosition(x, y);
 }
 

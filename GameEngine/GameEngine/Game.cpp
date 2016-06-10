@@ -2,8 +2,9 @@
 #include "Slime.h" // Eventually make a header with all Enemy types
 
 #define _DEBUG_MODE true
-#define WWIDTH 800	// TEMPORARY
-#define WHEIGHT 800 // TEMPORARY
+
+int WWIDTH(640);
+int WHEIGHT(480);
 
 Game::~Game(void) {}
 Game::Game(RenderWindow* rWindow) {
@@ -11,15 +12,23 @@ Game::Game(RenderWindow* rWindow) {
 	oID = 0;
 	debug = _DEBUG_MODE;
 
+	WWIDTH = 800;
+	WHEIGHT = 800;
+
 	rm_master = new ResourceManager();
-	cGrid = new CollisionGrid(WWIDTH, WHEIGHT);
-	window = new GameWindow(rWindow, WWIDTH*1.f, WHEIGHT*1.f, true);
+	cGrid = new CollisionGrid();
+	window = new GameWindow(rWindow, 640.f, 480.f, true);
 	player = new Player(200, 200, rm_master);
 	controller = new InputController();
 
+	rm_master->setView(window->getView());
 	addEntity(player);
 	controller->addControllable(player);
-
+	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
+	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\nCollisionGrid: " << sizeof(CollisionGrid) << "\n";
+	std::cout << "GameWindow : " << sizeof(GameWindow) << "\nInputController: " << sizeof(InputController) << "\n";
+	std::cout << "Player : " << sizeof(Player) << "\nGame: " << sizeof(Game) << "\n";
+	//*/
 	// Eventually, these will be moved into a map creator function, that will take a file/string
 	// and create all background tiles, entities, and static collision boxes.
 	addEntity(new Slime(100, 100, rm_master));
@@ -48,6 +57,12 @@ void Game::runLoop() {
 	rm_master->clearList(); // Clear list of drawable sprites
 }
 
+void Game::setLetterBoxView() {
+	if (window == nullptr)
+		return;
+	window->setLetterboxView();
+}
+
 void Game::update() {
 	for (auto entity : entityList) {
 		entity.second->beginUpdate();							// Begin update for every entity
@@ -55,8 +70,8 @@ void Game::update() {
 	}
 	controller->checkKeyState();								// Get Keyboard information
 	for (auto entity : entityList) entity.second->update();		// update every entity.
+	window->updateView(player);									// Update view to follow player.
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity.
-	window->updateView(player);
 }
 
 void Game::render() {
@@ -66,7 +81,7 @@ void Game::render() {
 	if (debug) {
 		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
 		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
-		/* FOR LINE TESTS
+		/* FOR LINE INTERSECTION TESTS
 		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l3; l3.first = Vector2f(200.0f, 90.f); l3.second = Vector2f(250.0f, 20.f);
@@ -79,9 +94,16 @@ void Game::render() {
 	}
 }
 
+/*
+ *	Perform all necessary functions to have a newly created Entity interact in the game world.
+ *	Entities entered into a map and their ID is initialized. Then they are put in a list of Drawables
+ *	in order to keep track of any drawables outside the view. Finally, they are given the address of the
+ *	CollisionGrid's multimaps of collidable entities and objects.
+ */
 void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
+	addDrawable(entity);
 	cGrid->initEntity(entity);
 	entity->entityList = cGrid->getEntityList();
 	entity->objectList = cGrid->getObjectList();
@@ -90,4 +112,8 @@ void Game::addEntity(Entity *entity) {
 void Game::addObject(Collidable *object) {
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
 	cGrid->addObject(object);
+}
+
+void Game::addDrawable(DrawableObject *drawable) {
+	drawableList.push_back(drawable);
 }

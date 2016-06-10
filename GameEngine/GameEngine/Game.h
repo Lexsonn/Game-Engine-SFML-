@@ -13,24 +13,27 @@ public:
 	~Game(void);
 
 	void runLoop();
+	void setLetterBoxView();
 private:
 	bool debug;
 	unsigned short int eID, oID;
+	int count;
 
 	ResourceManager *rm_master;
 	InputController *controller;
 	CollisionGrid *cGrid;
 	GameWindow* window;
 	Player *player;
-	View view;
 
-	std::map<unsigned short int, Entity *> entityList;
-	std::map<unsigned short int, Collidable *> objectList;
+	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
+	std::map<unsigned short int, Collidable *> objectList;	// Map for static collidable objects
+	std::vector<DrawableObject *> drawableList;				// Vector for all Drawable objects
 
 	void update();
 	void render();
 
 	void addEntity(Entity *entity);
 	void addObject(Collidable *object);
+	void addDrawable(DrawableObject *drawable);
 };
 #endif

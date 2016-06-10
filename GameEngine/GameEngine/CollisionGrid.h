@@ -3,9 +3,6 @@
 
 #include "Entity.h"
 
-#define GRID_WIDTH 160
-#define GRID_HEIGHT 160
-
 using namespace sf;
 
 class CollisionGrid {
@@ -14,11 +11,12 @@ public:
 
 	~CollisionGrid();
 	CollisionGrid();
-	CollisionGrid(int worldWidth, int worldHeight);
 
+	void build();
 	int getGrid(unsigned int x, unsigned int y);
 	Vector2i getCoords(unsigned int gridPos);
 
+	void setGridPos(int gridPos[], Entity *entity);
 	void initEntity(Entity *entity);
 	void updateEntity(Entity *entity);
 	void addObject(Collidable *object);
