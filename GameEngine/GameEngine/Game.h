@@ -27,13 +27,11 @@ private:
 
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
 	std::map<unsigned short int, Collidable *> objectList;	// Map for static collidable objects
-	std::vector<DrawableObject *> drawableList;				// Vector for all Drawable objects
 
 	void update();
 	void render();
 
 	void addEntity(Entity *entity);
 	void addObject(Collidable *object);
-	void addDrawable(DrawableObject *drawable);
 };
 #endif

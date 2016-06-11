@@ -13,6 +13,7 @@ void Entity::init() {
 	cX = int(x) - cWidth / 2;
 	cY = int(y) - cHeight / 2;
 }
+
 Entity::~Entity() { // Might have to revisit this
 	for (unsigned int i = 0; i < spriteEffectList.size(); i++)
 		delete spriteEffectList.at(i);
@@ -32,15 +33,15 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) {
 /*
  *	Check for the given animation name in the animation list. False if not in the list, true otherwise.
  */
-bool Entity::isInAnimList(animList name) {
+bool Entity::isInAnimList(animType name) {
 	return animationList.count(name) != 0;
 }
 
 /*
- *	Add an animation to the animation list. Does not add if the animation animList is already set.
+ *	Add an animation to the animation list. Does not add if the animation animType is already set.
  */
-void Entity::addAnimation(Animation *anim, animList name) {
-	animationList.insert(std::pair<animList, Animation*>(name, anim));
+void Entity::addAnimation(Animation *anim, animType name) {
+	animationList.insert(std::pair<animType, Animation*>(name, anim));
 }
 
 Animation *Entity::getCurrentAnimation() {
@@ -236,46 +237,40 @@ void Entity::moveOutsideEntity(Entity *other) {
 	Vector2f vec;
 	if (insideCollidable(other)) {
 		if (weight > other->weight) {//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
-			vec = other->getOverlap(this);
-			if (!other->willCollide(ID, int(vec.x), int(vec.y))) {
+			vec = other->getEntityOverlap(this);
+			if (!other->willEntityCollide(ID, int(vec.x), int(vec.y))) {
 				other->moveOutsideCollidable();
 				return;
 			}
 		}
-		vec = getOverlap(other);
+		vec = getEntityOverlap(other);
 		updatePosition(vec);
 	}
 }
 
-void Entity::update() { }
-void Entity::updateState() {}
-
-// COLLIDABLE INHERITANCE ////////////////////////////////////////////////////////////////////////////////////
-
 /*
- *	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
- *	coordinates + _dx and _dy. Returns false otherwise.
- */
-bool Entity::willCollide(unsigned short int _ID, int _dx, int _dy) {
-	bool c = false;
+*	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
+*	coordinates + _dx and _dy. Returns false otherwise.
+*/
+bool Entity::willEntityCollide(unsigned short int _ID, int _dx, int _dy) {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
 			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
 			cRange = objectList->equal_range(gridPos[i]);
 
 			for (std::multimap<unsigned short int, Collidable *>::iterator it = cRange.first; it != cRange.second; it++) {
-				c = c || willCollide(it->second, _dx, _dy);
-				if (c) return true;
+				if (willCollide(it->second, _dx, _dy))
+					return true;
 			}
-			
+
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
 			range = entityList->equal_range(gridPos[i]);
 
 			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID != ID && it->second->ID != _ID) {
 					if (!it->second->phased)
-						c = c || willCollide(it->second, _dx, _dy);
-					if (c) return true;
+						if (willCollide(it->second, _dx, _dy))
+							return true;
 				}
 			}
 		}
@@ -284,39 +279,11 @@ bool Entity::willCollide(unsigned short int _ID, int _dx, int _dy) {
 }
 
 /*
- *	Checks if a Collidable object is in the direction dx, dy of the Entity.
- *	Returns true if a Collidable object is in the current Collidable object's path. False otherwise.
- */
-bool Entity::willCollide(Collidable * other, int _dx, int _dy) {
-	if (other == nullptr) return false;
-	int otherLeft = other->cX - _dx;						// Left line of rectangle
-	int otherRight = other->cX + other->cWidth + _dx;		// Right line of rectangle
-	int otherTop = other->cY - _dy;							// Top line of rectangle
-	int otherBottom = other->cY + +other->cHeight + _dx;	// Bottom line of rectangle
-
-	return !((cY + dy > otherBottom) || (cX + dx > otherRight) || (cY + dy + cHeight < otherTop) || (cX + dx + cWidth < otherLeft));
-}
-
-/*
- *	Returns true if the Entity with its current speed is inside the Collidable object. False otherwise.
- *	This method doesn't use a buffer in order to prevent jittering.
- */
-bool Entity::insideCollidable(Collidable *other) {
-	if (other == nullptr) return false;
-	int otherLeft = other->cX;						// Left line of rectangle
-	int otherRight = other->cX + other->cWidth;		// Right line of rectangle
-	int otherTop = other->cY;						// Top line of rectangle
-	int otherBottom = other->cY + +other->cHeight;	// Bottom line of rectangle
-
-	return !((cY + dy > otherBottom) || (cX + dx > otherRight) || (cY + dy + cHeight < otherTop) || (cX + dx + cWidth < otherLeft));
-}
-
-/*
- *	To be called after checking if the Entity is inside another Entity object.
- *	Returns a Vector2f of which direction the Entity should move in order to be touching 
- *	the Collidable object's edge with its own collision box edge.
- */
-Vector2f Entity::getOverlap(Entity* other) {
+*	To be called after checking if the Entity is inside another Entity object.
+*	Returns a Vector2f of which direction the Entity should move in order to resolve Collision,
+*	but does so only in the smallest increment necessary.
+*/
+Vector2f Entity::getEntityOverlap(Entity* other) {
 	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of other rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of other rectangle
@@ -325,9 +292,9 @@ Vector2f Entity::getOverlap(Entity* other) {
 
 	Vector2f center = Vector2f((other->cX + other->cWidth / 2)*1.f, (other->cY + other->cHeight / 2)*1.f);
 	Vector2f myCenter = Vector2f((cX + cWidth / 2)*1.f, (cY + cWidth / 2)*1.f);
-	
-	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180/3.1415f;
-	
+
+	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
+
 	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(abs(other->dy)));	// NORTH
 	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(abs(other->dx)));	// WEST
 	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(abs(other->dy)));	// SOUTH
@@ -336,40 +303,5 @@ Vector2f Entity::getOverlap(Entity* other) {
 	return Vector2f(_x*1.f, _y*1.f);
 }
 
-/*
- *	To be called after checking if the Entity is inside a static non-Entity Collidable object.
- *	Returns a Vector2f of the distance needed to move the Entity outside the Collidable object.
- */
-Vector2f Entity::getStaticOverlap(Collidable* other) {
-	int _x = 0, _y = 0;
-	int otherLeft = other->cX - 1;						// Left line of rectangle
-	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle
-	int otherTop = other->cY - 1;						// Top line of rectangle
-	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
-	/*
-	// Quick, dirty checks for which side the Entity has collided on. Doesn't work near corners
-	if (hasCollidedN(other)) { _y -= cY - otherBottom;  return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedW(other)) { _x -= cX - otherRight;  return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedS(other)) { _y -= cY + cHeight - otherTop; return Vector2f(_x*1.f, _y*1.f); }
-	if (hasCollidedE(other)) { _x -= cX + cWidth - otherLeft; return Vector2f(_x*1.f, _y*1.f); }
-	//*/
-	// Doesn't often get through here, but if an Entity is pushed past the edge of the collidable this is used.
-	Vector2f center = Vector2f((cX + cWidth / 2)*1.f, (cY + cHeight / 2)*1.f);
-	Vector2f otherCenter = Vector2f((other->cX + other->cWidth / 2)*1.f, (other->cY + other->cHeight / 2)*1.f);
-	Vector2f diff = center - otherCenter;
-
-	float xOverlap = cWidth/2 + other->cWidth/2 - abs(diff.x);
-	float yOverlap = cHeight/2 + other->cHeight/2 - abs(diff.y);
-
-	if (xOverlap < yOverlap) {
-		if (diff.x > 0) _x -= cX - otherRight;
-		else _x -= cX + cWidth - otherLeft;
-	}
-	else {
-		if (diff.y > 0) _y -= cY - otherBottom;
-		else _y -= cY + cHeight - otherTop;
-	}
-	
-	
-	return Vector2f(_x*1.f, _y*1.f);
-}
+void Entity::update() { }
+void Entity::updateState() {}

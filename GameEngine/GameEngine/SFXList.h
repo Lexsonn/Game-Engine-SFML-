@@ -1,7 +1,7 @@
 #ifndef SFXLIST_H
 #define SFXLIST_H
 
-enum sfxList {
+enum sfxType {
 	UNKNOWN_s = -1,
 	PlayerAttack = 0
 };

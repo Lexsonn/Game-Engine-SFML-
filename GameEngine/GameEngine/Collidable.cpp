@@ -10,8 +10,55 @@ Collidable::Collidable(int x, int y, int width, int height) {
 	cHeight = height;
 }
 
-bool Collidable::insideCollidable(Collidable *other) { return false; }
-Vector2i Collidable::getOverlap(Collidable *other) { return Vector2i(0,0); }
+bool Collidable::willCollide(Collidable *other, int _dx, int _dy) {
+	if (other == nullptr) return false;
+	int otherLeft = other->cX - _dx;						// Left line of rectangle
+	int otherRight = other->cX + other->cWidth + _dx;		// Right line of rectangle
+	int otherTop = other->cY - _dy;							// Top line of rectangle
+	int otherBottom = other->cY + +other->cHeight + _dx;	// Bottom line of rectangle
+
+	return !((cY > otherBottom) || (cX > otherRight) || (cY + cHeight < otherTop) || (cX + cWidth < otherLeft));
+}
+
+bool Collidable::insideCollidable(Collidable *other) { 
+	if (other == nullptr) return false;
+	int otherLeft = other->cX;						// Left line of rectangle
+	int otherRight = other->cX + other->cWidth;		// Right line of rectangle
+	int otherTop = other->cY;						// Top line of rectangle
+	int otherBottom = other->cY + +other->cHeight;	// Bottom line of rectangle
+
+	return !((cY > otherBottom) || (cX > otherRight) || (cY + cHeight < otherTop) || (cX + cWidth < otherLeft));
+}
+Vector2f Collidable::getStaticOverlap(Collidable *other) { 
+	int _x = 0, _y = 0;
+	int otherLeft = other->cX - 1;						// Left line of rectangle
+	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle
+	int otherTop = other->cY - 1;						// Top line of rectangle
+	int otherBottom = other->cY + +other->cHeight + 1;	// Bottom line of rectangle
+
+	Vector2f center = Vector2f((cX + cWidth / 2)*1.f, (cY + cHeight / 2)*1.f);
+	Vector2f otherCenter = Vector2f((other->cX + other->cWidth / 2)*1.f, (other->cY + other->cHeight / 2)*1.f);
+	Vector2f diff = center - otherCenter;
+
+	float xOverlap = cWidth / 2 + other->cWidth / 2 - abs(diff.x);
+	float yOverlap = cHeight / 2 + other->cHeight / 2 - abs(diff.y);
+
+	if (xOverlap < 0 || yOverlap < 0) { // No overlap. Collidables do not touch.
+		return Vector2f(0.f, 0.f);
+		std::cout << "No overlap\n";
+	}
+
+	if (xOverlap < yOverlap) {
+		if (diff.x > 0) _x -= cX - otherRight;
+		else _x -= cX + cWidth - otherLeft;
+	}
+	else {
+		if (diff.y > 0) _y -= cY - otherBottom;
+		else _y -= cY + cHeight - otherTop;
+	}
+
+	return Vector2f(_x*1.f, _y*1.f);
+}
 
 bool Collidable::hasCollidedN(Collidable *other) {
 	int otherBottom = other->cY + +other->cHeight;

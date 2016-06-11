@@ -33,8 +33,6 @@ public:
 	short int maxLife, life, gridPos[4];
 	unsigned short int ID;
 	dir direction;
-	animList currentAnimation;
-	stateList state;
 
 	std::multimap<unsigned short int, Entity *> *entityList;
 	std::multimap<unsigned short int, Collidable *> *objectList;
@@ -44,8 +42,6 @@ public:
 	Entity(ResourceManager *rm);
 	Entity(float startX, float startY, ResourceManager *rm);
 	
-	bool isInAnimList(animList name);
-	void addAnimation(Animation *anim, animList name);
 	Animation *getCurrentAnimation();
 
 	void beginUpdate();
@@ -58,20 +54,22 @@ public:
 	void moveOutsideCollidable();
 	void moveOutsideCollidable(Collidable *other);
 	void moveOutsideEntity(Entity *other);
-
-	virtual bool willCollide(unsigned short int _ID, int _dx, int _dy);
-	virtual bool willCollide(Collidable *other, int _dx, int _dy);
-	virtual bool insideCollidable(Collidable *other);
-	virtual Vector2f getOverlap(Entity *other);
-	virtual Vector2f getStaticOverlap(Collidable *other);
+	bool willEntityCollide(unsigned short int _ID, int _dx, int _dy);
+	Vector2f getEntityOverlap(Entity *other);
+	//virtual bool willCollide(Collidable *other, int _dx, int _dy);
+	//virtual bool insideCollidable(Collidable *other);
+	//virtual Vector2f getStaticOverlap(Collidable *other);
 protected:
-	std::map<animList, Animation *> animationList;
+	std::map<animType, Animation *> animationList;
 	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
+	animType currentAnimation;
+	stateType state;
 	bool up, left, down, right;
 	bool invulnerable, absFinished, attFinished, recFinished;
 
-	int count;
+	bool isInAnimList(animType name);
+	void addAnimation(Animation *anim, animType name);
 
 	bool updateDirection();
 	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();

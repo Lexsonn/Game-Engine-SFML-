@@ -1,7 +1,7 @@
 #ifndef ANIMLIST_H
 #define ANIMLIST_H
 
-enum animList {
+enum animType {
 	UNKNOWN_a = -1,
 	idleE = 0,		// IDLE ANIMATION
 	idleNE,

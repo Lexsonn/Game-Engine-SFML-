@@ -1,7 +1,7 @@
 #ifndef TEXLIST_H
 #define TEXLIST_H
 
-enum texList {
+enum texType {
 	UNKNOWN_t = -1,
 	playerIdle = 0,
 	playerWalk,

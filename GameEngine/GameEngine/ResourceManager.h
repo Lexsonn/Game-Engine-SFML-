@@ -24,17 +24,17 @@ public:
 
 	void setView(View *view);
 
-	texList getTextureType(std::string texPath);
+	texType getTextureType(std::string texPath);
 	Texture *getTexture(std::string texPath);
 	bool addTexture(std::string texPath);
 	bool deleteTexture(std::string texPath);
 
-	sfxList getSoundType(std::string sfxPath);
+	sfxType getSoundType(std::string sfxPath);
 	Sound getSound(std::string sfxPath);
 	bool addSound(std::string sfxPath);
 	bool deleteSound(std::string sfxPath);
 
-	musicList getMusicType(std::string musicPath);
+	musicType getMusicType(std::string musicPath);
 	Music *getMusic(std::string musicPath);
 	bool addMusic(std::string musicPath);
 	bool deleteMusic(std::string musicPath);
@@ -47,9 +47,9 @@ private:
 	void init();
 	View *view;
 
-	std::map<texList, Texture *> textureList;
-	std::map<sfxList, SoundBuffer> soundList;
-	std::map<musicList, Music *> songList;
+	std::map<texType, Texture *> textureList;
+	std::map<sfxType, SoundBuffer> soundList;
+	std::map<musicType, Music *> songList;
 
 	std::multimap<int, Sprite &> zOrderedSpriteList;
 

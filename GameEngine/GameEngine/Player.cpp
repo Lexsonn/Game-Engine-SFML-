@@ -110,8 +110,8 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 }
 
 void Player::update() {
-	stateList oldState = state;
-	animList oldAnimation = currentAnimation;
+	stateType oldState = state;
+	animType oldAnimation = currentAnimation;
 	// Update the player state
 	updateState();
 	// Perform the correct action depending on the state
@@ -141,48 +141,85 @@ void Player::updateState() {
 	case IDLE:
 	case WALK:
 	case RUN:
-		if (dashU || dashL || dashD || dashR) {
-			state = DASH;
-			phased = true;
-		}
+		if (dashU || dashL || dashD || dashR)
+			setState(DASH);
 		else if (up || left || down || right) {
-			if (shiftHeld) state = RUN;
-			else state = WALK;
+			if (shiftHeld) setState(RUN);
+			else setState(WALK);
 		}
-		else
-			state = IDLE;
+		else setState(IDLE);
 		break;
-	case ATTACK_BACKSWING: if (absFinished) { state = ATTACK_SWING; } break;
-	case ATTACK_SWING: if (attFinished) { state = ATTACK_RECOVER; } break;
+	case ATTACK_BACKSWING: 
+		if (dashU || dashL || dashD || dashR) 
+			setState(DASH);
+		else if (absFinished) 
+			setState(ATTACK_SWING);
+		break;
+	case ATTACK_SWING: 
+		if (attFinished) 
+			setState(ATTACK_RECOVER);
+		break;
 	case ATTACK_RECOVER: 
-		if (dashU || dashL || dashD || dashR) {
-			state = DASH;
-			phased = true;
-		}
-		if (recFinished)  
-			state = IDLE;  
+		if (dashU || dashL || dashD || dashR) 
+			setState(DASH);
+		else if (recFinished)
+			setState(IDLE);
 		break;
 	case DASH:
 		dashTimer += DASH_TIMER_SPEED;
 		if (dashTimer > 1) { 
 			dashTimer = 0; 
-			state = IDLE; 
-			phased = false; dashU = false; dashL = false; dashD = false; dashR = false;
-		} 
+			setState(IDLE);
+		}
 		break;
 	default: std::cout << "What did you do now?\n";
 	}
 }
 
+/*
+ *	Set Player properties to correct values when switching states
+ */
+void Player::setState(stateType type) {
+	if (state == type)
+		return;
+	switch (type) {
+	case IDLE:
+		dx = 0;
+		dy = 0;
+		attackType = 0;
+		absFinished = false;
+		attFinished = false;
+		recFinished = false;
+		phased = false;
+		dashU = false; dashL = false; dashD = false; dashR = false;
+		break;
+	case ATTACK_BACKSWING:
+		if (attackType <= maxAttacks) {
+			dx = 0;
+			dy = 0;
+		}
+		currentAnimation = animType(direction + 24);
+		break;
+	case ATTACK_SWING:
+		if (attackType == maxAttacks + 1) { 
+			dx = 0; 
+			dy = 0; 
+		}
+		currentAnimation = animType(direction + 32);
+		break;
+	case ATTACK_RECOVER:
+		currentAnimation = animType(direction + 64);
+		break;
+	case DASH:
+		phased = true;
+		break;
+	}
+	state = type;
+}
+
 // Player idle behavior
 void Player::idle() {
-	dx = 0;
-	dy = 0;
-	attackType = 0;
-	absFinished = false;
-	attFinished = false;
-	recFinished = false;
-	currentAnimation = animList(direction);
+	currentAnimation = animType(direction);
 }
 
 // Player walk behavior
@@ -199,7 +236,7 @@ void Player::walk() {
 		case SOUTHEAST: dx = SPEED/2 * DIAG_MOD; dy = SPEED/2 * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animList(direction + 8);
+		currentAnimation = animType(direction + 8);
 	}
 	else idle(); // Idle animation if currently not moving.
 }
@@ -218,31 +255,23 @@ void Player::run() {
 		case SOUTHEAST: dx = SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animList(direction + 16);
+		currentAnimation = animType(direction + 16);
 	}
 	else idle(); // Idle animation if currently not moving.
 }
 
 // Player attack backswing behavior
 void Player::abs() {
-	if (attackType <= maxAttacks) {
-		dx = 0;
-		dy = 0;
-	}
-	currentAnimation = animList(direction + 24);
 	absFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 // Player attack behavior
 void Player::attack() {
-	if (attackType == maxAttacks + 1) { dx = 0; dy = 0; }
-	currentAnimation = animList(direction + 32);
 	attFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 // Player attack recover behavior
 void Player::attRec() {
-	currentAnimation = animList(direction + 64);
 	recFinished = animationList[currentAnimation]->isLastFrame();
 }
 
@@ -262,8 +291,7 @@ void Player::dash() {
 		case SOUTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animList(direction + 8);
-		
+		currentAnimation = animType(direction + 8);
 	}
 
 	if (int(dashTimer*20) % 2 == 0) {
@@ -276,9 +304,9 @@ void Player::dash() {
  *	Flashes the current sprite. The old animation animList type is passed in to reset any animations whose
  *	color has been changed while the player is changing animations.
  */
-void Player::flashCurrentSprite(animList oldAnimation) {
+void Player::flashCurrentSprite(animType oldAnimation) {
 	flashDmg += 0.12f;
-	if (flashDmg > 12) { playerHit = false; flashDmg = 0; }
+	if (flashDmg > 8) { playerHit = false; flashDmg = 0; }
 	if (int(flashDmg) %2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
 	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
 	// Checking if sprite changed, and resetting the old sprite back to its original color:
@@ -308,19 +336,19 @@ void Player::keyHeld(Keyboard::Key key) {
 	if (key == Keyboard::Space) {
 		if (state == IDLE || state == WALK) {	// Initial attack
 			attackType = 0;
-			state = ATTACK_BACKSWING;
+			setState(ATTACK_BACKSWING);
 		}
 		if (state == ATTACK_RECOVER) {			// Combo attacks
 			if (attackType < maxAttacks) {
 				attackType++;
-				state = ATTACK_BACKSWING;
+				setState(ATTACK_BACKSWING);
 				absFinished = false;
 				attFinished = false;
 			}
 		}
 		if (state == RUN) {						// Run attack
 			attackType = maxAttacks + 1;
-			state = ATTACK_BACKSWING;
+			setState(ATTACK_BACKSWING);
 		}
 	}
 }

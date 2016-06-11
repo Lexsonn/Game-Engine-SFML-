@@ -34,7 +34,8 @@ private:
 	void attRec();
 	void dash();
 
-	void flashCurrentSprite(animList oldAnimation);
+	void setState(stateType type);
+	void flashCurrentSprite(animType oldAnimation);
 	bool updateDashDirection();
 
 	virtual void init();

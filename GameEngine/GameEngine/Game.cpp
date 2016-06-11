@@ -66,7 +66,7 @@ void Game::setLetterBoxView() {
 void Game::update() {
 	for (auto entity : entityList) {
 		entity.second->beginUpdate();							// Begin update for every entity
-		cGrid->updateEntity(entity.second);						// Update Collision Grid position
+		cGrid->updateEntity(entity.second);						// Update Collision Grid position (move to after entity update?)
 	}
 	controller->checkKeyState();								// Get Keyboard information
 	for (auto entity : entityList) entity.second->update();		// update every entity.
@@ -96,14 +96,10 @@ void Game::render() {
 
 /*
  *	Perform all necessary functions to have a newly created Entity interact in the game world.
- *	Entities entered into a map and their ID is initialized. Then they are put in a list of Drawables
- *	in order to keep track of any drawables outside the view. Finally, they are given the address of the
- *	CollisionGrid's multimaps of collidable entities and objects.
  */
 void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
-	addDrawable(entity);
 	cGrid->initEntity(entity);
 	entity->entityList = cGrid->getEntityList();
 	entity->objectList = cGrid->getObjectList();
@@ -112,8 +108,4 @@ void Game::addEntity(Entity *entity) {
 void Game::addObject(Collidable *object) {
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
 	cGrid->addObject(object);
-}
-
-void Game::addDrawable(DrawableObject *drawable) {
-	drawableList.push_back(drawable);
 }

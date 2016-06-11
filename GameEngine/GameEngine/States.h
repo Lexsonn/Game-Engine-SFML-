@@ -1,7 +1,7 @@
 #ifndef STATES_H
 #define STATES_H
 
-enum stateList {
+enum stateType {
 	UNKNOWN_STATE = -1,
 	IDLE = 0,
 	WALK,

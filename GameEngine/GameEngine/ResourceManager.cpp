@@ -32,7 +32,7 @@ void ResourceManager::setView(View *view) {
 // TEXTURE MANAGEMENT //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-texList ResourceManager::getTextureType(std::string texPath) {
+texType ResourceManager::getTextureType(std::string texPath) {
 	if (texPath == "playerIdle.png") { return playerIdle; }
 	if (texPath == "playerWalk.png") { return playerWalk; }
 	if (texPath == "playerRun.png") { return playerRun; }
@@ -46,13 +46,13 @@ texList ResourceManager::getTextureType(std::string texPath) {
 Texture *ResourceManager::getTexture(std::string texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	std::cout << "LOADING " << fullpath << " ... ";
-	texList type = getTextureType(texPath);
+	texType type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
 		std::cout << "No such texture defined.\n";
 		return nullptr;
 	}
 
-	std::map<texList, Texture*>::iterator it = textureList.find(type);
+	std::map<texType, Texture*>::iterator it = textureList.find(type);
 	if (it == textureList.end()) {
 		std::cout << "Texture not found.\n";
 		return nullptr;
@@ -64,7 +64,7 @@ Texture *ResourceManager::getTexture(std::string texPath) {
 
 bool ResourceManager::addTexture(std::string texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
-	texList type = getTextureType(texPath);
+	texType type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
 		std::cout << "No texture " << fullpath << " defined.\n";
 		return false;
@@ -77,7 +77,7 @@ bool ResourceManager::addTexture(std::string texPath) {
 		return false;
 	}
 
-	if (textureList.insert(std::pair<texList, Texture*>(type, tx)).second == false) {
+	if (textureList.insert(std::pair<texType, Texture*>(type, tx)).second == false) {
 		std::cout << "Texture " << fullpath << " is already loaded in memory.\n";
 		delete tx;
 		return false;
@@ -90,13 +90,13 @@ bool ResourceManager::addTexture(std::string texPath) {
 bool ResourceManager::deleteTexture(std::string texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	std::cout << "DELETING " << fullpath << "... ";
-	texList type = getTextureType(texPath);
+	texType type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
 		std::cout << "Texture does not exist.\n";
 		return false;
 	}
 
-	std::map<texList, Texture*>::iterator it;
+	std::map<texType, Texture*>::iterator it;
 	it = textureList.find(type);
 
 	if (it == textureList.end()) {
@@ -115,20 +115,20 @@ bool ResourceManager::deleteTexture(std::string texPath) {
 // SOUND MANAGEMENT ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-sfxList ResourceManager::getSoundType(std::string sfxPath) {
+sfxType ResourceManager::getSoundType(std::string sfxPath) {
 	return UNKNOWN_s;
 }
 
 Sound ResourceManager::getSound(std::string sfxPath) { 
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
 	std::cout << "LOADING " << fullpath << " ... ";
-	sfxList type = getSoundType(sfxPath);
+	sfxType type = getSoundType(sfxPath);
 	if (type == UNKNOWN_s) {
 		std::cout << "No sound " << fullpath << " defined.\n";
 		return Sound();
 	}
 
-	std::map<sfxList, SoundBuffer>::iterator it = soundList.find(type);
+	std::map<sfxType, SoundBuffer>::iterator it = soundList.find(type);
 	if (it == soundList.end()) {
 		std::cout << "Sound not found.\n";
 		return Sound();
@@ -140,7 +140,7 @@ Sound ResourceManager::getSound(std::string sfxPath) {
 
 bool ResourceManager::addSound(std::string sfxPath) {
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
-	sfxList type = getSoundType(sfxPath);
+	sfxType type = getSoundType(sfxPath);
 	if (type == UNKNOWN_s) {
 		std::cout << "No sound " << fullpath << " defined.\n";
 		return false;
@@ -152,7 +152,7 @@ bool ResourceManager::addSound(std::string sfxPath) {
 		return false;
 	}
 
-	if (soundList.insert(std::pair<sfxList, SoundBuffer>(type, sfx)).second == false) {
+	if (soundList.insert(std::pair<sfxType, SoundBuffer>(type, sfx)).second == false) {
 		std::cout << "Sound " << fullpath << " is already loaded in memory.\n";
 		return false;
 	}
@@ -164,13 +164,13 @@ bool ResourceManager::addSound(std::string sfxPath) {
 bool ResourceManager::deleteSound(std::string sfxPath) {
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
 	std::cout << "DELETING " << fullpath << "... ";
-	sfxList type = getSoundType(sfxPath);
+	sfxType type = getSoundType(sfxPath);
 	if (type == UNKNOWN_s) {
 		std::cout << "Sound does not exist.\n";
 		return false;
 	}
 
-	std::map<sfxList, SoundBuffer>::iterator it;
+	std::map<sfxType, SoundBuffer>::iterator it;
 	it = soundList.find(type);
 
 	if (it == soundList.end()) {
@@ -188,20 +188,20 @@ bool ResourceManager::deleteSound(std::string sfxPath) {
 // MUSIC MANAGEMENT ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-musicList ResourceManager::getMusicType(std::string musicPath) {
+musicType ResourceManager::getMusicType(std::string musicPath) {
 	return UNKNOWN_m;
 }
 
 Music *ResourceManager::getMusic(std::string musicPath) { 
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
 	std::cout << "LOADING " << fullpath << " ... ";
-	musicList type = getMusicType(musicPath);
+	musicType type = getMusicType(musicPath);
 	if (type == UNKNOWN_m) {
 		std::cout << "No music " << fullpath << " defined.\n";
 		return nullptr;
 	}
 
-	std::map<musicList, Music *>::iterator it = songList.find(type);
+	std::map<musicType, Music *>::iterator it = songList.find(type);
 	if (it == songList.end()) {
 		std::cout << "Music not found.\n";
 		return nullptr;
@@ -213,7 +213,7 @@ Music *ResourceManager::getMusic(std::string musicPath) {
 
 bool ResourceManager::addMusic(std::string musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
-	musicList type = getMusicType(musicPath);
+	musicType type = getMusicType(musicPath);
 	if (type == UNKNOWN_m) {
 		std::cout << "No music " << fullpath << " defined.\n";
 		return false;
@@ -225,7 +225,7 @@ bool ResourceManager::addMusic(std::string musicPath) {
 		return false;
 	}
 
-	if (songList.insert(std::pair<musicList, Music *>(type, music)).second == false) {
+	if (songList.insert(std::pair<musicType, Music *>(type, music)).second == false) {
 		std::cout << "Music " << fullpath << " is already loaded in memory.\n";
 		return false;
 	}
@@ -237,13 +237,13 @@ bool ResourceManager::addMusic(std::string musicPath) {
 bool ResourceManager::deleteMusic(std::string musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
 	std::cout << "DELETING " << fullpath << "... ";
-	musicList type = getMusicType(musicPath);
+	musicType type = getMusicType(musicPath);
 	if (type == UNKNOWN_m) {
 		std::cout << "Music does not exist.\n";
 		return false;
 	}
 
-	std::map<musicList, Music *>::iterator it;
+	std::map<musicType, Music *>::iterator it;
 	it = songList.find(type);
 
 	if (it == songList.end()) {

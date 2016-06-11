@@ -29,8 +29,9 @@ public:
 	Collidable();
 	Collidable(int x, int y, int width, int height);
 
-	virtual bool insideCollidable(Collidable *other);
-	virtual Vector2i getOverlap(Collidable *other);
+	bool willCollide(Collidable *other, int _dx, int _dy);
+	bool insideCollidable(Collidable *other);
+	Vector2f getStaticOverlap(Collidable *other);
 	
 	bool hasCollidedN(Collidable *other);
 	bool hasCollidedW(Collidable *other);
@@ -38,7 +39,5 @@ public:
 	bool hasCollidedE(Collidable *other);
 	
 	bool intersectsLine(std::pair<Vector2f, Vector2f> line);
-protected:
-	//float findDistance(Vector2f l1, Vector2f l2, Vector2f point);
 };
 #endif
