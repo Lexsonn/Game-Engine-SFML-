@@ -24,6 +24,7 @@ private:
 	CollisionGrid *cGrid;
 	GameWindow* window;
 	Player *player;
+	Attack *att;
 
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
 	std::map<unsigned short int, Collidable *> objectList;	// Map for static collidable objects
@@ -32,6 +33,7 @@ private:
 	void render();
 
 	void addEntity(Entity *entity);
+	void deleteEntity(unsigned short int _ID);
 	void addObject(Collidable *object);
 };
 #endif

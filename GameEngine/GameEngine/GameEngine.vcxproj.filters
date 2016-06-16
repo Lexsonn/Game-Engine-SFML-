@@ -114,6 +114,12 @@
     <ClCompile Include="CollisionGrid.cpp">
       <Filter>Source Files\Game\Game World\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="Attack.cpp">
+      <Filter>Source Files\Game\Game World\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Calculations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -172,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="MusicList.h">
       <Filter>Header Files\Game\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Attack.h">
+      <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Calculations.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

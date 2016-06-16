@@ -2,6 +2,7 @@
 #define COLLIDABLE_H
 
 #include <SFML/System.hpp>
+#include "Calculations.h"
 #include <algorithm>
 
 #define GRID_WIDTH 160

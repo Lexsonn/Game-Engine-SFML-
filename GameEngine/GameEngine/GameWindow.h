@@ -26,6 +26,7 @@ public:
 	void render(ResourceManager *rm);
 	void render(CollisionGrid *cg);
 	void render(CollisionGrid *cg, short int gridPos[]);
+	void render(CollisionGrid *cg, std::map<short int, short int> gridPos);
 private:
 	float rectW, rectH;
 	bool limited;

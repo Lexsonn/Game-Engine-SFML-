@@ -96,7 +96,7 @@ void Player::init() {
 	std::cout << "player initialized\n";
 }
 
-Player::~Player() {};
+//Player::~Player() {};
 Player::Player(ResourceManager *rm) {
 	rm_master = rm;
 	init();
@@ -126,8 +126,8 @@ void Player::update() {
 	default: std::cout << "wat\n";
 	}
 
-	// Player has been hit. Invulnerable for a few seconds
-	if (playerHit) flashCurrentSprite(oldAnimation);
+	// If the Player has been hit, flash the current sprite.
+	flashCurrentSprite(oldAnimation);
 
 	// Reset the current animation to its first frame so the animation isn't left on its last frame the next 
 	// time it is used. Note that this keeps walk/run animations where they left off when switching directions.
@@ -152,17 +152,17 @@ void Player::updateState() {
 	case ATTACK_BACKSWING: 
 		if (dashU || dashL || dashD || dashR) 
 			setState(DASH);
-		else if (absFinished) 
+		else if (animFinished) 
 			setState(ATTACK_SWING);
 		break;
 	case ATTACK_SWING: 
-		if (attFinished) 
+		if (animFinished) 
 			setState(ATTACK_RECOVER);
 		break;
 	case ATTACK_RECOVER: 
 		if (dashU || dashL || dashD || dashR) 
 			setState(DASH);
-		else if (recFinished)
+		else if (animFinished)
 			setState(IDLE);
 		break;
 	case DASH:
@@ -170,6 +170,7 @@ void Player::updateState() {
 		if (dashTimer > 1) { 
 			dashTimer = 0; 
 			setState(IDLE);
+			setInvulFalse();
 		}
 		break;
 	default: std::cout << "What did you do now?\n";
@@ -187,13 +188,11 @@ void Player::setState(stateType type) {
 		dx = 0;
 		dy = 0;
 		attackType = 0;
-		absFinished = false;
-		attFinished = false;
-		recFinished = false;
 		phased = false;
 		dashU = false; dashL = false; dashD = false; dashR = false;
 		break;
 	case ATTACK_BACKSWING:
+		animFinished = false;
 		if (attackType <= maxAttacks) {
 			dx = 0;
 			dy = 0;
@@ -201,20 +200,30 @@ void Player::setState(stateType type) {
 		currentAnimation = animType(direction + 24);
 		break;
 	case ATTACK_SWING:
-		if (attackType == maxAttacks + 1) { 
-			dx = 0; 
-			dy = 0; 
-		}
+		animFinished = false;
+		dx = 0; 
+		dy = 0; 
 		currentAnimation = animType(direction + 32);
 		break;
 	case ATTACK_RECOVER:
+		animFinished = false;
 		currentAnimation = animType(direction + 64);
 		break;
 	case DASH:
 		phased = true;
+		invulnerable = true;
 		break;
 	}
 	state = type;
+}
+
+/*
+ *	Set player to stop being invulnerable if certain conditions are met.
+ *	To be called after updating the state of the Player.
+ */
+void Player::setInvulFalse() {
+	if (!hit && state != DASH) 
+		invulnerable = false;
 }
 
 // Player idle behavior
@@ -262,17 +271,17 @@ void Player::run() {
 
 // Player attack backswing behavior
 void Player::abs() {
-	absFinished = animationList[currentAnimation]->isLastFrame();
+	animFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 // Player attack behavior
 void Player::attack() {
-	attFinished = animationList[currentAnimation]->isLastFrame();
+	animFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 // Player attack recover behavior
 void Player::attRec() {
-	recFinished = animationList[currentAnimation]->isLastFrame();
+	animFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 // Player dash behavior
@@ -302,11 +311,13 @@ void Player::dash() {
 
 /*
  *	Flashes the current sprite. The old animation animList type is passed in to reset any animations whose
- *	color has been changed while the player is changing animations.
+ *	color has been changed while the Entity is changing animations.
  */
 void Player::flashCurrentSprite(animType oldAnimation) {
+	if (!hit)
+		return;
 	flashDmg += 0.12f;
-	if (flashDmg > 8) { playerHit = false; flashDmg = 0; }
+	if (flashDmg > 9) { hit = false; flashDmg = 0; setInvulFalse(); }
 	if (int(flashDmg) %2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
 	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
 	// Checking if sprite changed, and resetting the old sprite back to its original color:
@@ -342,8 +353,6 @@ void Player::keyHeld(Keyboard::Key key) {
 			if (attackType < maxAttacks) {
 				attackType++;
 				setState(ATTACK_BACKSWING);
-				absFinished = false;
-				attFinished = false;
 			}
 		}
 		if (state == RUN) {						// Run attack
@@ -360,8 +369,8 @@ void Player::keyPress(Keyboard::Key key) {
 		spriteEffectList.push_back(spr); 
 		spr->setRotationSpeed(8); 
 	}
-	if (key == Keyboard::LControl) playerHit = true;
-	if (key == Keyboard::RControl) playerHit = false;
+	if (key == Keyboard::LControl) { damage(32); std::cout << "Life: " << life << "\n"; }
+	if (key == Keyboard::RControl) recover(500);
 	if (key == Keyboard::Q) {
 		/* ENTITY PUSHING TESTS
 		if (weight != 20)

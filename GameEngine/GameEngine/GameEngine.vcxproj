@@ -120,6 +120,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
+    <ClCompile Include="Attack.cpp" />
+    <ClCompile Include="Calculations.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="CollisionGrid.cpp" />
     <ClCompile Include="Controllable.cpp" />
@@ -139,6 +141,8 @@
     <ClInclude Include="AI.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimList.h" />
+    <ClInclude Include="Attack.h" />
+    <ClInclude Include="Calculations.h" />
     <ClInclude Include="MusicList.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollisionGrid.h" />

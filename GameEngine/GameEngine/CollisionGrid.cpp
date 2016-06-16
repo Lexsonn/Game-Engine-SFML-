@@ -86,6 +86,22 @@ void CollisionGrid::updateEntity(Entity *entity) {
 	addEntity(gridPos, entity);
 }
 
+void CollisionGrid::deleteEntity(Entity *entity) {
+	for (int i = 0; i < 4; i++) {
+		if (entity->gridPos[i] >= 0) {
+			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+			range = entityList.equal_range(entity->gridPos[i]);
+
+			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+				if (it->second->ID == entity->ID) {
+					entityList.erase(it);
+					break;
+				}
+			}
+		}
+	}
+}
+
 std::multimap<unsigned short int, Entity *> *CollisionGrid::getEntityList() {
 	return &entityList;
 }
@@ -187,6 +203,20 @@ void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
 			Vector2i v = getCoords(gridPos[i]);
 			RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));
 			sh.setFillColor(Color(0, 255, 24, 128));
+			sh.setPosition((float)v.x*GRID_WIDTH, (float)v.y*GRID_HEIGHT);
+			window->draw(sh);
+		}
+	}
+}
+
+void CollisionGrid::render(RenderWindow *window, std::map<short int, short int> gridPos) {
+	render(window);
+
+	for (auto pos : gridPos) {
+		if (pos.second >= 0) {
+			Vector2i v = getCoords(pos.first);
+			RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));
+			sh.setFillColor(Color(255, 24, 24, 128));
 			sh.setPosition((float)v.x*GRID_WIDTH, (float)v.y*GRID_HEIGHT);
 			window->draw(sh);
 		}

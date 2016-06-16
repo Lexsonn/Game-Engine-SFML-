@@ -16,9 +16,9 @@ public:
 	int getGrid(unsigned int x, unsigned int y);
 	Vector2i getCoords(unsigned int gridPos);
 
-	void setGridPos(int gridPos[], Entity *entity);
 	void initEntity(Entity *entity);
 	void updateEntity(Entity *entity);
+	void deleteEntity(Entity *entity);
 	void addObject(Collidable *object);
 
 	std::multimap<unsigned short int, Entity *> *getEntityList();
@@ -27,10 +27,12 @@ public:
 	void printList();
 	void render(RenderWindow *window);
 	void render(RenderWindow *window, short int gridPos[]);
+	void render(RenderWindow *window, std::map<short int, short int> gridPos);
 private:
 	std::multimap<unsigned short int, Entity *> entityList;
 	std::multimap<unsigned short int, Collidable *> objectList;
 
+	void setGridPos(int gridPos[], Entity *entity);
 	void addEntity(int gridPos[], Entity *entity);
 	void removeEntity(int gridPos[], Entity *entity);
 	void addObject(int gridPos, Collidable *object);

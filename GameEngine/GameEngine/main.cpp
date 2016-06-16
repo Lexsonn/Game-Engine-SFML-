@@ -38,7 +38,6 @@ int main() {
 	Game game(&window);
 
 	while (window.isOpen()) {
-		// Open window for rendering.
 		while (window.pollEvent(event)) {
 			if (event.type == Event::Closed)
 				window.close();

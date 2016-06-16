@@ -83,8 +83,35 @@ void Entity::endUpdate() {
 	rm_master->addSprite(int(y), animationList[currentAnimation]->sprite);
 }
 
+void Entity::damage(int dmg) {
+	if (invulnerable)
+		return;
+	hit = true;
+	invulnerable = true;
+	life -= dmg;
+	if (life < 0)
+		life = 0;
+}
+
+void Entity::recover(int heal) {
+	life += heal;
+	if (life > maxLife)
+		life = maxLife;
+}
+
 int Entity::getDrawableType() {
 	return DO_ENTITY;
+}
+
+void Entity::flashCurrentSprite(animType oldAnimation) {
+	if (!hit)
+		return;
+	flashDmg += 0.12f;
+	if (flashDmg > 3) { hit = false; flashDmg = 0; invulnerable = false; }
+	if (int(flashDmg) % 2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
+	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
+	// Checking if sprite changed, and resetting the old sprite back to its original color:
+	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
 }
 
 void Entity::render(RenderWindow *window) {
@@ -118,6 +145,20 @@ bool Entity::updateDirection() {
 	if (!up && down) { direction = SOUTH; return true; }
 	
 	return false; // No direction is being held right now.
+}
+
+void Entity::updatePosition() {
+	x += dx;
+	y += dy;
+	cX = int(x) - cWidth / 2;
+	cY = int(y) - cHeight / 2;
+}
+
+void Entity::updatePosition(Vector2f v) {
+	x += v.x;
+	y += v.y;
+	cX = int(x) - cWidth / 2;
+	cY = int(y) - cHeight / 2;
 }
 
 /*
@@ -181,20 +222,6 @@ Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 		}
 	}
 	return nullptr;
-}
-
-void Entity::updatePosition() {
-	x += dx;
-	y += dy;
-	cX = int(x) - cWidth / 2;
-	cY = int(y) - cHeight / 2;
-}
-
-void Entity::updatePosition(Vector2f v) {
-	x += v.x;
-	y += v.y;
-	cX = int(x) - cWidth / 2;
-	cY = int(y) - cHeight / 2;
 }
 
 void Entity::moveOutsideCollidable() {

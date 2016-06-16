@@ -4,6 +4,7 @@
 #include <SFML/System.hpp>
 #include "ResourceManager.h"
 #include "Collidable.h"
+#include "Attack.h"
 #include "DrawableObject.h"
 #include "SpriteEffect.h"
 #include "Animation.h"
@@ -46,8 +47,11 @@ public:
 
 	void beginUpdate();
 	void endUpdate();
+	void damage(int dmg);
+	void recover(int heal);
 
 	virtual int getDrawableType();
+	virtual void flashCurrentSprite(animType oldAnimation);
 	virtual void render(RenderWindow *window);
 	virtual void update();
 
@@ -56,28 +60,26 @@ public:
 	void moveOutsideEntity(Entity *other);
 	bool willEntityCollide(unsigned short int _ID, int _dx, int _dy);
 	Vector2f getEntityOverlap(Entity *other);
-	//virtual bool willCollide(Collidable *other, int _dx, int _dy);
-	//virtual bool insideCollidable(Collidable *other);
-	//virtual Vector2f getStaticOverlap(Collidable *other);
 protected:
 	std::map<animType, Animation *> animationList;
 	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
 	animType currentAnimation;
 	stateType state;
+	float flashDmg;
 	bool up, left, down, right;
-	bool invulnerable, absFinished, attFinished, recFinished;
+	bool invulnerable, animFinished, hit;
 
 	bool isInAnimList(animType name);
 	void addAnimation(Animation *anim, animType name);
 
 	bool updateDirection();
+	void updatePosition();
+	void updatePosition(Vector2f v);
 	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
 	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void init();
 	virtual void updateState();
-	virtual void updatePosition();
-	virtual void updatePosition(Vector2f v);
 };
 #endif

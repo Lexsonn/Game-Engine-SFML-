@@ -11,7 +11,6 @@ using namespace sf;
 
 class Player : public Entity, public Controllable {
 public:
-	~Player();
 	Player(ResourceManager *rm);
 	Player(float startX, float startY, ResourceManager *rm);
 
@@ -22,9 +21,9 @@ public:
 	virtual void update();
 	virtual void render(RenderWindow *window);
 private:
-	bool shiftHeld, playerHit, dashU, dashL, dashD, dashR;
+	bool shiftHeld, dashU, dashL, dashD, dashR;
 	short int attackType, maxAttacks;
-	float flashDmg, dashTimer;
+	float dashTimer;
 
 	void walk();
 	void idle();
@@ -35,11 +34,11 @@ private:
 	void dash();
 
 	void setState(stateType type);
+	void setInvulFalse();
 	void flashCurrentSprite(animType oldAnimation);
 	bool updateDashDirection();
 
 	virtual void init();
 	virtual void updateState();
-	//virtual void updatePosition();
 };
 #endif

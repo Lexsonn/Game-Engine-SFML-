@@ -143,3 +143,7 @@ void GameWindow::render(CollisionGrid *cg) {
 void GameWindow::render(CollisionGrid *cg, short int gridPos[]) {
 	cg->render(nativeRenderer, gridPos);
 }
+
+void GameWindow::render(CollisionGrid *cg, std::map<short int, short int> gridPos) {
+	cg->render(nativeRenderer, gridPos);
+}
