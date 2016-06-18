@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include "SpriteRenderer.h"
 #include "MusicList.h"
 #include "TexList.h"
 #include "SFXList.h"
@@ -41,18 +42,15 @@ public:
 
 	bool addSprite(int z, Sprite &spr);
 	void clearList();
-
-	void render(RenderWindow *window);
+	void setSpriteRenderer(SpriteRenderer *sprRenderer);
 private:
-	void init();
-	View *view;
-
 	std::map<texType, Texture *> textureList;
 	std::map<sfxType, SoundBuffer> soundList;
 	std::map<musicType, Music *> songList;
+	SpriteRenderer *renderer;
+	View *view;
 
-	std::multimap<int, Sprite &> zOrderedSpriteList;
-
+	void init();
 	bool isInsideView(Sprite &spr);
 };
 #endif

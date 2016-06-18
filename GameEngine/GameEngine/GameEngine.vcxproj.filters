@@ -120,6 +120,12 @@
     <ClCompile Include="Calculations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AttackManager.cpp">
+      <Filter>Source Files\Game\Game World\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>Source Files\Game\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -184,6 +190,12 @@
     </ClInclude>
     <ClInclude Include="Calculations.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackManager.h">
+      <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>Header Files\Game\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

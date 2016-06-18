@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="Attack.cpp" />
+    <ClCompile Include="AttackManager.cpp" />
     <ClCompile Include="Calculations.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="CollisionGrid.cpp" />
@@ -136,12 +137,14 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="SpriteEffect.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimList.h" />
     <ClInclude Include="Attack.h" />
+    <ClInclude Include="AttackManager.h" />
     <ClInclude Include="Calculations.h" />
     <ClInclude Include="MusicList.h" />
     <ClInclude Include="Collidable.h" />
@@ -157,6 +160,7 @@
     <ClInclude Include="SFXList.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="SpriteEffect.h" />
+    <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="TexList.h" />
   </ItemGroup>

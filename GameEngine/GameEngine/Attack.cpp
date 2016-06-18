@@ -1,9 +1,12 @@
 #include "Attack.h"
-#include <iostream>
+
+extern int WWIDTH;
+extern int WHEIGHT;
+
 Attack::~Attack() {}
 Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0) { }
 Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, 
-			   short int life, short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList) {
+		short int life, short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList) {
 	ID = _ID;
 	parent = parentID;
 	type = _type;
@@ -14,8 +17,8 @@ Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned sho
 }
 
 void Attack::generateGridPos() {
-	//int width = (WWIDTH - 1) / GRID_WIDTH;
-	int height = (WHEIGHT - 1) / GRID_WIDTH;
+	int height = (WHEIGHT - 1) / GRID_HEIGHT;
+	unsigned short int num = 0;
 	for (auto l : attackLines) {
 		bool diagLine = false;
 		int diffX = int(l.second.x) / GRID_WIDTH - int(l.first.x) / GRID_WIDTH;
@@ -29,25 +32,29 @@ void Attack::generateGridPos() {
 		if (diffY > 0) y_inc = 1;
 		else if (diffY < 0) y_inc = -1;
 
-		// ADD METHOD FOR CHEKING IF LINE BISECTS ONLY SQUARES
+		// ADD METHOD FOR CHEKING IF LINE BISECTS ONLY ON DIAGONALS
 
 		// First point
-		gridPos.insert(std::pair<short int, short int>(x * (height + 1) + y, 2));
-		int num = 0;
+		if (validGridPos(x, y)) 
+			gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y, num));
+
 		while (abs(diffX) > 0 || abs(diffY) > 0) {
 			bool xx = false, yy = false;
 			if (gridIntersects(x + x_inc, y, l)) {
 				xx = true;
-				gridPos.insert(std::pair<int, int>((x + x_inc) * (height + 1) + y, 1));
+				if (validGridPos(x + x_inc, y))
+					gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y, num));
 			}
 			if (gridIntersects(x, y + y_inc, l)) {
 				yy = true;
-				gridPos.insert(std::pair<int, int>(x * (height + 1) + y + y_inc, 1));
+				if (validGridPos(x, y + y_inc))
+					gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y + y_inc, num));
 			}
 			if (!xx && !yy) {
 				if (gridIntersects(x + x_inc, y + y_inc, l)) {
 					xx = true; yy = true;
-					gridPos.insert(std::pair<short int, short int>((x + x_inc) * (height + 1) + y + y_inc, 1));
+					if (validGridPos(x + x_inc, y + y_inc))
+						gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y + y_inc, num));
 				}
 			}
 
@@ -59,7 +66,18 @@ void Attack::generateGridPos() {
 			if (x_inc > 0 && diffX < 0) diffX = 0;
 			if (x_inc < 0 && diffX > 0) diffX = 0;
 		}
+
+		num++;
 	}
+}
+
+bool Attack::validGridPos(int x, int y) {
+	int width = (WWIDTH - 1) / GRID_WIDTH;
+	int height = (WHEIGHT - 1) / GRID_HEIGHT;
+	if (x < 0 || y < 0 || x > width || y > height)
+		return false;
+
+	return true;
 }
 
 bool Attack::gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line) {
@@ -70,22 +88,12 @@ bool Attack::gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line) {
 	return lineIntersectsRect(left, top, width, height, line);
 }
 
-void Attack::initGridPos() {
-	int width = (WWIDTH - 1) / GRID_WIDTH;
-	int height = (WHEIGHT - 1) / GRID_HEIGHT;
-}
-
 void Attack::update() {
-	if (currentLife <= 0)
+	if (currentLife-- <= 0)
 		return;
-	currentLife--;
+	
 }
 
-bool Attack::hasHit(Collidable *c) {
-	for (auto line : attackLines) {
-		bool hit;
-		if (c->intersectsLine(line))
-			return true;
-	}
-	return false;
+Sprite &Attack::getSprite() {
+	return animation->sprite;
 }

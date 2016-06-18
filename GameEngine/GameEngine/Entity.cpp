@@ -99,6 +99,18 @@ void Entity::recover(int heal) {
 		life = maxLife;
 }
 
+void Entity::setAttackManager(AttackManager *manager) {
+	at_master = manager;
+}
+
+void Entity::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
+	entityList = list;
+}
+
+void Entity::setObjectList(std::multimap<unsigned short int, Collidable *> *list) {
+	objectList = list;
+}
+
 int Entity::getDrawableType() {
 	return DO_ENTITY;
 }

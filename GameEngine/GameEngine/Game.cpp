@@ -15,20 +15,15 @@ Game::Game(RenderWindow* rWindow) {
 	WWIDTH = 800;
 	WHEIGHT = 800;
 
-	rm_master = new ResourceManager();
-	cGrid = new CollisionGrid();
-	window = new GameWindow(rWindow, 640.f, 480.f, true);
-	player = new Player(200, 200, rm_master);
-	controller = new InputController();
+	initVars(rWindow);
+	createWorld();
+
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
-	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(100, 210), Vector2f(200, 340)));
-	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(300, 210), Vector2f(200, 340)));
+	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
+	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
 
-	att = new Attack(0, 0, 1, 20, 30, lines);
+	att = new Attack(0, 0, 1, 50, 23, lines);
 
-	rm_master->setView(window->getView());
-	addEntity(player);
-	controller->addControllable(player);
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\nCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\nInputController: " << sizeof(InputController) << "\n";
@@ -36,6 +31,26 @@ Game::Game(RenderWindow* rWindow) {
 	//*/
 	// Eventually, these will be moved into a map creator function, that will take a file/string
 	// and create all background tiles, entities, and static collision boxes.
+}
+
+void Game::initVars(RenderWindow *rWindow) {
+	rm_master = new ResourceManager();
+	spr_renderer = new SpriteRenderer();
+	at_master = new AttackManager();
+	cGrid = new CollisionGrid();
+	window = new GameWindow(rWindow, 640.f, 480.f, false);
+	player = new Player(200, 200, rm_master);
+	controller = new InputController();
+	
+	at_master->setResourceManager(rm_master);
+	rm_master->setSpriteRenderer(spr_renderer);
+	rm_master->setView(window->getView());
+	cGrid->setAttackManager(at_master);
+	controller->addControllable(player);
+}
+
+void Game::createWorld() {
+	addEntity(player);
 	addEntity(new Slime(100, 100, rm_master));
 	addEntity(new Slime(50, 100, rm_master));
 	addEntity(new Slime(150, 100, rm_master));
@@ -53,13 +68,14 @@ Game::Game(RenderWindow* rWindow) {
 	addObject(new Collidable(80, 290, 210, 20));
 	addObject(new Collidable(140, 270, 60, 60));
 }
+
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush
 void Game::runLoop() {
-	update();				// Update all entities
-	window->start();		// Clear the window
-	render();				// Draw everything
-	window->end();			// Update the window
-	rm_master->clearList(); // Clear list of drawable sprites
+	update();					// Update all entities
+	window->start();			// Clear the window
+	render();					// Draw everything
+	window->end();				// Update the window
+	spr_renderer->clearList();	// Clear list of drawable sprites
 }
 
 void Game::setLetterBoxView() {
@@ -84,11 +100,10 @@ void Game::render() {
 		window->render(cGrid, player->gridPos);							// Render collision grid first (debug)
 		window->render(cGrid, att->gridPos);
 	}
-	window->render(rm_master);											// Render all animations and sprite effects
+	window->render(spr_renderer);										// Render all animations and sprite effects
 	if (debug) {
 		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
 		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
-
 		for (auto line : att->attackLines) window->render(line);
 		/* FOR LINE INTERSECTION TESTS
 		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
@@ -110,8 +125,9 @@ void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
 	cGrid->initEntity(entity);
-	entity->entityList = cGrid->getEntityList();
-	entity->objectList = cGrid->getObjectList();
+	entity->setEntityList(cGrid->getEntityList());
+	entity->setObjectList(cGrid->getObjectList());
+	entity->setAttackManager(at_master);
 }
 
 void Game::deleteEntity(unsigned short int _ID) {

@@ -17,7 +17,7 @@ ResourceManager::~ResourceManager() {
 		delete tex.second;
 	}
 	textureList.clear();
-	zOrderedSpriteList.clear();
+	delete renderer;
 }
 
 ResourceManager::ResourceManager() { 
@@ -262,6 +262,10 @@ bool ResourceManager::deleteMusic(std::string musicPath) {
 // SPRITE DRAW PRIORITY MANAGEMENT /////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
+void ResourceManager::setSpriteRenderer(SpriteRenderer *sprRenderer) {
+	renderer = sprRenderer;
+}
+
 /*
  *	Adds a sprite to the z-ordered sprite list (typically ordered by y alone, but for "flying" objects
  *	a z value can be added to the y to move it forward) and returns true if the sprite is inside the view. 
@@ -269,22 +273,16 @@ bool ResourceManager::deleteMusic(std::string musicPath) {
  */
 bool ResourceManager::addSprite(int z, Sprite &spr) {
 	if (isInsideView(spr)) {
-		zOrderedSpriteList.insert(std::pair<int, Sprite&>(z, spr));
+		renderer->addSprite(z, spr);
 		return true;
 	}
 	return false;
 }
 
-void ResourceManager::clearList() {
-	zOrderedSpriteList.clear();
-}
-
-void ResourceManager::render(RenderWindow *window) {
-	std::multimap<int, Sprite&>::iterator it = zOrderedSpriteList.begin();
-	while (it != zOrderedSpriteList.end()) 
-		window->draw(it++->second);
-}
-
+/*
+ *	Returns true if the bounding box of the passed sprite is within the bounds of the view.
+ *	Returns false otherwise.
+ */
 bool ResourceManager::isInsideView(Sprite &spr) {
 	FloatRect bound = spr.getGlobalBounds();
 	float vcX, vcY, vsX, vsY;

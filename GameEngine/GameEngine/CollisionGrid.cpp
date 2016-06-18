@@ -8,6 +8,10 @@ CollisionGrid::CollisionGrid() {
 	build();
 }
 
+void CollisionGrid::setAttackManager(AttackManager *manager) {
+	at_master = manager;
+}
+
 /*
  *	Create bounds for the CollisionGrid. Called whenever the game world has changed.
  */
@@ -182,6 +186,16 @@ void CollisionGrid::printList() {
 	std::cout << std::endl;
 }
 
+void CollisionGrid::resolveAttackCollision() {
+	for (auto attack : at_master->attackList) {
+		int num = 0;
+		for (auto pos : attack.second->gridPos) {
+			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+			range = entityList.equal_range(pos.first);
+		}
+	}
+}
+
 void CollisionGrid::render(RenderWindow *window) {
 	for (unsigned int i = 0; i <= width + 1; i++) {
 		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, (height + 1) * GRID_HEIGHT * 1.f)) };
@@ -209,16 +223,14 @@ void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
 	}
 }
 
-void CollisionGrid::render(RenderWindow *window, std::map<short int, short int> gridPos) {
+void CollisionGrid::render(RenderWindow *window, std::map<short int, unsigned short int> gridPos) {
 	render(window);
 
 	for (auto pos : gridPos) {
-		if (pos.second >= 0) {
-			Vector2i v = getCoords(pos.first);
-			RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));
-			sh.setFillColor(Color(255, 24, 24, 128));
-			sh.setPosition((float)v.x*GRID_WIDTH, (float)v.y*GRID_HEIGHT);
-			window->draw(sh);
-		}
+		Vector2i v = getCoords(pos.first);
+		RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));
+		sh.setFillColor(Color(255, 24, 24, 128));
+		sh.setPosition((float)v.x*GRID_WIDTH, (float)v.y*GRID_HEIGHT);
+		window->draw(sh);
 	}
 }

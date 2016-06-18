@@ -3,8 +3,8 @@
 
 #include <SFML/System.hpp>
 #include "ResourceManager.h"
+#include "AttackManager.h"
 #include "Collidable.h"
-#include "Attack.h"
 #include "DrawableObject.h"
 #include "SpriteEffect.h"
 #include "Animation.h"
@@ -35,9 +35,6 @@ public:
 	unsigned short int ID;
 	dir direction;
 
-	std::multimap<unsigned short int, Entity *> *entityList;
-	std::multimap<unsigned short int, Collidable *> *objectList;
-	
 	~Entity();
 	Entity();
 	Entity(ResourceManager *rm);
@@ -49,6 +46,9 @@ public:
 	void endUpdate();
 	void damage(int dmg);
 	void recover(int heal);
+	void setAttackManager(AttackManager *manager);
+	void setEntityList(std::multimap<unsigned short int, Entity *> *list);
+	void setObjectList(std::multimap<unsigned short int, Collidable *> *list);
 
 	virtual int getDrawableType();
 	virtual void flashCurrentSprite(animType oldAnimation);
@@ -61,9 +61,12 @@ public:
 	bool willEntityCollide(unsigned short int _ID, int _dx, int _dy);
 	Vector2f getEntityOverlap(Entity *other);
 protected:
+	std::multimap<unsigned short int, Entity *> *entityList;
+	std::multimap<unsigned short int, Collidable *> *objectList;
 	std::map<animType, Animation *> animationList;
 	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
+	AttackManager *at_master;
 	animType currentAnimation;
 	stateType state;
 	float flashDmg;

@@ -132,8 +132,8 @@ void GameWindow::render(Collidable *c) {
 	nativeRenderer->draw(sh);
 }
 
-void GameWindow::render(ResourceManager *rm) {
-	rm->render(nativeRenderer);
+void GameWindow::render(SpriteRenderer *sr) {
+	sr->render(nativeRenderer);
 }
 
 void GameWindow::render(CollisionGrid *cg) {
@@ -144,6 +144,6 @@ void GameWindow::render(CollisionGrid *cg, short int gridPos[]) {
 	cg->render(nativeRenderer, gridPos);
 }
 
-void GameWindow::render(CollisionGrid *cg, std::map<short int, short int> gridPos) {
+void GameWindow::render(CollisionGrid *cg, std::map<short int, unsigned short int> gridPos) {
 	cg->render(nativeRenderer, gridPos);
 }

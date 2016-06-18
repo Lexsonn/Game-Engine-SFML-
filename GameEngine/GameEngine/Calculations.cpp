@@ -1,5 +1,8 @@
 #include "Calculations.h"
 
+extern int WWIDTH;
+extern int WHEIGHT;
+
 bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, Vector2f> l) {
 	float left = x;
 	float right = x + w;

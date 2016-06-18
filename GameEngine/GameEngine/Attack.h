@@ -2,16 +2,18 @@
 #define ATTACK_H
 
 #include <SFML/System.hpp>
-#include "Collidable.h"
+#include "DrawableObject.h"
+#include "Calculations.h"
+#include "Animation.h"
 #include <vector>
 #include <map>
 
 using namespace sf;
-
-class Attack {
+class Attack : public DrawableObject {
 public:
+	float z;
 	std::vector<std::pair<Vector2f, Vector2f>> attackLines;
-	std::map<short int, short int> gridPos;
+	std::map<short int, unsigned short int> gridPos;
 	unsigned short int parent, ID, type;
 	short int currentLife, strength;
 
@@ -20,11 +22,13 @@ public:
 	Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, 
 		   short int life, short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList);
 
-	void initGridPos();
 	void update();
-	bool hasHit(Collidable *c);
+	Sprite &getSprite();
 private:
+	Animation *animation;
+
 	void generateGridPos();
+	bool validGridPos(int x, int y);
 	bool gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line);
 };
 #endif

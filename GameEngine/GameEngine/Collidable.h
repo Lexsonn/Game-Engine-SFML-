@@ -5,9 +5,6 @@
 #include "Calculations.h"
 #include <algorithm>
 
-#define GRID_WIDTH 160
-#define GRID_HEIGHT 160
-
 using namespace sf;
 
 /************************* COLLIDABLE TYPE BIT OPERATIONS (32 bits) *****************************\
