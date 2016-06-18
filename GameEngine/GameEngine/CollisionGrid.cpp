@@ -22,7 +22,7 @@ void CollisionGrid::build() {
 
 	std::cout << "Grid list size: " << size << " (" << width << ", " << height << ")\n";
 }
-
+/*
 int CollisionGrid::getGrid(unsigned int x, unsigned int y) {
 	unsigned int posX = x / GRID_WIDTH;
 	unsigned int posY = y / GRID_HEIGHT;
@@ -40,7 +40,7 @@ Vector2i CollisionGrid::getCoords(unsigned int gridPos) {
 
 	return Vector2i(x, y);
 }
-
+//*/
 /*
  *	Format a grid position array of size 4 such that it contains the grid positions of an entity,
  *	setting any duplicate values to -1.
@@ -188,12 +188,21 @@ void CollisionGrid::printList() {
 
 void CollisionGrid::resolveAttackCollision() {
 	for (auto attack : at_master->attackList) {
-		int num = 0;
 		for (auto pos : attack.second->gridPos) {
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
 			range = entityList.equal_range(pos.first);
+
+			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+				for (auto line : attack.second->attackLines) 
+					if (it->second->intersectsLine(line))
+						it->second->damage(attack.second->strength);
+			}
 		}
 	}
+}
+
+void CollisionGrid::resolveEntityCollision(Entity * entity) {
+	entity->moveOutsideCollidable();
 }
 
 void CollisionGrid::render(RenderWindow *window) {
@@ -209,6 +218,9 @@ void CollisionGrid::render(RenderWindow *window) {
 	}
 }
 
+/*
+ *	(DEBUG) Draw CollisionGrid positions for Entities
+ */
 void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
 	render(window);
 
@@ -223,6 +235,9 @@ void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
 	}
 }
 
+/*
+ *	(DEBUG) Draw CollisionGrid positions for Attacks
+ */
 void CollisionGrid::render(RenderWindow *window, std::map<short int, unsigned short int> gridPos) {
 	render(window);
 

@@ -1,5 +1,4 @@
 #include "Collidable.h"
-#include <iostream>
 
 Collidable::~Collidable() { }
 Collidable::Collidable() { }

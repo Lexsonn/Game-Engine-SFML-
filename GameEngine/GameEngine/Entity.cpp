@@ -54,9 +54,6 @@ void Entity::beginUpdate() {
 }
 
 void Entity::endUpdate() {
-	// Resolve all collisions resulting from the update() function.
-	moveOutsideCollidable();
-
 	if (!isInAnimList(currentAnimation))
 		return;
 
@@ -221,6 +218,9 @@ std::pair<Vector2f, Vector2f> Entity::getAccessorLineFromDirection() {
 }
 
 Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
+	Vector2f mid = findMidpointOfLine(line);
+	int _x = int(mid.x) / GRID_WIDTH;
+	int _y = int(mid.y) / GRID_HEIGHT;
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
@@ -235,7 +235,7 @@ Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 	}
 	return nullptr;
 }
-
+// Move
 void Entity::moveOutsideCollidable() {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {

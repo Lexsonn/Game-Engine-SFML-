@@ -5,14 +5,15 @@ extern int WHEIGHT;
 
 Attack::~Attack() {}
 Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0) { }
-Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, 
-		short int life, short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList) {
+Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, short int life, short int str, 
+			   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim) {
 	ID = _ID;
 	parent = parentID;
 	type = _type;
 	currentLife = life;
 	strength = str;
 	attackLines = lineList;
+	animation = anim;
 	generateGridPos();
 }
 
@@ -91,7 +92,15 @@ bool Attack::gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line) {
 void Attack::update() {
 	if (currentLife-- <= 0)
 		return;
-	
+	animation->beginUpdate();
+
+	animation->endUpdate();
+}
+
+void Attack::setPosition(float _x, float _y) {
+	x = _x;
+	y = _y;
+	animation->updatePosition(x, y);
 }
 
 Sprite &Attack::getSprite() {

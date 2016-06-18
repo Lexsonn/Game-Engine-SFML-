@@ -21,8 +21,11 @@ Game::Game(RenderWindow* rWindow) {
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
-
-	att = new Attack(0, 0, 1, 50, 23, lines);
+	Animation *anim = new Animation(rm_master->getTexture("playerAtt1.png"), 0, 0, 50, 50, 5, 0.4f, true);
+	std::cout << "Adding... ";
+	//Attack * att = new Attack(0, 0, 1, 60, 23, lines);
+	at_master->addAttack(0, 1, 120, 23, lines, anim);
+	at_master->attackList.at(0)->setPosition(210, 190);
 
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\nCollisionGrid: " << sizeof(CollisionGrid) << "\n";
@@ -87,24 +90,30 @@ void Game::setLetterBoxView() {
 void Game::update() {
 	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
 	controller->checkKeyState();								// Get Keyboard information
+	at_master->updateAttacks();
 	for (auto entity : entityList) {
-		entity.second->update();								// Update every entity.
+		entity.second->update();								// Update every entity
 		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
 	}
-	window->updateView(player);									// Update view to follow player.
-	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity.
+	window->updateView(player);									// Update view to follow player
+	cGrid->resolveAttackCollision();							// Resolve collision for each attack
+	for (auto entity : entityList) {
+		cGrid->resolveEntityCollision(entity.second);			// Resolve collisions for every entity
+		entity.second->endUpdate();								// End updates for every entity
+	}
 }
 
 void Game::render() {
 	if (debug) {
 		window->render(cGrid, player->gridPos);							// Render collision grid first (debug)
-		window->render(cGrid, att->gridPos);
+		for (auto att : at_master->attackList) window->render(cGrid, att.second->gridPos);
 	}
 	window->render(spr_renderer);										// Render all animations and sprite effects
 	if (debug) {
 		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
 		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
-		for (auto line : att->attackLines) window->render(line);
+		for (auto att : at_master->attackList)
+			for (auto line : att.second->attackLines) window->render(line);
 		/* FOR LINE INTERSECTION TESTS
 		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
 		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);

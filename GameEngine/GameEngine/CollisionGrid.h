@@ -15,8 +15,8 @@ public:
 	void setAttackManager(AttackManager *manager);
 
 	void build();
-	int getGrid(unsigned int x, unsigned int y);
-	Vector2i getCoords(unsigned int gridPos);
+	//int getGrid(unsigned int x, unsigned int y);
+	//Vector2i getCoords(unsigned int gridPos);
 
 	void initEntity(Entity *entity);
 	void updateEntity(Entity *entity);
@@ -24,6 +24,7 @@ public:
 	void addObject(Collidable *object);
 
 	void resolveAttackCollision();
+	void resolveEntityCollision(Entity *entity);
 
 	std::multimap<unsigned short int, Entity *> *getEntityList();
 	std::multimap<unsigned short int, Collidable *> *getObjectList();

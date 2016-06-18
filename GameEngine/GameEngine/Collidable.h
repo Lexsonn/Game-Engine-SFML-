@@ -3,7 +3,7 @@
 
 #include <SFML/System.hpp>
 #include "Calculations.h"
-#include <algorithm>
+
 
 using namespace sf;
 

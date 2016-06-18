@@ -14,9 +14,14 @@ void AttackManager::setResourceManager(ResourceManager *rm) {
 	rm_master = rm;
 }
 
-void AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, 
-							  short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList) {
-	Attack *attack = new Attack(ID, parentID, type, life, str, lineList);
+void AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, short int str, 
+							  std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *animation) {
+	Attack *attack = new Attack(ID, parentID, type, life, str, lineList, animation);
+	attackList.insert(std::pair<unsigned short int, Attack *>(ID++, attack));
+}
+
+void AttackManager::addAttack(Attack *attack) {
+	attack->ID = ID;
 	attackList.insert(std::pair<unsigned short int, Attack *>(ID++, attack));
 }
 
@@ -28,19 +33,18 @@ void AttackManager::deleteAttack(unsigned short int _ID) {
 	attackList.erase(it);
 }
 
-void AttackManager::deleteAttack(std::map<unsigned short int, Attack *>::iterator it) {
-	delete it->second;
-	attackList.erase(it);
-}
-
 void AttackManager::updateAttacks() {
-	for (std::map<unsigned short int, Attack *>::iterator it = attackList.begin(); it != attackList.end(); it++) {
+	std::map<unsigned short int, Attack *>::iterator it = attackList.begin();
+	while (it != attackList.end()) {
 		it->second->update();
-		if (it->second->currentLife < 1)
-			deleteAttack(it);
-		else {
+		if (it->second->currentLife < 1) {
+			delete it->second;
+			it = attackList.erase(it);
+		}
+		else if (it->second->isVisible()){
 			Sprite &spr = it->second->getSprite();
-			rm_master->addSprite(int(it->second->z), spr);
+			rm_master->addSprite(int(it->second->y), spr);
+			it++;
 		}
 	}
 }

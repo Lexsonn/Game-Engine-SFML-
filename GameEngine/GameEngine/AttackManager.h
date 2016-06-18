@@ -15,10 +15,10 @@ public:
 
 	void setResourceManager(ResourceManager *rm);
 
-	void addAttack(unsigned short int parentID, unsigned short int _type, short int life, 
-				   short int str, std::vector<std::pair<Vector2f, Vector2f>> lineList);
+	void addAttack(unsigned short int parentID, unsigned short int _type, short int life, short int str, 
+				   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *animation);
+	void addAttack(Attack *attack);
 	void deleteAttack(unsigned short int _ID);
-	void deleteAttack(std::map<const unsigned short int, Attack *>::iterator it);
 	void updateAttacks();
 private:
 	unsigned short int ID;
