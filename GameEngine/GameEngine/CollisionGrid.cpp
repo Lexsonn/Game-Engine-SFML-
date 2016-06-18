@@ -8,10 +8,6 @@ CollisionGrid::CollisionGrid() {
 	build();
 }
 
-void CollisionGrid::setAttackManager(AttackManager *manager) {
-	at_master = manager;
-}
-
 /*
  *	Create bounds for the CollisionGrid. Called whenever the game world has changed.
  */
@@ -22,25 +18,7 @@ void CollisionGrid::build() {
 
 	std::cout << "Grid list size: " << size << " (" << width << ", " << height << ")\n";
 }
-/*
-int CollisionGrid::getGrid(unsigned int x, unsigned int y) {
-	unsigned int posX = x / GRID_WIDTH;
-	unsigned int posY = y / GRID_HEIGHT;
 
-	int i = -1;
-	if (posX <= width && posY <= height)
-		i = posX * (height + 1) + posY;
-	
-	return i;
-}
-
-Vector2i CollisionGrid::getCoords(unsigned int gridPos) {
-	int x = gridPos / (height + 1);
-	int y = gridPos % (height + 1);
-
-	return Vector2i(x, y);
-}
-//*/
 /*
  *	Format a grid position array of size 4 such that it contains the grid positions of an entity,
  *	setting any duplicate values to -1.
@@ -127,9 +105,9 @@ void CollisionGrid::addEntity(int gridPos[], Entity *entity) {
 }
 
 /*
-*	Remove entity from grid positions not included in the new grid positions, being careful 
+ *	Remove entity from grid positions not included in the new grid positions, being careful 
  *	not to delete any entries that are in the new grid positions.
-*/
+ */
 void CollisionGrid::removeEntity(int gridPos[], Entity *entity) {
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0 && gridPos[i] != entity->gridPos[i]) {
@@ -149,8 +127,8 @@ void CollisionGrid::removeEntity(int gridPos[], Entity *entity) {
 }
 
 /*
-*	Add the static Collidable object to every grid position it touches with its collision box.
-*/
+ *	Add the static Collidable object to every grid position it touches with its collision box.
+ */
 void CollisionGrid::addObject(Collidable *object) {
 	int cX, cW, cY, cH;
 	cX = object->cX / GRID_WIDTH;
@@ -167,8 +145,8 @@ void CollisionGrid::addObject(Collidable *object) {
 }
 
 /*
-*	Add a static Collidable object to the multimap of Collidables ordered by grid position.
-*/
+ *	Add a static Collidable object to the multimap of Collidables ordered by grid position.
+ */
 void CollisionGrid::addObject(int gridPos, Collidable *object) {
 	if (gridPos >= 0 && gridPos < size)
 		objectList.insert(std::pair<unsigned short int, Collidable *>(gridPos, object));
@@ -184,25 +162,6 @@ void CollisionGrid::printList() {
 		std::cout << object.first << "(" << object.second->cX << "," << object.second->cY << ") ";
 	}
 	std::cout << std::endl;
-}
-
-void CollisionGrid::resolveAttackCollision() {
-	for (auto attack : at_master->attackList) {
-		for (auto pos : attack.second->gridPos) {
-			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList.equal_range(pos.first);
-
-			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-				for (auto line : attack.second->attackLines) 
-					if (it->second->intersectsLine(line))
-						it->second->damage(attack.second->strength);
-			}
-		}
-	}
-}
-
-void CollisionGrid::resolveEntityCollision(Entity * entity) {
-	entity->moveOutsideCollidable();
 }
 
 void CollisionGrid::render(RenderWindow *window) {

@@ -41,6 +41,7 @@ void Game::initVars(RenderWindow *rWindow) {
 	spr_renderer = new SpriteRenderer();
 	at_master = new AttackManager();
 	cGrid = new CollisionGrid();
+	cMaster = new CollisionManager();
 	window = new GameWindow(rWindow, 640.f, 480.f, false);
 	player = new Player(200, 200, rm_master);
 	controller = new InputController();
@@ -48,8 +49,13 @@ void Game::initVars(RenderWindow *rWindow) {
 	at_master->setResourceManager(rm_master);
 	rm_master->setSpriteRenderer(spr_renderer);
 	rm_master->setView(window->getView());
-	cGrid->setAttackManager(at_master);
 	controller->addControllable(player);
+	// CollisionManager setup
+	cMaster->setAttackManager(at_master);
+	cMaster->setEntityList(&entityList);
+	cMaster->setObjectList(&objectList);
+	cMaster->setEntityPosList(cGrid->getEntityList());
+	cMaster->setObjectPosList(cGrid->getObjectList());
 }
 
 void Game::createWorld() {
@@ -96,11 +102,10 @@ void Game::update() {
 		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
 	}
 	window->updateView(player);									// Update view to follow player
-	cGrid->resolveAttackCollision();							// Resolve collision for each attack
-	for (auto entity : entityList) {
-		cGrid->resolveEntityCollision(entity.second);			// Resolve collisions for every entity
-		entity.second->endUpdate();								// End updates for every entity
-	}
+	cMaster->resolveAttackCollisions();							// Resolve collision for each attack
+	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
+	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
+	
 }
 
 void Game::render() {

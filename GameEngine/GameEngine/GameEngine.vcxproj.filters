@@ -126,6 +126,9 @@
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>Source Files\Game\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
+      <Filter>Source Files\Game\Game World\Collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
       <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>Header Files\Game\Game World\Collision</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

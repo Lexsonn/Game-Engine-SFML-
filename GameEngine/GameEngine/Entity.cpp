@@ -235,7 +235,7 @@ Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 	}
 	return nullptr;
 }
-// Move
+
 void Entity::moveOutsideCollidable() {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {

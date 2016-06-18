@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "InputController.h"
+#include "CollisionManager.h"
 #include "GameWindow.h"
 #include "Player.h"
 
@@ -22,6 +23,7 @@ private:
 	SpriteRenderer *spr_renderer;
 	InputController *controller;
 	CollisionGrid *cGrid;
+	CollisionManager *cMaster;
 	AttackManager *at_master;
 	GameWindow* window;
 	Player *player;

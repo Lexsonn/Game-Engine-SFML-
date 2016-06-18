@@ -125,6 +125,7 @@
     <ClCompile Include="Calculations.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="CollisionGrid.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Controllable.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Attack.h" />
     <ClInclude Include="AttackManager.h" />
     <ClInclude Include="Calculations.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="MusicList.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollisionGrid.h" />
