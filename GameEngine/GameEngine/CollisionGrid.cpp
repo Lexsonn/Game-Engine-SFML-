@@ -181,8 +181,6 @@ void CollisionGrid::render(RenderWindow *window) {
  *	(DEBUG) Draw CollisionGrid positions for Entities
  */
 void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
-	render(window);
-
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
 			Vector2i v = getCoords(gridPos[i]);
@@ -198,8 +196,6 @@ void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
  *	(DEBUG) Draw CollisionGrid positions for Attacks
  */
 void CollisionGrid::render(RenderWindow *window, std::map<short int, unsigned short int> gridPos) {
-	render(window);
-
 	for (auto pos : gridPos) {
 		Vector2i v = getCoords(pos.first);
 		RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));

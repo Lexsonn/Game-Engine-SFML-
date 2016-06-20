@@ -4,9 +4,9 @@ extern int WWIDTH;
 extern int WHEIGHT;
 
 Attack::~Attack() {}
-Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0) { }
+Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0), force(Vector2f(0,0)) { }
 Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, short int life, short int str, 
-			   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim) {
+			   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim) : force(Vector2f(0, 0)) {
 	ID = _ID;
 	parent = parentID;
 	type = _type;
@@ -14,7 +14,7 @@ Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned sho
 	strength = str;
 	attackLines = lineList;
 	animation = anim;
-	generateGridPos();
+	//generateGridPos();
 }
 
 void Attack::generateGridPos() {
@@ -37,25 +37,25 @@ void Attack::generateGridPos() {
 
 		// First point
 		if (validGridPos(x, y)) 
-			gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y, num));
+			gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y, ID));
 
 		while (abs(diffX) > 0 || abs(diffY) > 0) {
 			bool xx = false, yy = false;
 			if (gridIntersects(x + x_inc, y, l)) {
 				xx = true;
 				if (validGridPos(x + x_inc, y))
-					gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y, num));
+					gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y, ID));
 			}
 			if (gridIntersects(x, y + y_inc, l)) {
 				yy = true;
 				if (validGridPos(x, y + y_inc))
-					gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y + y_inc, num));
+					gridPos.insert(std::pair<short int, unsigned short int>(x * (height + 1) + y + y_inc, ID));
 			}
 			if (!xx && !yy) {
 				if (gridIntersects(x + x_inc, y + y_inc, l)) {
 					xx = true; yy = true;
 					if (validGridPos(x + x_inc, y + y_inc))
-						gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y + y_inc, num));
+						gridPos.insert(std::pair<short int, unsigned short int>((x + x_inc) * (height + 1) + y + y_inc, ID));
 				}
 			}
 
@@ -67,8 +67,6 @@ void Attack::generateGridPos() {
 			if (x_inc > 0 && diffX < 0) diffX = 0;
 			if (x_inc < 0 && diffX > 0) diffX = 0;
 		}
-
-		num++;
 	}
 }
 
@@ -101,6 +99,10 @@ void Attack::setPosition(float _x, float _y) {
 	x = _x;
 	y = _y;
 	animation->updatePosition(x, y);
+}
+
+void Attack::setForce(float dx, float dy) {
+	force = Vector2f(dx, dy);
 }
 
 Sprite &Attack::getSprite() {

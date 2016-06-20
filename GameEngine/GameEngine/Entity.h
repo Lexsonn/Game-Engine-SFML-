@@ -47,22 +47,25 @@ public:
 	void damage(int dmg);
 	void recover(int heal);
 	void setAttackManager(AttackManager *manager);
-	void setEntityList(std::multimap<unsigned short int, Entity *> *list);
-	void setObjectList(std::multimap<unsigned short int, Collidable *> *list);
+	//void setEntityList(std::multimap<unsigned short int, Entity *> *list);
+	//void setObjectList(std::multimap<unsigned short int, Collidable *> *list);
 
 	virtual int getDrawableType();
 	virtual void flashCurrentSprite(animType oldAnimation);
 	virtual void render(RenderWindow *window);
 	virtual void update();
+	virtual void setState(stateType type);
 
-	void moveOutsideCollidable();
+	void applyForce(Vector2f f);
+	void updatePosition(Vector2f v);
+	//void moveOutsideCollidable();
 	void moveOutsideCollidable(Collidable *other);
-	void moveOutsideEntity(Entity *other);
-	bool willEntityCollide(unsigned short int _ID, int _dx, int _dy);
+	//void moveOutsideEntity(Entity *other);
+	//bool willEntityCollide(unsigned short int _ID, int _dx, int _dy);
 	Vector2f getEntityOverlap(Entity *other);
 protected:
-	std::multimap<unsigned short int, Entity *> *entityList;
-	std::multimap<unsigned short int, Collidable *> *objectList;
+	// std::multimap<unsigned short int, Entity *> *entityList;
+	//std::multimap<unsigned short int, Collidable *> *objectList;
 	std::map<animType, Animation *> animationList;
 	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
@@ -78,9 +81,8 @@ protected:
 
 	bool updateDirection();
 	void updatePosition();
-	void updatePosition(Vector2f v);
-	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
-	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
+	// std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
+	// Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void init();
 	virtual void updateState();

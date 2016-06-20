@@ -82,6 +82,14 @@ enum animType {
 	damageW,
 	damageSW,
 	damageS,
-	damageSE
+	damageSE,
+	dashE,			// DASH ANIMATION
+	dashNE,
+	dashN,
+	dashNW,
+	dashW,
+	dashSW,
+	dashS,
+	dashSE
 };
 #endif

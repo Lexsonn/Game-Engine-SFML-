@@ -1,6 +1,21 @@
 #include "Player.h"
 
+#define SPEED 2.f
+#define DASH_TIMER_SPEED 0.05f
+
+#define WALK_ANIM 8
+#define RUN_ANIM 16
+#define ABS_ANIM 24
+#define ATT1_ANIM 32
+#define ATT2_ANIM 40
+#define ATT3_ANIM 48
+#define ATT4_ANIM 56
+#define AREC_ANIM 64
+#define DAMG_ANIM 72
+#define DASH_ANIM 8 //80
+
 void Player::init() {
+	Entity::init();
 	// Initialize inherited variables
 	name = "El";
 	cWidth = 16;
@@ -10,7 +25,6 @@ void Player::init() {
 	maxAttacks = 2;
 	currentAnimation = idleE;
 	weight = 8;
-	Entity::init();
 	// Get spritesheet memory locations from Resource Manager for every texture used by sprites
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
 	Texture *tx1 = rm_master->getTexture("playerWalk.png");
@@ -109,12 +123,16 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 	init();
 }
 
+void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
+	entityList = list;
+}
+
 void Player::update() {
 	stateType oldState = state;
 	animType oldAnimation = currentAnimation;
 	// Update the player state
 	updateState();
-	// Perform the correct action depending on the state
+	// Perform the correct update depending on the state
 	switch (state) {
 	case IDLE: idle(); break;
 	case WALK: walk(); break;
@@ -122,6 +140,7 @@ void Player::update() {
 	case ATTACK_BACKSWING: abs();  break;
 	case ATTACK_SWING: attack();  break;
 	case ATTACK_RECOVER: attRec();  break;
+	case DAMAGED: damaged(); break;
 	case DASH: dash(); break;
 	default: std::cout << "wat\n";
 	}
@@ -165,6 +184,10 @@ void Player::updateState() {
 		else if (animFinished)
 			setState(IDLE);
 		break;
+	case DAMAGED:
+		if (animFinished)
+			setState(IDLE);
+		break;
 	case DASH:
 		dashTimer += DASH_TIMER_SPEED;
 		if (dashTimer > 1) { 
@@ -180,10 +203,10 @@ void Player::updateState() {
 /*
  *	Set Player properties to correct values when switching states
  */
-void Player::setState(stateType type) {
-	if (state == type)
+void Player::setState(stateType newState) {
+	if (state == newState)
 		return;
-	switch (type) {
+	switch (newState) {
 	case IDLE:
 		dx = 0;
 		dy = 0;
@@ -197,29 +220,34 @@ void Player::setState(stateType type) {
 			dx = 0;
 			dy = 0;
 		}
-		currentAnimation = animType(direction + 24);
+		currentAnimation = animType(direction + ABS_ANIM);
 		break;
 	case ATTACK_SWING:
 		animFinished = false;
 		dx = 0; 
 		dy = 0; 
-		currentAnimation = animType(direction + 32);
+		currentAnimation = animType(direction + ATT1_ANIM);
 		break;
 	case ATTACK_RECOVER:
 		animFinished = false;
-		currentAnimation = animType(direction + 64);
+		currentAnimation = animType(direction + AREC_ANIM);
+		break;
+	case DAMAGED:
+		animFinished = false;
+		hit = true;
+		invulnerable = true;
+		currentAnimation = animType(direction + AREC_ANIM);
 		break;
 	case DASH:
 		phased = true;
 		invulnerable = true;
 		break;
 	}
-	state = type;
+	state = newState;
 }
 
 /*
  *	Set player to stop being invulnerable if certain conditions are met.
- *	To be called after updating the state of the Player.
  */
 void Player::setInvulFalse() {
 	if (!hit && state != DASH) 
@@ -245,7 +273,7 @@ void Player::walk() {
 		case SOUTHEAST: dx = SPEED/2 * DIAG_MOD; dy = SPEED/2 * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animType(direction + 8);
+		currentAnimation = animType(direction + WALK_ANIM);
 	}
 	else idle(); // Idle animation if currently not moving.
 }
@@ -264,7 +292,7 @@ void Player::run() {
 		case SOUTHEAST: dx = SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animType(direction + 16);
+		currentAnimation = animType(direction + RUN_ANIM);
 	}
 	else idle(); // Idle animation if currently not moving.
 }
@@ -284,6 +312,12 @@ void Player::attRec() {
 	animFinished = animationList[currentAnimation]->isLastFrame();
 }
 
+void Player::damaged() {
+	dx *= 0.95f;
+	dy *= 0.95f;
+	animFinished = animationList[currentAnimation]->isLastFrame();
+}
+
 // Player dash behavior
 void Player::dash() {
 	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
@@ -300,12 +334,73 @@ void Player::dash() {
 		case SOUTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
-		currentAnimation = animType(direction + 8);
+		currentAnimation = animType(direction + DASH_ANIM);
 	}
 
 	if (int(dashTimer*20) % 2 == 0) {
 		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
 		spriteEffectList.push_back(spr);
+	}
+}
+/*
+ *	Create short line normal to the direction the Entity is facing. The line will be positioned
+ *	shortly in front of the Entity. Useful for interacting with Entities directly in front of the
+ *	current Entity.
+ */
+std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
+	std::pair<Vector2f, Vector2f> line;
+	line.first = line.second = Vector2f(-1.f, -1.f);
+
+	switch (direction) {
+	case EAST:
+		line.first = Vector2f(x + cWidth / 2 + 4, y - cHeight / 4);
+		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 4);
+		break;
+	case NORTHEAST:
+		line.first = Vector2f(x + cWidth / 2 - 4, y - cHeight / 2 + 4);
+		line.second = Vector2f(x + cWidth / 2 + 4, y - cHeight / 2 - 4);
+		break;
+	case NORTH:
+		line.first = Vector2f(x - cWidth / 4, y - cHeight / 2 - 4);
+		line.second = Vector2f(x + cWidth / 4, y - cHeight / 2 - 4);
+		break;
+	case NORTHWEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 2 - 4);
+		line.second = Vector2f(x - cWidth / 2 + 4, y - cHeight / 2 + 4);
+		break;
+	case WEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 4);
+		line.second = Vector2f(x - cWidth / 2 - 4, y + cHeight / 4);
+		break;
+	case SOUTHWEST:
+		line.first = Vector2f(x - cWidth / 2 - 4, y + cHeight / 2 - 4);
+		line.second = Vector2f(x - cWidth / 2 + 4, y + cHeight / 2 + 4);
+		break;
+	case SOUTH:
+		line.first = Vector2f(x - cWidth / 4, y + cHeight / 2 + 4);
+		line.second = Vector2f(x + cWidth / 4, y + cHeight / 2 + 4);
+		break;
+	case SOUTHEAST:
+		line.first = Vector2f(x + cWidth / 2 - 4, y + cHeight / 2 + 4);
+		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 2 - 4);
+		break;
+	}
+	return line;
+}
+
+Entity* Player::getEntityAt(std::pair<Vector2f, Vector2f> line) {
+	Vector2f mid = findMidpointOfLine(line);
+	int gridPosition = getGrid(int(mid.x), int(mid.y));
+	if (gridPosition < 0)
+		return nullptr;
+
+	std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+	range = entityList->equal_range(gridPosition);
+	for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+		if (it->second->ID != ID) 
+			if (it->second->intersectsLine(line))
+				return it->second;
+		
 	}
 }
 

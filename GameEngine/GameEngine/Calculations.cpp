@@ -81,8 +81,8 @@ float findDistancePointToLine(Vector2f l1, Vector2f l2, Vector2f p) {
 }
 
 Vector2f findMidpointOfLine(std::pair<Vector2f, Vector2f> l) {
-	float midX = (l.second.x - l.first.x) / 2;
-	float midY = (l.second.y - l.first.y) / 2;
+	float midX = (l.second.x + l.first.x) / 2;
+	float midY = (l.second.y + l.first.y) / 2;
 
 	return Vector2f(midX, midY);
 }

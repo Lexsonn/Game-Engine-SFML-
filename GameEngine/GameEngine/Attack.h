@@ -16,6 +16,7 @@ public:
 	std::map<short int, unsigned short int> gridPos;
 	unsigned short int parent, ID, type;
 	short int currentLife, strength;
+	Vector2f force;
 
 	~Attack();
 	Attack();
@@ -24,6 +25,7 @@ public:
 
 	void update();
 	void setPosition(float _x, float _y);
+	void setForce(float dx, float dy);
 	Sprite &getSprite();
 private:
 	Animation *animation;

@@ -14,7 +14,7 @@ void Entity::init() {
 	cY = int(y) - cHeight / 2;
 }
 
-Entity::~Entity() { // Might have to revisit this
+Entity::~Entity() {
 	for (unsigned int i = 0; i < spriteEffectList.size(); i++)
 		delete spriteEffectList.at(i);
 	
@@ -83,8 +83,7 @@ void Entity::endUpdate() {
 void Entity::damage(int dmg) {
 	if (invulnerable)
 		return;
-	hit = true;
-	invulnerable = true;
+	setState(DAMAGED);
 	life -= dmg;
 	if (life < 0)
 		life = 0;
@@ -99,15 +98,11 @@ void Entity::recover(int heal) {
 void Entity::setAttackManager(AttackManager *manager) {
 	at_master = manager;
 }
-
+/*
 void Entity::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
 	entityList = list;
 }
-
-void Entity::setObjectList(std::multimap<unsigned short int, Collidable *> *list) {
-	objectList = list;
-}
-
+//*/
 int Entity::getDrawableType() {
 	return DO_ENTITY;
 }
@@ -170,11 +165,24 @@ void Entity::updatePosition(Vector2f v) {
 	cY = int(y) - cHeight / 2;
 }
 
+void Entity::setState(stateType newState) {
+	if (state == newState)
+		return;
+	switch (newState) {
+	case DAMAGED:
+		animFinished = false;
+		invulnerable = true;
+		hit = true;
+		break;
+	}
+	state = newState;
+}
+
 /*
  *	Create short line normal to the direction the Entity is facing. The line will be positioned 
  *	shortly in front of the Entity. Useful for interacting with Entities directly in front of the 
  *	current Entity.
- */
+ 
 std::pair<Vector2f, Vector2f> Entity::getAccessorLineFromDirection() {
 	std::pair<Vector2f, Vector2f> line;
 	line.first = line.second = Vector2f(-1.f, -1.f);
@@ -219,43 +227,23 @@ std::pair<Vector2f, Vector2f> Entity::getAccessorLineFromDirection() {
 
 Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 	Vector2f mid = findMidpointOfLine(line);
-	int _x = int(mid.x) / GRID_WIDTH;
-	int _y = int(mid.y) / GRID_HEIGHT;
-	for (int i = 0; i < 4; i++) {
-		if (gridPos[i] >= 0) {
-			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList->equal_range(gridPos[i]);
-			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-				if (it->second->ID != ID) {
-					if (it->second->intersectsLine(line))
-						return it->second;
-				}
-			}
-		}
-	}
-	return nullptr;
-}
+	int gridPosition = getGrid(int(mid.x), int(mid.y));
+	if (gridPosition < 0) 
+		return nullptr;
 
-void Entity::moveOutsideCollidable() {
-	for (int i = 0; i < 4; i++) {
-		if (gridPos[i] >= 0) {
-			if (!phased) {
-				std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-				range = entityList->equal_range(gridPos[i]);
-				// Cycle through Entities first, since it is permissable to be partially inside one.
-				for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-					if (it->second->ID != ID) {
-						moveOutsideEntity(it->second);
-					}
-				}
-			}
-			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
-			cRange = objectList->equal_range(gridPos[i]);
-			// Cycle through Collidable objects last, since those can not move. Entities cannot pass through.
-			for (std::multimap<unsigned short int, Collidable *>::iterator it = cRange.first; it != cRange.second; it++)
-				moveOutsideCollidable(it->second);
+	std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+	range = entityList->equal_range(gridPosition);
+	for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+		if (it->second->ID != ID) {
+			if (it->second->intersectsLine(line))
+				return it->second;
 		}
 	}
+}
+//*/
+void Entity::applyForce(Vector2f f) {
+	dx = f.x;
+	dy = f.y;
 }
 
 void Entity::moveOutsideCollidable(Collidable *other) {
@@ -268,60 +256,16 @@ void Entity::moveOutsideCollidable(Collidable *other) {
 	}
 }
 
-void Entity::moveOutsideEntity(Entity *other) {
-	if (other == nullptr)
-		return;
-	if (other->phased)
-		return;
-	Vector2f vec;
-	if (insideCollidable(other)) {
-		if (weight > other->weight) {//|| (weight == other->weight && abs(other->dx) < abs(dx) && abs(other->dy) < abs(dy) )) {
-			vec = other->getEntityOverlap(this);
-			if (!other->willEntityCollide(ID, int(vec.x), int(vec.y))) {
-				other->moveOutsideCollidable();
-				return;
-			}
-		}
-		vec = getEntityOverlap(other);
-		updatePosition(vec);
-	}
-}
+/*
+ *	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
+ *	coordinates + _dx and _dy. Returns false otherwise.
+//*/
 
 /*
-*	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
-*	coordinates + _dx and _dy. Returns false otherwise.
-*/
-bool Entity::willEntityCollide(unsigned short int _ID, int _dx, int _dy) {
-	for (int i = 0; i < 4; i++) {
-		if (gridPos[i] >= 0) {
-			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
-			cRange = objectList->equal_range(gridPos[i]);
-
-			for (std::multimap<unsigned short int, Collidable *>::iterator it = cRange.first; it != cRange.second; it++) {
-				if (willCollide(it->second, _dx, _dy))
-					return true;
-			}
-
-			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList->equal_range(gridPos[i]);
-
-			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-				if (it->second->ID != ID && it->second->ID != _ID) {
-					if (!it->second->phased)
-						if (willCollide(it->second, _dx, _dy))
-							return true;
-				}
-			}
-		}
-	}
-	return false;
-}
-
-/*
-*	To be called after checking if the Entity is inside another Entity object.
-*	Returns a Vector2f of which direction the Entity should move in order to resolve Collision,
-*	but does so only in the smallest increment necessary.
-*/
+ *	To be called after checking if the Entity is inside another Entity object.
+ *	Returns a Vector2f of which direction the Entity should move in order to resolve Collision,
+ *	but does so only in the smallest increment necessary.
+ */
 Vector2f Entity::getEntityOverlap(Entity* other) {
 	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of other rectangle

@@ -24,9 +24,9 @@ Game::Game(RenderWindow* rWindow) {
 	Animation *anim = new Animation(rm_master->getTexture("playerAtt1.png"), 0, 0, 50, 50, 5, 0.4f, true);
 	std::cout << "Adding... ";
 	//Attack * att = new Attack(0, 0, 1, 60, 23, lines);
-	at_master->addAttack(0, 1, 120, 23, lines, anim);
+	at_master->addAttack(1, 1, 320, 23, lines, anim);
 	at_master->attackList.at(0)->setPosition(210, 190);
-
+	at_master->attackList.at(0)->setForce(2, 2);
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\nCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\nInputController: " << sizeof(InputController) << "\n";
@@ -50,6 +50,7 @@ void Game::initVars(RenderWindow *rWindow) {
 	rm_master->setSpriteRenderer(spr_renderer);
 	rm_master->setView(window->getView());
 	controller->addControllable(player);
+	player->setEntityList(cGrid->getEntityList());
 	// CollisionManager setup
 	cMaster->setAttackManager(at_master);
 	cMaster->setEntityList(&entityList);
@@ -96,13 +97,12 @@ void Game::setLetterBoxView() {
 void Game::update() {
 	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
 	controller->checkKeyState();								// Get Keyboard information
-	at_master->updateAttacks();
+	at_master->updateAttacks();									// Update all Attacks
 	for (auto entity : entityList) {
 		entity.second->update();								// Update every entity
 		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
 	}
 	window->updateView(player);									// Update view to follow player
-	cMaster->resolveAttackCollisions();							// Resolve collision for each attack
 	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
 	
@@ -110,25 +110,16 @@ void Game::update() {
 
 void Game::render() {
 	if (debug) {
-		window->render(cGrid, player->gridPos);							// Render collision grid first (debug)
-		for (auto att : at_master->attackList) window->render(cGrid, att.second->gridPos);
+		window->render(cGrid, player->gridPos);							// Render collision grid positions of player (debug)
+		window->render(cGrid);											// Render collision grid lines (debug)
 	}
 	window->render(spr_renderer);										// Render all animations and sprite effects
 	if (debug) {
 		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
 		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
-		for (auto att : at_master->attackList)
-			for (auto line : att.second->attackLines) window->render(line);
-		/* FOR LINE INTERSECTION TESTS
-		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
-		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);
-		std::pair<Vector2f, Vector2f> l3; l3.first = Vector2f(200.0f, 90.f); l3.second = Vector2f(250.0f, 20.f);
-		std::pair<Vector2f, Vector2f> l4; l4.first = Vector2f(300.0f, 90.f); l4.second = Vector2f(350.0f, 90.f);
-		window->render(l);
-		window->render(l2);
-		window->render(l3);
-		window->render(l4);
-		//*/
+		for (auto att : at_master->attackList)							// Render all attack collision lines (debug)
+			for (auto line : att.second->attackLines) 
+				window->render(line);
 	}
 }
 
@@ -139,11 +130,12 @@ void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
 	cGrid->initEntity(entity);
-	entity->setEntityList(cGrid->getEntityList());
-	entity->setObjectList(cGrid->getObjectList());
 	entity->setAttackManager(at_master);
 }
 
+/*
+ *	Delete an Entity from all lists related to the Entity.
+ */
 void Game::deleteEntity(unsigned short int _ID) {
 	std::map<unsigned short int, Entity *>::iterator it = entityList.find(_ID);
 	if (it == entityList.end())

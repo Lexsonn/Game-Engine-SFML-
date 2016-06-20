@@ -17,7 +17,6 @@ public:
 	void setEntityPosList(std::multimap<unsigned short int, Entity *> *list);
 	void setObjectPosList(std::multimap<unsigned short int, Collidable *> *list);
 
-	void resolveAttackCollisions();
 	void resolveEntityCollisions();
 private:
 	std::map<unsigned short int, Entity *> *entityList;
@@ -25,6 +24,11 @@ private:
 	std::multimap<unsigned short int, Entity *> *entityPosList;
 	std::multimap<unsigned short int, Collidable *> *objectPosList;
 	AttackManager *at_master;
+
+	void resolveEntitiyAttackCollision(Entity *entity);
+	void moveEntityOutsideCollision(Entity *entity);
+	void moveEntityOutsideEntity(Entity *entity, Entity *other);
+	bool willEntityCollide(Entity *entity, unsigned short int _ID, int _dx, int _dy);
 };
 
 #endif
