@@ -4,6 +4,11 @@
 #define DASH_TIMER_SPEED 0.05f
 #define PLAYER_FLASHTIMER 9.f;
 
+#define LENGTH 36.f
+#define DISTANCE 17.f
+#define ATT_FORCE 2.f
+#define ATT_BASE_STR 10
+
 void Player::init() {
 	Entity::init();
 	// Initialize inherited variables
@@ -226,6 +231,7 @@ void Player::setState(stateType newState) {
 		dx = 0; 
 		dy = 0; 
 		currentAnimation = animType(direction + ATT1_ANIM);
+		generateAttack();
 		break;
 	case ATTACK_RECOVER:
 		animFinished = false;
@@ -340,10 +346,28 @@ void Player::dash() {
 		spriteEffectList.push_back(spr);
 	}
 }
+
 /*
- *	Create short line normal to the direction the Entity is facing. The line will be positioned
- *	shortly in front of the Entity. Useful for interacting with Entities directly in front of the
- *	current Entity.
+ *	Generate an attack with proper animation and force depending on the current attackType
+ */
+void Player::generateAttack() {
+	switch (attackType) {
+	case 3:
+	default:
+		std::vector<std::pair<Vector2f, Vector2f>> attLines;
+		attLines.push_back(createAttackLine(LENGTH, DISTANCE));
+		Vector2f f = generateForceFromDirection(ATT_FORCE);
+		Texture *t = rm_master->getTexture("playerAtt1.png");
+		Animation *anim = new Animation(t, 0.f, 0.f, 50, 50, 5, 0.4f, true);
+		Vector2f pos = findMidpointOfLine(attLines.at(0));
+		createAttack(pos, 1, 80, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
+	}
+}
+
+/*
+ *	Create short line normal to the direction the Player is facing. The line will be positioned
+ *	shortly in front of the Player. Useful for interacting with Entities directly in front of the
+ *	Player.
  */
 std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
 	std::pair<Vector2f, Vector2f> line;

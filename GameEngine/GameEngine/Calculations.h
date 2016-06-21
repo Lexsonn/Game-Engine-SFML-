@@ -8,11 +8,14 @@ using namespace sf;
 #define GRID_WIDTH 160
 #define GRID_HEIGHT 160
 
+#define PI 3.1415
+
 // LINE CALCULATIONS ///////////////////////////////////////////////////////////////////////////
 
 bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, Vector2f> l);
 float findDistancePointToLine(Vector2f l1, Vector2f l2, Vector2f p);
 Vector2f findMidpointOfLine(std::pair<Vector2f, Vector2f> l);
+std::pair<Vector2f, Vector2f> rotateLineAboutPoint(std::pair<Vector2f, Vector2f> line, Vector2f point, float angle);
 
 // GRID CALCULATIONS ///////////////////////////////////////////////////////////////////////////
 

@@ -4,9 +4,10 @@ extern int WWIDTH;
 extern int WHEIGHT;
 
 Attack::~Attack() {}
-Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0), force(Vector2f(0,0)) { }
+Attack::Attack() : ID(0), parent(0), type(0), currentLife(0), strength(0), force(Vector2f(0,0)), formed(true) { }
 Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, short int life, short int str, 
-			   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim) : force(Vector2f(0, 0)) {
+			   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim) : force(Vector2f(0, 0)), formed(true) {
+	formAt = 0;
 	ID = _ID;
 	parent = parentID;
 	type = _type;
@@ -15,7 +16,7 @@ Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned sho
 	attackLines = lineList;
 	animation = anim;
 }
-/* Might be too much of a hassle considering there theoretically wont be that many attacks at once, especially if I want attacks that move.
+/* Might be too much of a hassle considering there theoretically wont be that many attacks at once, and especially if I want attacks that move.
 void Attack::generateGridPos() {
 	int height = (WHEIGHT - 1) / GRID_HEIGHT;
 	unsigned short int num = 0;
@@ -90,14 +91,28 @@ bool Attack::gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line) {
 void Attack::update() {
 	if (currentLife-- <= 0)
 		return;
+	if (currentLife == formAt)
+		formed = true;
+
 	animation->beginUpdate();
 
 	animation->endUpdate();
 }
 
+void Attack::setFormed(int formAt) {
+	this->formAt = formAt;
+	formed = false;
+}
+
 void Attack::setPosition(float _x, float _y) {
 	x = _x;
 	y = _y;
+	animation->updatePosition(x, y);
+}
+
+void Attack::setPosition(Vector2f position) {
+	x = position.x;
+	y = position.y;
 	animation->updatePosition(x, y);
 }
 

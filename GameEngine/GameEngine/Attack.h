@@ -24,11 +24,15 @@ public:
 		   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim);
 
 	void update();
+	void setFormed(int formAt);
 	void setPosition(float _x, float _y);
+	void setPosition(Vector2f position);
 	void setForce(float dx, float dy);
 	Sprite &getSprite();
 private:
 	Animation *animation;
+	int formAt;
+	bool formed;
 
 	// void generateGridPos();
 	// bool validGridPos(int x, int y);

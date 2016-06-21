@@ -25,8 +25,9 @@ void CollisionManager::setObjectPosList(std::multimap<unsigned short int, Collid
 
 void CollisionManager::resolveEntityCollisions() {
 	for (std::map<unsigned short int, Entity *>::iterator it = entityList->begin(); it != entityList->end(); it++) {
-		// Resolve Entity collisions with Attacks
-		resolveEntitiyAttackCollision(it->second);
+		// Resolve Entity collisions with Attacks (if Entity is not invulnerable)
+		if (!it->second->invulnerable)
+			resolveEntitiyAttackCollision(it->second);
 		// Resolve Entity collisions with other Entities and static Collidables
 		moveEntityOutsideCollision(it->second);
 	}

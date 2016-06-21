@@ -32,7 +32,7 @@ private:
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
 	std::map<unsigned short int, Collidable *> objectList;	// Map for static collidable objects
 
-	void initVars(RenderWindow *rWindow);
+	void initManagers(RenderWindow *rWindow);
 	void createWorld();
 	void update();
 	void render();

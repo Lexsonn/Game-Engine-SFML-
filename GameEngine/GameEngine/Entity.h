@@ -46,7 +46,7 @@ public:
 	std::string name;
 	float dx, dy;
 	short int maxLife, life, gridPos[4];
-	unsigned short int ID;
+	bool invulnerable;
 	dir direction;
 
 	~Entity();
@@ -84,7 +84,7 @@ protected:
 	stateType state;
 	float flashDmg;
 	bool up, left, down, right;
-	bool running, invulnerable, animFinished, hit;
+	bool running, animFinished, hit;
 
 	bool isInAnimList(animType name);
 
@@ -95,6 +95,11 @@ protected:
 	virtual float getSpeed();
 	virtual float getFlashTimer();
 	virtual void updateState();
+
+	void createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
+	Vector2f generateForceFromDirection(float strength);
+	std::pair<Vector2f, Vector2f> createAttackLine(float length, float distance);
+	std::pair<Vector2f, Vector2f> Entity::createAttackLineFromAngle(float length, float distance, float angle);
 
 	virtual void idle();
 	virtual void walk();

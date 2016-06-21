@@ -6,7 +6,7 @@
 int WWIDTH(640);
 int WHEIGHT(480);
 
-Game::~Game(void) {}
+Game::~Game() { }
 Game::Game(RenderWindow* rWindow) {
 	eID = 0;
 	oID = 0;
@@ -15,7 +15,7 @@ Game::Game(RenderWindow* rWindow) {
 	WWIDTH = 800;
 	WHEIGHT = 800;
 
-	initVars(rWindow);
+	initManagers(rWindow);
 	createWorld();
 
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
@@ -34,16 +34,16 @@ Game::Game(RenderWindow* rWindow) {
 	//*/
 }
 
-void Game::initVars(RenderWindow *rWindow) {
+void Game::initManagers(RenderWindow *rWindow) {
 	rm_master = new ResourceManager();
 	spr_renderer = new SpriteRenderer();
-	at_master = new AttackManager();
+	controller = new InputController();
 	cGrid = new CollisionGrid();
 	cMaster = new CollisionManager();
+	at_master = new AttackManager();
 	window = new GameWindow(rWindow, 640.f, 480.f, true);
 	player = new Player(200, 200, rm_master);
-	controller = new InputController();
-	
+	// Manager/player setup
 	at_master->setResourceManager(rm_master);
 	rm_master->setSpriteRenderer(spr_renderer);
 	rm_master->setView(window->getView());
@@ -143,7 +143,20 @@ void Game::deleteEntity(unsigned short int _ID) {
 	entityList.erase(it);
 }
 
+/*
+ *	Delete a static Collidable from all lists related to the Collidable.
+
+void Game::deleteCollidable(unsigned short int _ID) {
+	std::map<unsigned short int, Entity *>::iterator it = objectList.find(_ID);
+	if (it == objectList.end())
+		return;
+	cGrid->deleteCollidable(it->second);
+	delete it->second;
+	entityList.erase(it);
+}
+//*/
 void Game::addObject(Collidable *object) {
+	object->ID = oID;
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
 	cGrid->addObject(object);
 }

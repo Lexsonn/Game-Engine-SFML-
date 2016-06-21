@@ -220,6 +220,54 @@ void Entity::update() { }
 void Entity::updateState() { }
 void Entity::setState(stateType newState) { }
 
+void Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
+	Attack *newAttack;
+	newAttack = new Attack(0, ID, type, life, str, attackLines, anim);
+	newAttack->setForce(force.x, force.y);
+	newAttack->setPosition(pos);
+	at_master->addAttack(newAttack);
+}
+
+Vector2f Entity::generateForceFromDirection(float strength) {
+	switch (direction) {
+	case EAST: return Vector2f(strength, 0);
+	case NORTHEAST: return Vector2f(strength * DIAG_MOD, -strength * DIAG_MOD);
+	case NORTH: return Vector2f(0, -strength);
+	case NORTHWEST: return Vector2f(-strength * DIAG_MOD, -strength * DIAG_MOD);
+	case WEST: return Vector2f(-strength, 0);
+	case SOUTHWEST: return Vector2f(-strength * DIAG_MOD, strength * DIAG_MOD);
+	case SOUTH: return Vector2f(0, strength);
+	case SOUTHEAST: return Vector2f(strength * DIAG_MOD, strength * DIAG_MOD);
+	default: return Vector2f(0, 0);
+	}
+}
+
+/*
+ *	Returns a line of specified length, normal to the direction of the Entity, at a specified 
+ *	distance away from the Entity's direction.
+ */
+std::pair<Vector2f, Vector2f> Entity::createAttackLine(float length, float distance) {
+	std::pair<Vector2f, Vector2f> line;
+	line.first = Vector2f(x + distance, y - length / 2);
+	line.second = Vector2f(x + distance, y + length / 2);
+	if (direction != EAST)
+		line = rotateLineAboutPoint(line, Vector2f(x, y), 45.f * int(direction) * PI / 180.f);
+	
+	return line;
+}
+
+/*
+*	Returns a line of specified length, normal to the specified direction, at a specified
+*	distance away from the direction. The angle entered is in degrees.
+*/
+std::pair<Vector2f, Vector2f> Entity::createAttackLineFromAngle(float length, float distance, float angle) {
+	std::pair<Vector2f, Vector2f> line;
+	line.first = Vector2f(x + distance, y - length / 2);
+	line.second = Vector2f(x + distance, y + length / 2);
+	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * int(direction) * PI / 180.f);
+	return line;
+}
+
 void Entity::idle() { }
 void Entity::walk() { 
 	if (updateDirection()) {

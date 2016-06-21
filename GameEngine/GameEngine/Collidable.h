@@ -20,6 +20,7 @@ class Collidable {
 public:
 	int cX, cY;
 	int cWidth, cHeight;
+	unsigned short int ID;
 	short int weight;
 	bool phased;
 

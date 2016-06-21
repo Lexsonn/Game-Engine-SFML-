@@ -1,5 +1,5 @@
 #include "Calculations.h"
-
+#include <iostream>
 extern int WWIDTH;
 extern int WHEIGHT;
 
@@ -85,6 +85,20 @@ Vector2f findMidpointOfLine(std::pair<Vector2f, Vector2f> l) {
 	float midY = (l.second.y + l.first.y) / 2;
 
 	return Vector2f(midX, midY);
+}
+
+std::pair<Vector2f, Vector2f> rotateLineAboutPoint(std::pair<Vector2f, Vector2f> l, Vector2f p, float angle) {
+	float x1, x2, y1, y2;
+	x1 = l.first.x - p.x; y1 = l.first.y - p.y;
+	x2 = l.second.x - p.x; y2 = l.second.y - p.y;
+
+	float tempX1 = x1, tempX2 = x2;
+	x1 = x1*cos(angle) + y1*sin(angle);
+	y1 = y1*cos(angle) - tempX1*sin(angle);
+	x2 = x2*cos(angle) + y2*sin(angle);
+	y2 = y2*cos(angle) - tempX2*sin(angle);
+
+	return std::pair<Vector2f, Vector2f>(Vector2f(x1 + p.x, y1 + p.y), Vector2f(x2 + p.x, y2 + p.y));
 }
 
 int getGrid(unsigned int x, unsigned int y) {

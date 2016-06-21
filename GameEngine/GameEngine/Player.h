@@ -38,6 +38,8 @@ private:
 	void setInvulFalse();
 	bool updateDashDirection();
 
+	void generateAttack();
+
 	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
 	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
