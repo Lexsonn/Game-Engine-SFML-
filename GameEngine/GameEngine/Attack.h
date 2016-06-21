@@ -30,8 +30,8 @@ public:
 private:
 	Animation *animation;
 
-	void generateGridPos();
-	bool validGridPos(int x, int y);
-	bool gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line);
+	// void generateGridPos();
+	// bool validGridPos(int x, int y);
+	// bool gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line);
 };
 #endif

@@ -13,13 +13,14 @@ public:
 	Slime(float startX, float startY, ResourceManager *rm);
 
 	virtual void update();
-
-	//virtual void render(RenderWindow *window);
 private:
 	void init();
 
 	virtual void decideDirection();
 	virtual void updateState();
-	//virtual void updatePosition();
+	virtual void setState(stateType newState);
+
+	virtual void walk();
+	virtual void run();
 };
 #endif

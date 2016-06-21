@@ -14,9 +14,8 @@ Attack::Attack(unsigned short int _ID, unsigned short int parentID, unsigned sho
 	strength = str;
 	attackLines = lineList;
 	animation = anim;
-	//generateGridPos();
 }
-
+/* Might be too much of a hassle considering there theoretically wont be that many attacks at once, especially if I want attacks that move.
 void Attack::generateGridPos() {
 	int height = (WHEIGHT - 1) / GRID_HEIGHT;
 	unsigned short int num = 0;
@@ -86,6 +85,7 @@ bool Attack::gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line) {
 	float height = GRID_HEIGHT * 1.f;
 	return lineIntersectsRect(left, top, width, height, line);
 }
+//*/
 
 void Attack::update() {
 	if (currentLife-- <= 0)

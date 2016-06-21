@@ -2,17 +2,7 @@
 
 #define SPEED 2.f
 #define DASH_TIMER_SPEED 0.05f
-
-#define WALK_ANIM 8
-#define RUN_ANIM 16
-#define ABS_ANIM 24
-#define ATT1_ANIM 32
-#define ATT2_ANIM 40
-#define ATT3_ANIM 48
-#define ATT4_ANIM 56
-#define AREC_ANIM 64
-#define DAMG_ANIM 72
-#define DASH_ANIM 8 //80
+#define PLAYER_FLASHTIMER 9.f;
 
 void Player::init() {
 	Entity::init();
@@ -127,6 +117,14 @@ void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
 	entityList = list;
 }
 
+float Player::getSpeed() {
+	return SPEED;
+}
+
+float Player::getFlashTimer() {
+	return PLAYER_FLASHTIMER;
+}
+
 void Player::update() {
 	stateType oldState = state;
 	animType oldAnimation = currentAnimation;
@@ -163,7 +161,7 @@ void Player::updateState() {
 		if (dashU || dashL || dashD || dashR)
 			setState(DASH);
 		else if (up || left || down || right) {
-			if (shiftHeld) setState(RUN);
+			if (running) setState(RUN);
 			else setState(WALK);
 		}
 		else setState(IDLE);
@@ -213,6 +211,7 @@ void Player::setState(stateType newState) {
 		attackType = 0;
 		phased = false;
 		dashU = false; dashL = false; dashD = false; dashR = false;
+		currentAnimation = animType(direction);
 		break;
 	case ATTACK_BACKSWING:
 		animFinished = false;
@@ -255,11 +254,10 @@ void Player::setInvulFalse() {
 }
 
 // Player idle behavior
-void Player::idle() {
-	currentAnimation = animType(direction);
-}
+// void Player::idle() { }
 
 // Player walk behavior
+/*
 void Player::walk() {
 	if (updateDirection())  {
 		switch (direction) {
@@ -275,7 +273,7 @@ void Player::walk() {
 		}
 		currentAnimation = animType(direction + WALK_ANIM);
 	}
-	else idle(); // Idle animation if currently not moving.
+	else setState(IDLE); // Idle animation if currently not moving.
 }
 
 // Player run behavior
@@ -294,10 +292,10 @@ void Player::run() {
 		}
 		currentAnimation = animType(direction + RUN_ANIM);
 	}
-	else idle(); // Idle animation if currently not moving.
+	else setState(IDLE); // Idle animation if currently not moving.
 }
-
-// Player attack backswing behavior
+//*/
+/* Player attack backswing behavior
 void Player::abs() {
 	animFinished = animationList[currentAnimation]->isLastFrame();
 }
@@ -317,7 +315,7 @@ void Player::damaged() {
 	dy *= 0.95f;
 	animFinished = animationList[currentAnimation]->isLastFrame();
 }
-
+//*/
 // Player dash behavior
 void Player::dash() {
 	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
@@ -402,21 +400,7 @@ Entity* Player::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 				return it->second;
 		
 	}
-}
-
-/*
- *	Flashes the current sprite. The old animation animList type is passed in to reset any animations whose
- *	color has been changed while the Entity is changing animations.
- */
-void Player::flashCurrentSprite(animType oldAnimation) {
-	if (!hit)
-		return;
-	flashDmg += 0.12f;
-	if (flashDmg > 9) { hit = false; flashDmg = 0; setInvulFalse(); }
-	if (int(flashDmg) %2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
-	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
-	// Checking if sprite changed, and resetting the old sprite back to its original color:
-	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
+	return nullptr;
 }
 
 bool Player::updateDashDirection() {
@@ -458,7 +442,7 @@ void Player::keyHeld(Keyboard::Key key) {
 }
 
 void Player::keyPress(Keyboard::Key key) {
-	if (key == Keyboard::LShift) shiftHeld = true; 
+	if (key == Keyboard::LShift) running = true; 
 	if (key == Keyboard::RShift) { 
 		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 50, 16); 
 		spriteEffectList.push_back(spr); 
@@ -502,7 +486,7 @@ void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::Right) { dashR = true; }
 }
 void Player::keyRelease(Keyboard::Key key) {
-	if (key == Keyboard::LShift) shiftHeld = false;
+	if (key == Keyboard::LShift) running = false;
 	if (key == Keyboard::W) { up = false; }
 	if (key == Keyboard::A) { left = false; }
 	if (key == Keyboard::S) { down = false; }

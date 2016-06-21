@@ -22,27 +22,28 @@ public:
 	virtual void render(RenderWindow *window);
 private:
 	std::multimap<unsigned short int, Entity *> *entityList;
-	bool shiftHeld, dashU, dashL, dashD, dashR;
+	bool dashU, dashL, dashD, dashR;
 	short int attackType, maxAttacks;
 	float dashTimer;
 
-	void walk();
-	void idle();
-	void run();
-	void abs();
-	void attack();
-	void attRec();
-	void damaged();
-	void dash();
+	//virtual void walk();
+	//virtual void idle();
+	//virtual void run();
+	//virtual void abs();
+	//virtual void attack();
+	//virtual void attRec();
+	//virtual void damaged();
+	virtual void dash();
 
 	void setInvulFalse();
-	void flashCurrentSprite(animType oldAnimation);
 	bool updateDashDirection();
 
 	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
 	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void init();
+	virtual float getSpeed();
+	virtual float getFlashTimer();
 	virtual void updateState();
 };
 #endif

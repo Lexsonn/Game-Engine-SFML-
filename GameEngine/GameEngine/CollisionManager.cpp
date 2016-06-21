@@ -87,6 +87,10 @@ void CollisionManager::moveEntityOutsideEntity(Entity *entity, Entity *other) {
 	}
 }
 
+/*
+ *	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
+ *	coordinates + _dx and _dy. Returns false otherwise.
+ */
 bool CollisionManager::willEntityCollide(Entity *entity, unsigned short int _ID, int _dx, int _dy) {
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0) {

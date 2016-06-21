@@ -31,11 +31,6 @@ public:
 	bool insideCollidable(Collidable *other);
 	Vector2f getStaticOverlap(Collidable *other);
 	
-	bool hasCollidedN(Collidable *other);
-	bool hasCollidedW(Collidable *other);
-	bool hasCollidedS(Collidable *other);
-	bool hasCollidedE(Collidable *other);
-	
 	bool intersectsLine(std::pair<Vector2f, Vector2f> line);
 };
 #endif

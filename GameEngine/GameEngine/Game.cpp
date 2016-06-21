@@ -22,18 +22,16 @@ Game::Game(RenderWindow* rWindow) {
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
 	Animation *anim = new Animation(rm_master->getTexture("playerAtt1.png"), 0, 0, 50, 50, 5, 0.4f, true);
-	std::cout << "Adding... ";
 	//Attack * att = new Attack(0, 0, 1, 60, 23, lines);
 	at_master->addAttack(1, 1, 320, 23, lines, anim);
 	at_master->attackList.at(0)->setPosition(210, 190);
 	at_master->attackList.at(0)->setForce(2, 2);
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
-	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\nCollisionGrid: " << sizeof(CollisionGrid) << "\n";
-	std::cout << "GameWindow : " << sizeof(GameWindow) << "\nInputController: " << sizeof(InputController) << "\n";
-	std::cout << "Player : " << sizeof(Player) << "\nEntity: " << sizeof(Entity) << "\n";
+	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\tCollisionGrid: " << sizeof(CollisionGrid) << "\n";
+	std::cout << "GameWindow : " << sizeof(GameWindow) << "\tInputController: " << sizeof(InputController) << "\n";
+	std::cout << "AttackManager : " << sizeof(AttackManager) << "\tAttack: " << sizeof(Attack) << "\n";
+	std::cout << "Player : " << sizeof(Player) << "\t\tEntity: " << sizeof(Entity) << "\n";
 	//*/
-	// Eventually, these will be moved into a map creator function, that will take a file/string
-	// and create all background tiles, entities, and static collision boxes.
 }
 
 void Game::initVars(RenderWindow *rWindow) {
@@ -42,7 +40,7 @@ void Game::initVars(RenderWindow *rWindow) {
 	at_master = new AttackManager();
 	cGrid = new CollisionGrid();
 	cMaster = new CollisionManager();
-	window = new GameWindow(rWindow, 640.f, 480.f, false);
+	window = new GameWindow(rWindow, 640.f, 480.f, true);
 	player = new Player(200, 200, rm_master);
 	controller = new InputController();
 	
@@ -129,8 +127,8 @@ void Game::render() {
 void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
-	cGrid->initEntity(entity);
 	entity->setAttackManager(at_master);
+	cGrid->initEntity(entity);
 }
 
 /*

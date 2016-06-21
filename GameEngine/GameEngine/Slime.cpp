@@ -1,7 +1,5 @@
 #include "Slime.h"
 
-#define SPEED 0.5f
-
 void Slime::init() {
 	// AI vars
 	generateRND(int(time(NULL)), 99);
@@ -20,8 +18,10 @@ void Slime::init() {
 	Entity::init();
 
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
+	Texture *tx1 = rm_master->getTexture("playerAttRec.png");
 
 	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.75, 0.75);
+	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.2f, true); animationList[damageE]->setScale(0.75, 0.75);
 }
 
 Slime::~Slime() { }
@@ -38,41 +38,38 @@ Slime::Slime(float startX, float startY, ResourceManager *rm) {
 }
 
 void Slime::update() { 
+	// AI decision making
 	int decision = 100;
 	decisionMake += decisionSpeed;
 	
-	flashCurrentSprite(currentAnimation);
-
 	if (decisionMake >= 1) {
 		decision = getDecision();
 		decisionMake -= 1;
 	}
-
 	if (decision <= 8)
 		setDestination();
 
-	if (x == destination.x && y == destination.y)
-		return;
-
 	decideDirection();
+	// Typical Entity update
+	stateType oldState = state;
+	animType oldAnimation = currentAnimation;
 
-	if (updateDirection()) {
-		switch (direction) {
-		case EAST: dx = SPEED; dy = 0; break;
-		case NORTHEAST: dx = SPEED * DIAG_MOD; dy = -SPEED * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -SPEED; break;
-		case NORTHWEST: dx = -SPEED * DIAG_MOD; dy = -SPEED * DIAG_MOD; break;
-		case WEST: dx = -SPEED; dy = 0; break;
-		case SOUTHWEST: dx = -SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = SPEED; break;
-		case SOUTHEAST: dx = SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
-		}
-		updatePosition();
+	updateState();
+	switch (state) {
+	case IDLE: idle(); break;
+	case WALK: walk(); break;
+	case RUN: run(); break;
+	case DAMAGED: damaged(); break;
 	}
-	else {
-		dx = 0;
-		dy = 0;
-	}
+
+	// If the Slime has been hit, flash the current sprite.
+	flashCurrentSprite(oldAnimation);
+
+	// Reset the current animation to its first frame so the animation isn't left on its last frame the next 
+	// time it is used. Note that this keeps walk/run animations where they left off when switching directions.
+	if (oldState != state) animationList[oldAnimation]->restart();
+
+	updatePosition();
 }
 
 void Slime::updateState() { 
@@ -81,13 +78,36 @@ void Slime::updateState() {
 	case WALK:
 	case RUN:
 		if (up || left || down || right) {
-				state = WALK;
+			if (running) setState(RUN);
+			else setState(WALK);
 		}
 		else
-			state = IDLE;
+			setState(IDLE);
+		break;
+	case DAMAGED:
+		if (animFinished)
+			setState(IDLE);
 		break;
 	default: std::cout << "What did you do now?\n";
 	}
+}
+void Slime::setState(stateType newState) {
+	if (state == newState)
+		return;
+	switch (newState) {
+	case IDLE:
+		dx = 0;
+		dy = 0;
+		currentAnimation = idleE;
+		break;
+	case DAMAGED:
+		animFinished = false;
+		invulnerable = true;
+		hit = true;
+		currentAnimation = damageE;
+		break;
+	}
+	state = newState;
 }
 
 void Slime::decideDirection() {
@@ -96,8 +116,8 @@ void Slime::decideDirection() {
 	up = false;
 	down = false;
 
-	if (abs(x - destination.x) != 0) {
-		if (abs(int(x - destination.x)) <= SPEED)
+	if (std::abs(x - destination.x) != 0) {
+		if (std::abs(int(x - destination.x)) <= std::max(ENTITY_SPEED / 2, std::abs(dx)))
 			x = float(destination.x);
 		else {
 			if (x < destination.x) right = true;
@@ -105,12 +125,48 @@ void Slime::decideDirection() {
 		}
 	}
 
-	if (abs(int(y - destination.y)) != 0) {
-		if (abs(y - destination.y) <= SPEED)
+	if (std::abs(int(y - destination.y)) != 0) {
+		if (std::abs(y - destination.y) <= std::max(ENTITY_SPEED / 2, std::abs(dy)))
 			y = float(destination.y);
 		else {
 			if (y < destination.y) down = true;
 			else up = true;
 		}
 	}
+}
+
+void Slime::walk() {
+	if (updateDirection()) {
+		switch (direction) {
+		case EAST: dx = getSpeed() / 2; dy = 0; break;
+		case NORTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
+		case NORTH: dx = 0; dy = -getSpeed() / 2; break;
+		case NORTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
+		case WEST: dx = -getSpeed() / 2; dy = 0; break;
+		case SOUTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		case SOUTH: dx = 0; dy = getSpeed() / 2; break;
+		case SOUTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		// currentAnimation = animType(direction + WALK_ANIM);
+	}
+	else setState(IDLE); // Idle animation if currently not moving.
+}
+
+void Slime::run() {
+	if (updateDirection()) {
+		switch (direction) {
+		case EAST: dx = getSpeed(); dy = 0; break;
+		case NORTHEAST: dx = getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
+		case NORTH: dx = 0; dy = -getSpeed(); break;
+		case NORTHWEST: dx = -getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
+		case WEST: dx = -getSpeed(); dy = 0; break;
+		case SOUTHWEST: dx = -getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		case SOUTH: dx = 0; dy = getSpeed(); break;
+		case SOUTHEAST: dx = getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		// currentAnimation = animType(direction + RUN_ANIM);
+	}
+	else setState(IDLE); // Idle animation if currently not moving.
 }

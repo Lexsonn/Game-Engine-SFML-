@@ -17,8 +17,11 @@ void Entity::init() {
 Entity::~Entity() {
 	for (unsigned int i = 0; i < spriteEffectList.size(); i++)
 		delete spriteEffectList.at(i);
-	
+	for (std::map<animType, Animation *>::iterator it = animationList.begin(); it != animationList.end(); it++)
+		delete it->second;
+
 	spriteEffectList.clear();
+	animationList.clear();
 }
 Entity::Entity() { }
 Entity::Entity(ResourceManager *rm) { rm_master = rm; }
@@ -28,6 +31,18 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) {
 	x = startX;
 	y = startY;
 	init();
+}
+
+void Entity::setAttackManager(AttackManager *manager) {
+	at_master = manager;
+}
+
+float Entity::getSpeed() {
+	return ENTITY_SPEED;
+}
+
+float Entity::getFlashTimer() {
+	return ENTITY_FLASHTIMER;
 }
 
 /*
@@ -46,6 +61,21 @@ void Entity::addAnimation(Animation *anim, animType name) {
 
 Animation *Entity::getCurrentAnimation() {
 	return animationList[currentAnimation];
+}
+
+/*
+*	Flashes the current sprite. The old animation animList type is passed in to reset any animations whose
+*	color has been changed while the Entity is changing animations.
+*/
+void Entity::flashCurrentSprite(animType oldAnimation) {
+	if (!hit)
+		return;
+	flashDmg += FLASHTIMER_SPEED;
+	if (flashDmg > getFlashTimer()) { hit = false; flashDmg = 0; invulnerable = false; }
+	if (int(flashDmg) % 2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
+	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
+	// Checking if sprite changed, and resetting the old sprite back to its original color:
+	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
 }
 
 void Entity::beginUpdate() {
@@ -95,37 +125,8 @@ void Entity::recover(int heal) {
 		life = maxLife;
 }
 
-void Entity::setAttackManager(AttackManager *manager) {
-	at_master = manager;
-}
-/*
-void Entity::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
-	entityList = list;
-}
-//*/
 int Entity::getDrawableType() {
 	return DO_ENTITY;
-}
-
-void Entity::flashCurrentSprite(animType oldAnimation) {
-	if (!hit)
-		return;
-	flashDmg += 0.12f;
-	if (flashDmg > 3) { hit = false; flashDmg = 0; invulnerable = false; }
-	if (int(flashDmg) % 2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
-	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
-	// Checking if sprite changed, and resetting the old sprite back to its original color:
-	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
-}
-
-void Entity::render(RenderWindow *window) {
-	// RENDER COLLISION BOX
-	RectangleShape sh(Vector2f(cWidth * 1.f, cHeight * 1.f));
-	sh.setFillColor(Color(128, 0, 0, 160));
-	sh.setOutlineColor(Color::Red);
-	sh.setOutlineThickness(1.0f);
-	sh.setPosition((float)cX, (float)cY);
-	window->draw(sh);
 }
 
 /*
@@ -165,82 +166,6 @@ void Entity::updatePosition(Vector2f v) {
 	cY = int(y) - cHeight / 2;
 }
 
-void Entity::setState(stateType newState) {
-	if (state == newState)
-		return;
-	switch (newState) {
-	case DAMAGED:
-		animFinished = false;
-		invulnerable = true;
-		hit = true;
-		break;
-	}
-	state = newState;
-}
-
-/*
- *	Create short line normal to the direction the Entity is facing. The line will be positioned 
- *	shortly in front of the Entity. Useful for interacting with Entities directly in front of the 
- *	current Entity.
- 
-std::pair<Vector2f, Vector2f> Entity::getAccessorLineFromDirection() {
-	std::pair<Vector2f, Vector2f> line;
-	line.first = line.second = Vector2f(-1.f, -1.f);
-	
-	switch (direction) {
-	case EAST: 
-		line.first = Vector2f(x + cWidth / 2 + 4, y - cHeight / 4); 
-		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 4); 
-		break;
-	case NORTHEAST: 
-		line.first = Vector2f(x + cWidth / 2 - 4, y - cHeight / 2 + 4); 
-		line.second = Vector2f(x + cWidth / 2 + 4, y - cHeight / 2 - 4); 
-		break;
-	case NORTH: 
-		line.first = Vector2f(x - cWidth / 4, y - cHeight / 2 - 4);
-		line.second = Vector2f(x + cWidth / 4, y - cHeight / 2 - 4); 
-		break;
-	case NORTHWEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 2 - 4);
-		line.second = Vector2f(x - cWidth / 2 + 4, y - cHeight / 2 + 4);
-		break;
-	case WEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 4);
-		line.second = Vector2f(x - cWidth / 2 - 4, y + cHeight / 4);
-		break;
-	case SOUTHWEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y + cHeight / 2 - 4);
-		line.second = Vector2f(x - cWidth / 2 + 4, y + cHeight / 2 + 4);
-		break;
-	case SOUTH:
-		line.first = Vector2f(x - cWidth / 4, y + cHeight / 2 + 4);
-		line.second = Vector2f(x + cWidth / 4, y + cHeight / 2 + 4);
-		break;
-	case SOUTHEAST:
-		line.first = Vector2f(x + cWidth / 2 - 4, y + cHeight / 2 + 4);
-		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 2 - 4);
-		break;
-	}
-
-	return line;
-}
-
-Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
-	Vector2f mid = findMidpointOfLine(line);
-	int gridPosition = getGrid(int(mid.x), int(mid.y));
-	if (gridPosition < 0) 
-		return nullptr;
-
-	std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-	range = entityList->equal_range(gridPosition);
-	for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-		if (it->second->ID != ID) {
-			if (it->second->intersectsLine(line))
-				return it->second;
-		}
-	}
-}
-//*/
 void Entity::applyForce(Vector2f f) {
 	dx = f.x;
 	dy = f.y;
@@ -257,16 +182,11 @@ void Entity::moveOutsideCollidable(Collidable *other) {
 }
 
 /*
- *	Only called if being pushed by another Entity. Retuns true if a Collidable object is in the current
- *	coordinates + _dx and _dy. Returns false otherwise.
-//*/
-
-/*
  *	To be called after checking if the Entity is inside another Entity object.
  *	Returns a Vector2f of which direction the Entity should move in order to resolve Collision,
  *	but does so only in the smallest increment necessary.
  */
-Vector2f Entity::getEntityOverlap(Entity* other) {
+Vector2f Entity::getEntityOverlap(Entity *other) {
 	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of other rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of other rectangle
@@ -278,13 +198,80 @@ Vector2f Entity::getEntityOverlap(Entity* other) {
 
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
 
-	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(abs(other->dy)));	// NORTH
-	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(abs(other->dx)));	// WEST
-	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(abs(other->dy)));	// SOUTH
-	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(abs(other->dx)));	// EAST
+	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
+	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
+	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
+	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
 
+void Entity::render(RenderWindow *window) {
+	// RENDER COLLISION BOX
+	RectangleShape sh(Vector2f(cWidth * 1.f, cHeight * 1.f));
+	sh.setFillColor(Color(128, 0, 0, 160));
+	sh.setOutlineColor(Color::Red);
+	sh.setOutlineThickness(1.0f);
+	sh.setPosition((float)cX, (float)cY);
+	window->draw(sh);
+}
+
 void Entity::update() { }
-void Entity::updateState() {}
+void Entity::updateState() { }
+void Entity::setState(stateType newState) { }
+
+void Entity::idle() { }
+void Entity::walk() { 
+	if (updateDirection()) {
+		switch (direction) {
+		case EAST: dx = getSpeed() / 2; dy = 0; break;
+		case NORTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
+		case NORTH: dx = 0; dy = -getSpeed() / 2; break;
+		case NORTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
+		case WEST: dx = -getSpeed() / 2; dy = 0; break;
+		case SOUTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		case SOUTH: dx = 0; dy = getSpeed() / 2; break;
+		case SOUTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		currentAnimation = animType(direction + WALK_ANIM);
+	}
+	else setState(IDLE); // Idle animation if currently not moving.
+}
+void Entity::run() { 
+	if (updateDirection()) {
+		switch (direction) {
+		case EAST: dx = getSpeed(); dy = 0; break;
+		case NORTHEAST: dx = getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
+		case NORTH: dx = 0; dy = -getSpeed(); break;
+		case NORTHWEST: dx = -getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
+		case WEST: dx = -getSpeed(); dy = 0; break;
+		case SOUTHWEST: dx = -getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		case SOUTH: dx = 0; dy = getSpeed(); break;
+		case SOUTHEAST: dx = getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		currentAnimation = animType(direction + RUN_ANIM);
+	}
+	else setState(IDLE); // Idle animation if currently not moving.
+}
+
+void Entity::abs() { 
+	animFinished = animationList[currentAnimation]->isLastFrame();
+}
+
+void Entity::attack() { 
+	animFinished = animationList[currentAnimation]->isLastFrame();
+}
+
+void Entity::attRec() { 
+	animFinished = animationList[currentAnimation]->isLastFrame();
+}
+
+void Entity::damaged() { 
+	dx *= 0.95f;
+	dy *= 0.95f;
+	animFinished = animationList[currentAnimation]->isLastFrame();
+}
+
+void Entity::dash() { }

@@ -57,34 +57,6 @@ Vector2f Collidable::getStaticOverlap(Collidable *other) {
 	return Vector2f(_x*1.f, _y*1.f);
 }
 
-bool Collidable::hasCollidedN(Collidable *other) {
-	int otherBottom = other->cY + +other->cHeight;
-
-	if (cY < otherBottom) return false;
-	return true;
-}
-
-bool Collidable::hasCollidedW(Collidable *other) {
-	int otherRight = other->cX + other->cWidth;	
-
-	if (cX < otherRight) return false;
-	return true;
-}
-
-bool Collidable::hasCollidedS(Collidable *other) {
-	int otherTop = other->cY;	
-
-	if (cY + cHeight > otherTop) return false;
-	return true;
-}
-
-bool Collidable::hasCollidedE(Collidable *other) {
-	int otherLeft = other->cX;
-
-	if (cX + cWidth > otherLeft) return false;
-	return true;
-}
-
 bool Collidable::intersectsLine(std::pair<Vector2f, Vector2f> line) {
 	return lineIntersectsRect(float(cX), float(cY), float(cWidth), float(cHeight), line);
 }
