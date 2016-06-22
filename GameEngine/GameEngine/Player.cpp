@@ -4,7 +4,7 @@
 #define DASH_TIMER_SPEED 0.05f
 #define PLAYER_FLASHTIMER 9.f;
 
-#define LENGTH 36.f
+#define LENGTH 28.f
 #define DISTANCE 17.f
 #define ATT_FORCE 2.f
 #define ATT_BASE_STR 10
@@ -131,7 +131,6 @@ float Player::getFlashTimer() {
 }
 
 void Player::update() {
-	stateType oldState = state;
 	animType oldAnimation = currentAnimation;
 	// Update the player state
 	updateState();
@@ -150,10 +149,6 @@ void Player::update() {
 
 	// If the Player has been hit, flash the current sprite.
 	flashCurrentSprite(oldAnimation);
-
-	// Reset the current animation to its first frame so the animation isn't left on its last frame the next 
-	// time it is used. Note that this keeps walk/run animations where they left off when switching directions.
-	if (oldState != state ) animationList[oldAnimation]->restart();
 
 	updatePosition();
 }
@@ -209,6 +204,9 @@ void Player::updateState() {
 void Player::setState(stateType newState) {
 	if (state == newState)
 		return;
+
+	animationList[currentAnimation]->restart();
+
 	switch (newState) {
 	case IDLE:
 		dx = 0;
@@ -312,7 +310,7 @@ void Player::generateAttack() {
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
 		anim->setRotation(-direction * 45);
 		pos = findMidpointOfLine(attLines.at(0));
-		createAttack(pos, 1, 80, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
+		createAttack(pos, 1, 10, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
 	}
 }
 

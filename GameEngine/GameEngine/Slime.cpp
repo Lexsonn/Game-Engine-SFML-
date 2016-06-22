@@ -21,7 +21,7 @@ void Slime::init() {
 	Texture *tx1 = rm_master->getTexture("playerAttRec.png");
 
 	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.75, 0.75);
-	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.2f, true); animationList[damageE]->setScale(0.75, 0.75);
+	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.1f, true); animationList[damageE]->setScale(0.75, 0.75);
 }
 
 Slime::~Slime() { }
@@ -50,8 +50,8 @@ void Slime::update() {
 		setDestination();
 
 	decideDirection();
+
 	// Typical Entity update
-	stateType oldState = state;
 	animType oldAnimation = currentAnimation;
 
 	updateState();
@@ -64,10 +64,6 @@ void Slime::update() {
 
 	// If the Slime has been hit, flash the current sprite.
 	flashCurrentSprite(oldAnimation);
-
-	// Reset the current animation to its first frame so the animation isn't left on its last frame the next 
-	// time it is used. Note that this keeps walk/run animations where they left off when switching directions.
-	if (oldState != state) animationList[oldAnimation]->restart();
 
 	updatePosition();
 }
@@ -94,6 +90,9 @@ void Slime::updateState() {
 void Slime::setState(stateType newState) {
 	if (state == newState)
 		return;
+
+	animationList[currentAnimation]->restart();
+
 	switch (newState) {
 	case IDLE:
 		dx = 0;
