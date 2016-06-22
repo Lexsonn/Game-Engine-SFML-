@@ -41,9 +41,8 @@ void AttackManager::updateAttacks() {
 			delete it->second;
 			it = attackList.erase(it);
 		}
-		else if (it->second->isVisible()){
-			Sprite &spr = it->second->getSprite();
-			rm_master->addSprite(int(it->second->y), spr);
+		else if (it->second->isVisible()) {
+			rm_master->addSprite(int(it->second->y), it->second->getSprite());
 			it++;
 		}
 	}

@@ -8,7 +8,7 @@ using namespace sf;
 #define GRID_WIDTH 160
 #define GRID_HEIGHT 160
 
-#define PI 3.1415
+#define PI 3.1415f
 
 // LINE CALCULATIONS ///////////////////////////////////////////////////////////////////////////
 

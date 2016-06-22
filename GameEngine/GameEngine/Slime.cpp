@@ -116,22 +116,14 @@ void Slime::decideDirection() {
 	up = false;
 	down = false;
 
-	if (std::abs(x - destination.x) != 0) {
-		if (std::abs(int(x - destination.x)) <= std::max(ENTITY_SPEED / 2, std::abs(dx)))
-			x = float(destination.x);
-		else {
-			if (x < destination.x) right = true;
-			else left = true;
-		}
+	if (std::abs(int(x - destination.x)) > std::max(ENTITY_SPEED / 2, std::abs(dx))) {
+		if (x < destination.x) right = true;
+		else left = true;
 	}
 
-	if (std::abs(int(y - destination.y)) != 0) {
-		if (std::abs(y - destination.y) <= std::max(ENTITY_SPEED / 2, std::abs(dy)))
-			y = float(destination.y);
-		else {
-			if (y < destination.y) down = true;
-			else up = true;
-		}
+	if (std::abs(y - destination.y) > std::max(ENTITY_SPEED / 2, std::abs(dy))) {
+		if (y < destination.y) down = true;
+		else up = true;
 	}
 }
 

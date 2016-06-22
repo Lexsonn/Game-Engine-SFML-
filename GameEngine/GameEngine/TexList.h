@@ -11,6 +11,6 @@ enum texType {
 	playerAttack2,
 	playerAttack3,
 	playerAttRec,
-	enemyIdle
+	playerAttackAnim1,
 };
 #endif

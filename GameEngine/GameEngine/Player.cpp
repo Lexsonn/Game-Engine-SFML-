@@ -259,69 +259,6 @@ void Player::setInvulFalse() {
 		invulnerable = false;
 }
 
-// Player idle behavior
-// void Player::idle() { }
-
-// Player walk behavior
-/*
-void Player::walk() {
-	if (updateDirection())  {
-		switch (direction) {
-		case EAST: dx = SPEED/2; dy = 0; break;
-		case NORTHEAST: dx = SPEED/2 * DIAG_MOD; dy = -SPEED/2 * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -SPEED/2; break;
-		case NORTHWEST: dx = -SPEED/2 * DIAG_MOD; dy = -SPEED/2 * DIAG_MOD; break;
-		case WEST: dx = -SPEED/2; dy = 0; break;
-		case SOUTHWEST: dx = -SPEED/2 * DIAG_MOD; dy = SPEED/2 * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = SPEED/2; break;
-		case SOUTHEAST: dx = SPEED/2 * DIAG_MOD; dy = SPEED/2 * DIAG_MOD; break;
-		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
-		}
-		currentAnimation = animType(direction + WALK_ANIM);
-	}
-	else setState(IDLE); // Idle animation if currently not moving.
-}
-
-// Player run behavior
-void Player::run() {
-	if (updateDirection()) {
-		switch (direction) {
-		case EAST: dx = SPEED; dy = 0; break;
-		case NORTHEAST: dx = SPEED * DIAG_MOD; dy = -SPEED * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -SPEED; break;
-		case NORTHWEST: dx = -SPEED * DIAG_MOD; dy = -SPEED * DIAG_MOD; break;
-		case WEST: dx = -SPEED; dy = 0; break;
-		case SOUTHWEST: dx = -SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = SPEED; break;
-		case SOUTHEAST: dx = SPEED * DIAG_MOD; dy = SPEED * DIAG_MOD; break;
-		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
-		}
-		currentAnimation = animType(direction + RUN_ANIM);
-	}
-	else setState(IDLE); // Idle animation if currently not moving.
-}
-//*/
-/* Player attack backswing behavior
-void Player::abs() {
-	animFinished = animationList[currentAnimation]->isLastFrame();
-}
-
-// Player attack behavior
-void Player::attack() {
-	animFinished = animationList[currentAnimation]->isLastFrame();
-}
-
-// Player attack recover behavior
-void Player::attRec() {
-	animFinished = animationList[currentAnimation]->isLastFrame();
-}
-
-void Player::damaged() {
-	dx *= 0.95f;
-	dy *= 0.95f;
-	animFinished = animationList[currentAnimation]->isLastFrame();
-}
-//*/
 // Player dash behavior
 void Player::dash() {
 	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
@@ -351,15 +288,30 @@ void Player::dash() {
  *	Generate an attack with proper animation and force depending on the current attackType
  */
 void Player::generateAttack() {
+	std::vector<std::pair<Vector2f, Vector2f>> attLines;
+	Texture *t;
+	Animation *anim;
+	Vector2f f, pos;
 	switch (attackType) {
+	case 0:
+	case 1:
+		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
+		f = Vector2f(0, 0);
+		t = rm_master->getTexture("playerAttackAnim1.png");
+		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
+		anim->setRotation(-direction * 45);
+		pos = findMidpointOfLine(attLines.at(0));
+		createAttack(pos, 1, 10, int(ATT_BASE_STR), f, attLines, anim);
+		break;
+	case 2:
 	case 3:
 	default:
-		std::vector<std::pair<Vector2f, Vector2f>> attLines;
-		attLines.push_back(createAttackLine(LENGTH, DISTANCE));
-		Vector2f f = generateForceFromDirection(ATT_FORCE);
-		Texture *t = rm_master->getTexture("playerAtt1.png");
-		Animation *anim = new Animation(t, 0.f, 0.f, 50, 50, 5, 0.4f, true);
-		Vector2f pos = findMidpointOfLine(attLines.at(0));
+		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
+		f = generateForceFromDirection(ATT_FORCE);
+		t = rm_master->getTexture("playerAttackAnim1.png");
+		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
+		anim->setRotation(-direction * 45);
+		pos = findMidpointOfLine(attLines.at(0));
 		createAttack(pos, 1, 80, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
 	}
 }

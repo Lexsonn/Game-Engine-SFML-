@@ -10,6 +10,7 @@ void ResourceManager::init() {
 	addTexture("playerABS.png");
 	addTexture("playerAtt1.png");
 	addTexture("playerAttRec.png");
+	addTexture("playerAttackAnim1.png");
 }
 
 ResourceManager::~ResourceManager() { 
@@ -40,6 +41,7 @@ texType ResourceManager::getTextureType(std::string texPath) {
 	if (texPath == "playerAtt1.png") { return playerAttack1; }
 	if (texPath == "playerAtt2.png") { return playerAttack2; }
 	if (texPath == "playerAttRec.png") { return playerAttRec; }
+	if (texPath == "playerAttackAnim1.png") { return playerAttackAnim1; }
 	return UNKNOWN_t;
 }
 

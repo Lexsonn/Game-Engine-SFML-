@@ -246,25 +246,25 @@ Vector2f Entity::generateForceFromDirection(float strength) {
  *	Returns a line of specified length, normal to the direction of the Entity, at a specified 
  *	distance away from the Entity's direction.
  */
-std::pair<Vector2f, Vector2f> Entity::createAttackLine(float length, float distance) {
+std::pair<Vector2f, Vector2f> Entity::createNormalAttackLine(float length, float distance) {
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
 	if (direction != EAST)
-		line = rotateLineAboutPoint(line, Vector2f(x, y), 45.f * int(direction) * PI / 180.f);
+		line = rotateLineAboutPoint(line, Vector2f(x, y), 45.f * float(direction) * PI / 180.f);
 	
 	return line;
 }
 
 /*
-*	Returns a line of specified length, normal to the specified direction, at a specified
-*	distance away from the direction. The angle entered is in degrees.
-*/
-std::pair<Vector2f, Vector2f> Entity::createAttackLineFromAngle(float length, float distance, float angle) {
+ *	Returns a line of specified length, normal to the specified direction, at a specified
+ *	distance away from the direction. The angle entered is in degrees.
+ */
+std::pair<Vector2f, Vector2f> Entity::createNormalAttackLineFromAngle(float length, float distance, float angle) {
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
-	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * int(direction) * PI / 180.f);
+	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * float(direction) * PI / 180.f);
 	return line;
 }
 

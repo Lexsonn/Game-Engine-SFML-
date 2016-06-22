@@ -95,7 +95,6 @@ void Game::setLetterBoxView() {
 void Game::update() {
 	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
 	controller->checkKeyState();								// Get Keyboard information
-	at_master->updateAttacks();									// Update all Attacks
 	for (auto entity : entityList) {
 		entity.second->update();								// Update every entity
 		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
@@ -103,6 +102,7 @@ void Game::update() {
 	window->updateView(player);									// Update view to follow player
 	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
+	at_master->updateAttacks();									// Update all Attacks
 	
 }
 

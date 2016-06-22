@@ -12,7 +12,7 @@ void SpriteRenderer::clearList() {
 }
 
 void SpriteRenderer::render(RenderWindow *window) {
-	std::multimap<int, Sprite&>::iterator it = zOrderedSpriteList.begin();
+	std::multimap<int, Sprite &>::iterator it = zOrderedSpriteList.begin();
 	while (it != zOrderedSpriteList.end())
 		window->draw(it++->second);
 }

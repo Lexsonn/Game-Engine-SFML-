@@ -41,7 +41,6 @@ public:
 	bool deleteMusic(std::string musicPath);
 
 	bool addSprite(int z, Sprite &spr);
-	void clearList();
 	void setSpriteRenderer(SpriteRenderer *sprRenderer);
 private:
 	std::map<texType, Texture *> textureList;

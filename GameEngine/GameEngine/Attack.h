@@ -27,6 +27,7 @@ public:
 	void setFormed(int formAt);
 	void setPosition(float _x, float _y);
 	void setPosition(Vector2f position);
+	void setRotation(float angle);
 	void setForce(float dx, float dy);
 	Sprite &getSprite();
 private:

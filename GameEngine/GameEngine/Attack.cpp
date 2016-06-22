@@ -116,6 +116,10 @@ void Attack::setPosition(Vector2f position) {
 	animation->updatePosition(x, y);
 }
 
+void Attack::setRotation(float angle) {
+	animation->setRotation(angle);
+}
+
 void Attack::setForce(float dx, float dy) {
 	force = Vector2f(dx, dy);
 }
