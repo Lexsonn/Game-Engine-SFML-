@@ -130,6 +130,14 @@ int Entity::getDrawableType() {
 	return DO_ENTITY;
 }
 
+bool Entity::issuedDash() {
+	return (dashU || dashL || dashD || dashR);
+}
+
+bool Entity::issuedMove() {
+	return (up || left || down || right);
+}
+
 /*
  *	Update the direction the Entity is facing based on its up/down/left/right bool values
  *  Returns false if the Entity is not traveling in any direction.
@@ -151,6 +159,30 @@ bool Entity::updateDirection() {
 	if (!up && down) { direction = SOUTH; return true; }
 	
 	return false; // No direction is being held right now.
+}
+
+/*
+ *	Update the direction the Entity is dashing based on its dashU/dashL/dashD/dashR bool 
+ *	values.
+ *  Returns false if the Entity is not dashing in any direction.
+ */
+bool Entity::updateDashDirection() {
+	if (!dashL && dashR) {	// EAST/NORTHEAST/SOUTHEAST
+		if (!dashU && dashD) { direction = SOUTHEAST; return true; }
+		if (dashU && !dashD) { direction = NORTHEAST; return true; }
+		direction = EAST;
+		return true;
+	}
+	if (dashL && !dashR) {	// WEST/NORTHWEST/SOUTHWEST
+		if (!dashU && dashD) { direction = SOUTHWEST; return true; }
+		if (dashU && !dashD) { direction = NORTHWEST; return true; }
+		direction = WEST;
+		return true;
+	}
+	if (dashU && !dashD) { direction = NORTH; return true; }
+	if (!dashU && dashD) { direction = SOUTH; return true; }
+
+	return false; // No dash being issued.
 }
 
 void Entity::updatePosition() {

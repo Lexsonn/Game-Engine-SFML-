@@ -158,16 +158,16 @@ void Player::updateState() {
 	case IDLE:
 	case WALK:
 	case RUN:
-		if (dashU || dashL || dashD || dashR)
+		if (issuedDash())
 			setState(DASH);
-		else if (up || left || down || right) {
+		else if (issuedMove()) {
 			if (running) setState(RUN);
 			else setState(WALK);
 		}
 		else setState(IDLE);
 		break;
 	case ATTACK_BACKSWING: 
-		if (dashU || dashL || dashD || dashR) 
+		if (issuedDash()) 
 			setState(DASH);
 		else if (animFinished) 
 			setState(ATTACK_SWING);
@@ -177,7 +177,7 @@ void Player::updateState() {
 			setState(ATTACK_RECOVER);
 		break;
 	case ATTACK_RECOVER: 
-		if (dashU || dashL || dashD || dashR) 
+		if (issuedDash()) 
 			setState(DASH);
 		else if (animFinished)
 			setState(IDLE);
@@ -297,7 +297,7 @@ void Player::generateAttack() {
 		f = Vector2f(0, 0);
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
-		anim->setRotation(-direction * 45);
+		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
 		createAttack(pos, 1, 10, int(ATT_BASE_STR), f, attLines, anim);
 		break;
@@ -305,10 +305,11 @@ void Player::generateAttack() {
 	case 3:
 	default:
 		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
+		attLines.push_back(createNormalAttackLine(LENGTH/2, DISTANCE + 5));
 		f = generateForceFromDirection(ATT_FORCE);
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
-		anim->setRotation(-direction * 45);
+		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
 		createAttack(pos, 1, 10, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
 	}
@@ -363,37 +364,17 @@ std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
 Entity* Player::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 	Vector2f mid = findMidpointOfLine(line);
 	int gridPosition = getGrid(int(mid.x), int(mid.y));
-	if (gridPosition < 0)
-		return nullptr;
+	if (gridPosition >= 0) {
+		std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+		range = entityList->equal_range(gridPosition);
 
-	std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-	range = entityList->equal_range(gridPosition);
-	for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-		if (it->second->ID != ID) 
-			if (it->second->intersectsLine(line))
-				return it->second;
-		
+		for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+			if (it->second->ID != ID)
+				if (it->second->intersectsLine(line))
+					return it->second;
+		}
 	}
 	return nullptr;
-}
-
-bool Player::updateDashDirection() {
-	if (!dashL && dashR) {	// EAST/NORTHEAST/SOUTHEAST
-		if (!dashU && dashD) { direction = SOUTHEAST; return true; }
-		if (dashU && !dashD) { direction = NORTHEAST; return true; }
-		direction = EAST;
-		return true;
-	}
-	if (dashL && !dashR) {	// WEST/NORTHWEST/SOUTHWEST
-		if (!dashU && dashD) { direction = SOUTHWEST; return true; }
-		if (dashU && !dashD) { direction = NORTHWEST; return true; }
-		direction = WEST;
-		return true;
-	}
-	if (dashU && !dashD) { direction = NORTH; return true; }
-	if (!dashU && dashD) { direction = SOUTH; return true; }
-
-	return false; // No direction is being held right now.
 }
 
 void Player::keyHeld(Keyboard::Key key) {

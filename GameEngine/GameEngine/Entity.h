@@ -67,7 +67,6 @@ public:
 
 	virtual int getDrawableType();
 	virtual void update();
-	virtual void setState(stateType type);
 
 	void applyForce(Vector2f f);
 	void updatePosition(Vector2f v);
@@ -84,17 +83,22 @@ protected:
 	stateType state;
 	float flashDmg;
 	bool up, left, down, right;
+	bool dashU, dashL, dashD, dashR;
 	bool running, animFinished, hit;
 
 	bool isInAnimList(animType name);
 
+	bool issuedDash();
+	bool issuedMove();
 	bool updateDirection();
+	bool updateDashDirection();
 	void updatePosition();
 
 	virtual void init();
 	virtual float getSpeed();
 	virtual float getFlashTimer();
 	virtual void updateState();
+	virtual void setState(stateType type);
 
 	void createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
 	Vector2f generateForceFromDirection(float strength);

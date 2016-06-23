@@ -13,7 +13,7 @@ using namespace sf;
 // LINE CALCULATIONS ///////////////////////////////////////////////////////////////////////////
 
 bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, Vector2f> l);
-float findDistancePointToLine(Vector2f l1, Vector2f l2, Vector2f p);
+float findDistancePointToLine(std::pair<Vector2f, Vector2f> l, Vector2f p);
 Vector2f findMidpointOfLine(std::pair<Vector2f, Vector2f> l);
 std::pair<Vector2f, Vector2f> rotateLineAboutPoint(std::pair<Vector2f, Vector2f> line, Vector2f point, float angle);
 

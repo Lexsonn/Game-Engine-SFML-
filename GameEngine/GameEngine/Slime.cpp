@@ -73,7 +73,7 @@ void Slime::updateState() {
 	case IDLE:
 	case WALK:
 	case RUN:
-		if (up || left || down || right) {
+		if (issuedMove()) {
 			if (running) setState(RUN);
 			else setState(WALK);
 		}

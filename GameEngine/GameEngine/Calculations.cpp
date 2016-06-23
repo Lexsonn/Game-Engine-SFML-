@@ -52,29 +52,29 @@ bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, 
 	return true;
 }
 
-float findDistancePointToLine(Vector2f l1, Vector2f l2, Vector2f p) {
-	float diffX = l2.x - l1.x;
-	float diffY = l2.y - l1.y;
+float findDistancePointToLine(std::pair<Vector2f, Vector2f> l, Vector2f p) {
+	float diffX = l.second.x - l.first.x;
+	float diffY = l.second.y - l.first.y;
 
 	if ((diffX == 0) && (diffY == 0)) {
-		diffX = p.x - l1.x;
-		diffY = p.y - l1.y;
+		diffX = p.x - l.first.x;
+		diffY = p.y - l.first.y;
 		return sqrt(diffX * diffX + diffY * diffY);
 	}
 
-	float t = ((p.x - l1.x) * diffX + (p.y - l1.y) * diffY) / (diffX * diffX + diffY * diffY);
+	float t = ((p.x - l.first.x) * diffX + (p.y - l.first.y) * diffY) / (diffX * diffX + diffY * diffY);
 
 	if (t < 0) {
-		diffX = p.x - l1.x;
-		diffY = p.y - l1.y;
+		diffX = p.x - l.first.x;
+		diffY = p.y - l.first.y;
 	}
 	else if (t > 1) {
-		diffX = p.x - l2.x;
-		diffY = p.y - l2.y;
+		diffX = p.x - l.second.x;
+		diffY = p.y - l.second.y;
 	}
 	else {
-		diffX = p.x - (l1.x + t * diffX);
-		diffY = p.y - (l1.y + t * diffY);
+		diffX = p.x - (l.first.x + t * diffX);
+		diffY = p.y - (l.first.y + t * diffY);
 	}
 
 	return sqrt(diffX * diffX + diffY * diffY);
