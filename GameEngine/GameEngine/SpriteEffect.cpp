@@ -15,8 +15,8 @@ using namespace sf;
 \************************************************************************************************/
 
 SpriteEffect::~SpriteEffect() { }
-SpriteEffect::SpriteEffect() { }
-SpriteEffect::SpriteEffect(Sprite spr, float x, float y, int life, int t) {
+SpriteEffect::SpriteEffect() : currentLife(100), maxLife(100), rotationSpeed(4), finalScale(-1) { }
+SpriteEffect::SpriteEffect(Sprite spr, float x, float y, int life, int t) : rotationSpeed(4), finalScale(-1) {
 	sprite = spr;
 	sprite.setPosition(x, y);
 	this->x = x;

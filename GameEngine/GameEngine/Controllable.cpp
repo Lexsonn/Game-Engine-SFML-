@@ -2,7 +2,7 @@
 
 Controllable::~Controllable() {}
 Controllable::Controllable() {
-	keyWatchlist = std::vector<int>::vector();
+	keyWatchlist = std::vector<int>();
 }
 
 std::vector<int> Controllable::getWatchlist() {

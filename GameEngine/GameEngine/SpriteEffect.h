@@ -36,8 +36,8 @@ public:
 	void setScale(float scale);
 protected:
 	unsigned int type;
-	int currentLife = 100, maxLife = 100;
-	float rotationSpeed = 4, finalScale = -1;
+	int currentLife, maxLife;
+	float rotationSpeed, finalScale;
 
 	void fastFade();	// Default
 	void fade();		// bit 0

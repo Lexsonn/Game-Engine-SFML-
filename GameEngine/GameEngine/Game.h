@@ -18,7 +18,7 @@ public:
 private:
 	bool debug;
 	unsigned short int eID, oID;
-	int count = 0;
+	//int count = 0;
 
 	ResourceManager *rm_master;
 	SpriteRenderer *spr_renderer;
