@@ -23,9 +23,11 @@ Game::Game(RenderWindow* rWindow) {
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
 	Animation *anim = new Animation(rm_master->getTexture("playerAtt1.png"), 0, 0, 50, 50, 5, 0.4f, true);
 	//Attack * att = new Attack(0, 0, 1, 60, 23, lines);
+	//*
 	at_master->addAttack(1, 1, 320, 23, lines, anim);
 	at_master->attackList.at(0)->setPosition(210, 190);
 	at_master->attackList.at(0)->setForce(2, 2);
+	//*/
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\tCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\tInputController: " << sizeof(InputController) << "\n";

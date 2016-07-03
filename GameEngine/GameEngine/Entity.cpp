@@ -23,10 +23,9 @@ Entity::~Entity() {
 	spriteEffectList.clear();
 	animationList.clear();
 }
-Entity::Entity() { }
-Entity::Entity(ResourceManager *rm) { rm_master = rm; }
-Entity::Entity(float startX, float startY, ResourceManager *rm) { 
-	life = 100; 
+Entity::Entity() : life(100), maxLife(100), invulnerable(false) { init(); }
+Entity::Entity(ResourceManager *rm) : life(100), maxLife(100) { rm_master = rm; init();  }
+Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), maxLife(100) {
 	rm_master = rm;
 	x = startX;
 	y = startY;
@@ -114,7 +113,8 @@ void Entity::damage(int dmg) {
 	if (invulnerable)
 		return;
 	setState(DAMAGED);
-	animationList[currentAnimation]->restart();
+	if (animationList.count(currentAnimation) != 0)
+		animationList[currentAnimation]->restart();
 	life -= dmg;
 	if (life < 0)
 		life = 0;
@@ -253,12 +253,12 @@ void Entity::update() { }
 void Entity::updateState() { }
 void Entity::setState(stateType newState) { }
 
-void Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
+int Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
 	Attack *newAttack;
-	newAttack = new Attack(0, ID, type, life, str, attackLines, anim);
+	newAttack = new Attack(ID, type, life, str, attackLines, anim);
 	newAttack->setForce(force.x, force.y);
 	newAttack->setPosition(pos);
-	at_master->addAttack(newAttack);
+	return at_master->addAttack(newAttack);
 }
 
 Vector2f Entity::generateForceFromDirection(float strength) {

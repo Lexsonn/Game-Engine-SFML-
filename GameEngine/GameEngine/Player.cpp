@@ -290,6 +290,7 @@ void Player::generateAttack() {
 	Texture *t;
 	Animation *anim;
 	Vector2f f, pos;
+	int newAtt;
 	switch (attackType) {
 	case 0:
 	case 1:

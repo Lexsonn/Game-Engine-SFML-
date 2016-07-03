@@ -100,7 +100,7 @@ protected:
 	virtual void updateState();
 	virtual void setState(stateType type);
 
-	void createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
+	int createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
 	Vector2f generateForceFromDirection(float strength);
 	std::pair<Vector2f, Vector2f> createNormalAttackLine(float length, float distance);
 	std::pair<Vector2f, Vector2f> createNormalAttackLineFromAngle(float length, float distance, float angle);

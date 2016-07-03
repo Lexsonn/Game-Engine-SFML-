@@ -14,15 +14,18 @@ void AttackManager::setResourceManager(ResourceManager *rm) {
 	rm_master = rm;
 }
 
-void AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, short int str, 
+int AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, short int str, 
 							  std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *animation) {
-	Attack *attack = new Attack(ID, parentID, type, life, str, lineList, animation);
-	attackList.insert(std::pair<unsigned short int, Attack *>(ID++, attack));
+	Attack *attack = new Attack(parentID, type, life, str, lineList, animation);
+	attack->ID = ID;
+	attackList.insert(std::pair<unsigned short int, Attack *>(ID, attack));
+	return ID++;
 }
 
-void AttackManager::addAttack(Attack *attack) {
+int AttackManager::addAttack(Attack *attack) {
 	attack->ID = ID;
-	attackList.insert(std::pair<unsigned short int, Attack *>(ID++, attack));
+	attackList.insert(std::pair<unsigned short int, Attack *>(ID, attack));
+	return ID++;
 }
 
 void AttackManager::deleteAttack(unsigned short int _ID) {
