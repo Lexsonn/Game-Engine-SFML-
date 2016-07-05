@@ -23,6 +23,7 @@ Entity::~Entity() {
 	spriteEffectList.clear();
 	animationList.clear();
 }
+
 Entity::Entity() : life(100), maxLife(100), invulnerable(false) { init(); }
 Entity::Entity(ResourceManager *rm) : life(100), maxLife(100) { rm_master = rm; init();  }
 Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), maxLife(100) {
@@ -231,10 +232,10 @@ Vector2f Entity::getEntityOverlap(Entity *other) {
 
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
 
+	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
 	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
 	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
 	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
-	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
@@ -297,7 +298,7 @@ std::pair<Vector2f, Vector2f> Entity::createNormalAttackLineFromAngle(float leng
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
-	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * float(direction) * PI / 180.f);
+	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * PI / 180.f);
 	return line;
 }
 

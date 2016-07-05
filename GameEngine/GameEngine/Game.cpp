@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Slime.h" // Eventually make a header with all Enemy types
+#include "BabySlime.h"
 
 #define _DEBUG_MODE true
 
@@ -73,6 +74,19 @@ void Game::createWorld() {
 	addEntity(new Slime(300, 140, rm_master));
 	addEntity(new Slime(190, 250, rm_master));
 	addEntity(new Slime(340, 340, rm_master));
+
+	addEntity(new BabySlime(300, 160, rm_master));
+	addEntity(new BabySlime(300, 170, rm_master));
+	addEntity(new BabySlime(300, 180, rm_master));
+	addEntity(new BabySlime(300, 190, rm_master));
+	addEntity(new BabySlime(320, 160, rm_master));
+	addEntity(new BabySlime(320, 170, rm_master));
+	addEntity(new BabySlime(320, 180, rm_master));
+	addEntity(new BabySlime(320, 190, rm_master));
+	addEntity(new BabySlime(340, 160, rm_master));
+	addEntity(new BabySlime(340, 170, rm_master));
+	addEntity(new BabySlime(340, 180, rm_master));
+	addEntity(new BabySlime(340, 190, rm_master));
 
 	addObject(new Collidable(370, 140, 40, 240));
 	addObject(new Collidable(80, 290, 210, 20));

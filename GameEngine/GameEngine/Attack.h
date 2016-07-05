@@ -9,6 +9,7 @@
 #include <map>
 
 using namespace sf;
+
 class Attack : public DrawableObject {
 public:
 	float z;

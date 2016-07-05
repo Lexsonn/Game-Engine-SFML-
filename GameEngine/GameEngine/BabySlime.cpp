@@ -1,6 +1,8 @@
-#include "Slime.h"
+#include "BabySlime.h"
 
-void Slime::init() {
+#define SPEED 0.5f
+
+void BabySlime::init() {
 	// AI vars
 	generateRND(int(time(NULL)), 99);
 	destination.x = int(x);
@@ -9,35 +11,39 @@ void Slime::init() {
 	decisionMake = 0;
 	decisionSpeed = 0.05f;
 	// Entity vars
-	name = "Slime";
-	cWidth = 20;
-	cHeight = 20;
-	life = 100;
+	name = "Baby Slime";
+	cWidth = 10;
+	cHeight = 10;
+	life = 40;
 	currentAnimation = idleE;
-	weight = 10;
+	weight = 2;
 	Entity::init();
 
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
 	Texture *tx1 = rm_master->getTexture("playerAttRec.png");
 
-	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.75, 0.75);
-	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.1f, true); animationList[damageE]->setScale(0.75, 0.75);
+	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.35f, 0.35f);
+	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.1f, true); animationList[damageE]->setScale(0.35f, 0.35f);
 }
 
-Slime::~Slime() { }
-Slime::Slime(ResourceManager *rm) { 
+BabySlime::~BabySlime() { }
+BabySlime::BabySlime(ResourceManager *rm) {
 	rm_master = rm;
 	init();
 }
 
-Slime::Slime(float startX, float startY, ResourceManager *rm) { 
+BabySlime::BabySlime(float startX, float startY, ResourceManager *rm) {
 	rm_master = rm;
 	x = startX;
 	y = startY;
 	init();
 }
 
-void Slime::update() { 
+float BabySlime::getSpeed() {
+	return SPEED;
+}
+
+void BabySlime::update() {
 	// AI decision making
 	decisionMake += decisionSpeed;
 	if (decisionMake >= 1) {
@@ -64,7 +70,7 @@ void Slime::update() {
 	updatePosition();
 }
 
-void Slime::updateState() { 
+void BabySlime::updateState() {
 	switch (state) {
 	case IDLE:
 	case WALK:
@@ -83,7 +89,7 @@ void Slime::updateState() {
 	default: std::cout << "What did you do now?\n";
 	}
 }
-void Slime::setState(stateType newState) {
+void BabySlime::setState(stateType newState) {
 	if (state == newState)
 		return;
 
@@ -105,24 +111,24 @@ void Slime::setState(stateType newState) {
 	state = newState;
 }
 
-void Slime::decideDirection() {
+void BabySlime::decideDirection() {
 	left = false;
 	right = false;
 	up = false;
 	down = false;
 
-	if (std::abs(int(x - destination.x)) > std::max(ENTITY_SPEED / 2, std::abs(dx))) {
+	if (std::abs(int(x - destination.x)) > std::max(SPEED / 2, std::abs(dx))) {
 		if (x < destination.x) right = true;
 		else left = true;
 	}
 
-	if (std::abs(y - destination.y) > std::max(ENTITY_SPEED / 2, std::abs(dy))) {
+	if (std::abs(y - destination.y) > std::max(SPEED / 2, std::abs(dy))) {
 		if (y < destination.y) down = true;
 		else up = true;
 	}
 }
 
-void Slime::walk() {
+void BabySlime::walk() {
 	if (updateDirection()) {
 		switch (direction) {
 		case EAST: dx = getSpeed() / 2; dy = 0; break;
@@ -140,7 +146,7 @@ void Slime::walk() {
 	else setState(IDLE); // Idle animation if currently not moving.
 }
 
-void Slime::run() {
+void BabySlime::run() {
 	if (updateDirection()) {
 		switch (direction) {
 		case EAST: dx = getSpeed(); dy = 0; break;

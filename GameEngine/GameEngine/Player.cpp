@@ -96,16 +96,15 @@ void Player::init() {
 	keyWatchlist.push_back((int)Keyboard::Right);
 	keyWatchlist.push_back((int)Keyboard::LShift);	// Run modifier
 	keyWatchlist.push_back((int)Keyboard::Space);	// Attack button
-
-	keyWatchlist.push_back((int)Keyboard::LControl); // TEMP KEYS
+	// TEMP KEYS ///////////////////////////////////////////////////////////
+	keyWatchlist.push_back((int)Keyboard::LControl);
 	keyWatchlist.push_back((int)Keyboard::RControl);
 	keyWatchlist.push_back((int)Keyboard::RShift);
 	keyWatchlist.push_back((int)Keyboard::Q);
 	
-	std::cout << "player initialized\n";
+	std::cout << "Player initialized\n";
 }
 
-//Player::~Player() {};
 Player::Player(ResourceManager *rm) {
 	rm_master = rm;
 	init();
@@ -146,13 +145,16 @@ void Player::update() {
 	case DASH: dash(); break;
 	default: std::cout << "wat\n";
 	}
-
 	// If the Player has been hit, flash the current sprite.
 	flashCurrentSprite(oldAnimation);
 
 	updatePosition();
 }
 
+/*
+ *	Switch states depending on the current state and what actions the player wants
+ *	to perform.
+ */
 void Player::updateState() {
 	switch (state) {
 	case IDLE:
@@ -289,18 +291,17 @@ void Player::generateAttack() {
 	std::vector<std::pair<Vector2f, Vector2f>> attLines;
 	Texture *t;
 	Animation *anim;
-	Vector2f f, pos;
-	int newAtt;
+	Vector2f pos, f;
 	switch (attackType) {
 	case 0:
 	case 1:
 		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
-		f = Vector2f(0, 0);
+		attLines.push_back(createNormalAttackLine(LENGTH / 2, DISTANCE + 5));
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
 		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
-		createAttack(pos, 1, 10, int(ATT_BASE_STR), f, attLines, anim);
+		createAttack(pos, 1, 10, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
 		break;
 	case 2:
 	case 3:
@@ -318,8 +319,7 @@ void Player::generateAttack() {
 
 /*
  *	Create short line normal to the direction the Player is facing. The line will be positioned
- *	shortly in front of the Player. Useful for interacting with Entities directly in front of the
- *	Player.
+ *	shortly in front of the Player. Used to interact with Entities directly in front of the	Player.
  */
 std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
 	std::pair<Vector2f, Vector2f> line;

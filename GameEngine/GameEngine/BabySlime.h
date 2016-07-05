@@ -1,16 +1,16 @@
-#ifndef SLIME_H
-#define SLIME_H
+#ifndef BABYSLIME_H
+#define BABYSLIME_H
 
 #include "Entity.h"
 #include "AI.h"
 
 using namespace sf;
 
-class Slime : public Entity, public AI {
+class BabySlime : public Entity, public AI {
 public:
-	~Slime();
-	Slime(ResourceManager *rm);
-	Slime(float startX, float startY, ResourceManager *rm);
+	~BabySlime();
+	BabySlime(ResourceManager *rm);
+	BabySlime(float startX, float startY, ResourceManager *rm);
 
 	virtual void update();
 private:
@@ -19,7 +19,7 @@ private:
 	virtual void setState(stateType newState);
 
 	virtual void init();
-
+	virtual float getSpeed();
 	virtual void walk();
 	virtual void run();
 };
