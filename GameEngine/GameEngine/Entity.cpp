@@ -114,7 +114,7 @@ void Entity::damage(int dmg) {
 	if (invulnerable)
 		return;
 	setState(DAMAGED);
-	if (animationList.count(currentAnimation) != 0)
+	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->restart();
 	life -= dmg;
 	if (life < 0)

@@ -18,7 +18,7 @@ public:
 private:
 	bool debug;
 	unsigned short int eID, oID;
-	//int count = 0;
+	int count = 0;
 
 	ResourceManager *rm_master;
 	SpriteRenderer *spr_renderer;
@@ -40,5 +40,6 @@ private:
 	void addEntity(Entity *entity);
 	void deleteEntity(unsigned short int _ID);
 	void addObject(Collidable *object);
+	void deleteObject(unsigned short int _ID);
 };
 #endif

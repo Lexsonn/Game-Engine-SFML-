@@ -159,20 +159,21 @@ void Game::deleteEntity(unsigned short int _ID) {
 	entityList.erase(it);
 }
 
-/*
- *	Delete a static Collidable from all lists related to the Collidable.
-
-void Game::deleteCollidable(unsigned short int _ID) {
-	std::map<unsigned short int, Entity *>::iterator it = objectList.find(_ID);
-	if (it == objectList.end())
-		return;
-	cGrid->deleteCollidable(it->second);
-	delete it->second;
-	entityList.erase(it);
-}
-//*/
 void Game::addObject(Collidable *object) {
 	object->ID = oID;
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
 	cGrid->addObject(object);
 }
+
+/*
+*	Delete a static Collidable from all lists related to the Collidable.
+*/
+void Game::deleteObject(unsigned short int _ID) {
+	std::map<unsigned short int, Collidable *>::iterator it = objectList.find(_ID);
+	if (it == objectList.end())
+		return;
+	cGrid->deleteObject(it->second);
+	delete it->second;
+	objectList.erase(it);
+}
+//*/
