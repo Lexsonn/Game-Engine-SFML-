@@ -6,9 +6,11 @@
 
 int WWIDTH(640);
 int WHEIGHT(480);
+Game *game(nullptr);
 
 Game::~Game() { }
 Game::Game(RenderWindow* rWindow) {
+	game = this;
 	eID = 0;
 	oID = 0;
 	debug = _DEBUG_MODE;
@@ -16,6 +18,7 @@ Game::Game(RenderWindow* rWindow) {
 	WWIDTH = 800;
 	WHEIGHT = 800;
 
+	initEntityMap();
 	initManagers(rWindow);
 	createWorld();
 
@@ -35,6 +38,13 @@ Game::Game(RenderWindow* rWindow) {
 	std::cout << "AttackManager : " << sizeof(AttackManager) << "\tAttack: " << sizeof(Attack) << "\n";
 	std::cout << "Player : " << sizeof(Player) << "\t\tEntity: " << sizeof(Entity) << "\n";
 	//*/
+}
+
+void Game::initEntityMap() {
+	entityMap["Entity"] = ENTITY;
+	entityMap["Player"] = PLAYER;
+	entityMap["Slime"] = SLIME;
+	entityMap["BabySlime"] = BABYSLIME;
 }
 
 void Game::initManagers(RenderWindow *rWindow) {
@@ -91,6 +101,22 @@ void Game::createWorld() {
 	addObject(new Collidable(370, 140, 40, 240));
 	addObject(new Collidable(80, 290, 210, 20));
 	addObject(new Collidable(140, 270, 60, 60));
+}
+
+void Game::createEntity(std::string entityName, Vector2f pos) {
+	Entity *newEntity = nullptr;
+	EntityType type = UNKNOWN_e;
+	std::map<std::string, EntityType>::iterator it = entityMap.find(entityName);
+	if (it != entityMap.end())
+		type = it->second;
+	switch (type) {
+	case PLAYER: newEntity = new Player(pos.x, pos.y, rm_master); break;
+	case SLIME: newEntity = new Slime(pos.x, pos.y, rm_master); break;
+	case BABYSLIME: newEntity = new BabySlime(pos.x, pos.y, rm_master); break;
+	default: std::cout << "Unable to create entity: " + entityName + "\n";
+	}
+	if (newEntity != nullptr)
+		addEntity(newEntity);
 }
 
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush

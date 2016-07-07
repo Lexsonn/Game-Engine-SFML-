@@ -1,7 +1,9 @@
 #include "Entity.h"
+#include "Game.h"
 
 extern int WWIDTH;
 extern int WHEIGHT;
+extern Game *game;
 
 void Entity::init() { 
 	for (int i = 0; i < 4; i++)
@@ -203,6 +205,11 @@ void Entity::updatePosition(Vector2f v) {
 void Entity::applyForce(Vector2f f) {
 	dx = f.x;
 	dy = f.y;
+}
+
+void Entity::createNewEntity(std::string entityName, Vector2f pos) {
+	if (game != nullptr)
+		game->createEntity(entityName, pos);
 }
 
 void Entity::moveOutsideCollidable(Collidable *other) {

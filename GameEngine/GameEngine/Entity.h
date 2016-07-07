@@ -93,6 +93,7 @@ protected:
 	bool updateDirection();
 	bool updateDashDirection();
 	void updatePosition();
+	void createNewEntity(std::string entityName, Vector2f pos);
 
 	virtual void init();
 	virtual float getSpeed();
