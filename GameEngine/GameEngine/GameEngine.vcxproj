@@ -74,11 +74,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Daimen\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2832 bit%29\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Daimen\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2832 bit%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-network-d.lib;sfml-audio-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;kernel32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -129,6 +129,7 @@
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="Attack.cpp" />
     <ClCompile Include="AttackManager.cpp" />
+    <ClCompile Include="BabySlime.cpp" />
     <ClCompile Include="Calculations.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="CollisionGrid.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="AnimList.h" />
     <ClInclude Include="Attack.h" />
     <ClInclude Include="AttackManager.h" />
+    <ClInclude Include="BabySlime.h" />
     <ClInclude Include="Calculations.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="MusicList.h" />

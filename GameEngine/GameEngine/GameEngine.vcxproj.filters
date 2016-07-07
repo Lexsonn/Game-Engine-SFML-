@@ -129,6 +129,9 @@
     <ClCompile Include="CollisionManager.cpp">
       <Filter>Source Files\Game\Game World\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="BabySlime.cpp">
+      <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -202,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
       <Filter>Header Files\Game\Game World\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="BabySlime.h">
+      <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
