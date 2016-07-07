@@ -89,11 +89,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2832 bit%29\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Projects\Game-Engine-SFML-\GameEngine\GameEngine;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sfml-network-d.lib;sfml-audio-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Projects\Game-Engine-SFML-\GameEngine\GoogleTest;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2832 bit%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,11 +106,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2864 bit%29\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Projects\Game-Engine-SFML-\GameEngine\GameEngine;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest\include;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\googletest-master\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sfml-network-d.lib;sfml-audio-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Projects\Game-Engine-SFML-\GameEngine\GoogleTest;C:\Users\fasttrackd-student-8\Documents\Visual Studio 2015\Additional Libraries\C++\SFML-2.3.2 %2864 bit%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +155,27 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameEngine_Test.cpp" />
+    <ClCompile Include="..\GameEngine\AI.cpp" />
+    <ClCompile Include="..\GameEngine\Animation.cpp" />
+    <ClCompile Include="..\GameEngine\Attack.cpp" />
+    <ClCompile Include="..\GameEngine\AttackManager.cpp" />
+    <ClCompile Include="..\GameEngine\BabySlime.cpp" />
+    <ClCompile Include="..\GameEngine\Calculations.cpp" />
+    <ClCompile Include="..\GameEngine\Collidable.cpp" />
+    <ClCompile Include="..\GameEngine\CollisionGrid.cpp" />
+    <ClCompile Include="..\GameEngine\CollisionManager.cpp" />
+    <ClCompile Include="..\GameEngine\Controllable.cpp" />
+    <ClCompile Include="..\GameEngine\DrawableObject.cpp" />
+    <ClCompile Include="..\GameEngine\Entity.cpp" />
+    <ClCompile Include="..\GameEngine\Game.cpp" />
+    <ClCompile Include="..\GameEngine\GameWindow.cpp" />
+    <ClCompile Include="..\GameEngine\InputController.cpp" />
+    <ClCompile Include="..\GameEngine\Player.cpp" />
+    <ClCompile Include="..\GameEngine\ResourceManager.cpp" />
+    <ClCompile Include="..\GameEngine\Slime.cpp" />
+    <ClCompile Include="..\GameEngine\SpriteEffect.cpp" />
+    <ClCompile Include="..\GameEngine\SpriteRenderer.cpp" />
+    <ClCompile Include="Entity_Tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameEngine\GameEngine.vcxproj">
