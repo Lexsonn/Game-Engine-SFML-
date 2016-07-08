@@ -14,6 +14,9 @@ public:
 
 	virtual void update();
 private:
+	float panicTimer;
+	bool panicMode;
+
 	virtual void decideDirection();
 	virtual void updateState();
 	virtual void setState(stateType newState);

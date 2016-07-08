@@ -25,8 +25,6 @@ private:
 	short int attackType, maxAttacks;
 	float dashTimer;
 
-	virtual void dash();
-
 	void setInvulFalse();
 
 	void generateAttack();
@@ -39,5 +37,7 @@ private:
 	virtual float getFlashTimer();
 	virtual void updateState();
 	virtual void setState(stateType newState);
+
+	virtual void dash();
 };
 #endif

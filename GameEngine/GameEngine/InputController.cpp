@@ -2,25 +2,28 @@
 
 InputController::~InputController() {}
 InputController::InputController() {
-	std::fill_n(keyPressed, (int)Keyboard::KeyCount, false);
+	keyPressed.resize((int) Keyboard::KeyCount, false);
 }
 
 void InputController::checkKeyState() {
+	//Temp keyPressed values, so multiple input objects can be properly handled
+	std::vector<bool> _keyPressed = keyPressed;
 	for (Controllable* controllable : controllableList) {
 		for (int currentKey : controllable->getWatchlist()) {
-			if (Keyboard::isKeyPressed((Keyboard::Key)currentKey) && !keyPressed[currentKey]) {
+			if (Keyboard::isKeyPressed((Keyboard::Key)currentKey) && !keyPressed.at(currentKey)) {
 				controllable->_keyPress((Keyboard::Key)currentKey);
-				keyPressed[currentKey] = true;
+				_keyPressed[currentKey] = true;
 			}
-			else if (!Keyboard::isKeyPressed((Keyboard::Key)currentKey) && keyPressed[currentKey]) {
+			else if (!Keyboard::isKeyPressed((Keyboard::Key)currentKey) && keyPressed.at(currentKey)) {
 				controllable->_keyRelease((Keyboard::Key)currentKey);
-				keyPressed[currentKey] = false;
+				_keyPressed[currentKey] = false;
 			}
 			if (Keyboard::isKeyPressed((Keyboard::Key)currentKey)) {
 				controllable->_keyHeld((Keyboard::Key)currentKey);
 			}
 		}
 	}
+	keyPressed = _keyPressed;
 }
 
 void InputController::addControllable(Controllable* controllable) {

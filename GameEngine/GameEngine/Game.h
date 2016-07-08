@@ -48,6 +48,7 @@ private:
 	void update();
 	void render();
 
+	Controllable *addControllable(Controllable *c);
 	void addEntity(Entity *entity);
 	void deleteEntity(unsigned short int _ID);
 	void addObject(Collidable *object);

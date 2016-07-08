@@ -407,7 +407,7 @@ void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::LControl) { damage(32); std::cout << "Life: " << life << "\n"; }
 	if (key == Keyboard::RControl) recover(500);
 	if (key == Keyboard::Q) {
-		createNewEntity("Entity", Vector2f(100.f, 100.f));
+		//createNewEntity("Slime", Vector2f(100.f, 100.f));
 		//* ENTITY INTERACTION TESTS
 		// Access entity at position. For things like text box conversations.
 		std::pair<Vector2f, Vector2f> line = getAccessorLineFromDirection(); 

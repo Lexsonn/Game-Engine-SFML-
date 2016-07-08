@@ -110,7 +110,7 @@ void Game::createEntity(std::string entityName, Vector2f pos) {
 	if (it != entityMap.end())
 		type = it->second;
 	switch (type) {
-	case PLAYER: newEntity = new Player(pos.x, pos.y, rm_master); break;
+	case PLAYER: newEntity = dynamic_cast<Player *>(addControllable(new Player(pos.x, pos.y, rm_master))); break;
 	case SLIME: newEntity = new Slime(pos.x, pos.y, rm_master); break;
 	case BABYSLIME: newEntity = new BabySlime(pos.x, pos.y, rm_master); break;
 	default: std::cout << "Unable to create entity: " + entityName + "\n";
@@ -145,7 +145,6 @@ void Game::update() {
 	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
 	at_master->updateAttacks();									// Update all Attacks
-	
 }
 
 void Game::render() {
@@ -163,6 +162,10 @@ void Game::render() {
 	}
 }
 
+Controllable *Game::addControllable(Controllable *c) {
+	controller->addControllable(c);
+	return c;
+}
 /*
  *	Perform all necessary functions to have a newly created Entity interact in the game world.
  */
