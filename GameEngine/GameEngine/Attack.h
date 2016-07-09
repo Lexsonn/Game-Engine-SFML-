@@ -9,6 +9,7 @@
 #include <map>
 
 using namespace sf;
+
 class Attack : public DrawableObject {
 public:
 	float z;
@@ -20,7 +21,7 @@ public:
 
 	~Attack();
 	Attack();
-	Attack(unsigned short int _ID, unsigned short int parentID, unsigned short int _type, short int life, short int str, 
+	Attack(unsigned short int parentID, unsigned short int _type, short int life, short int str, 
 		   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim);
 
 	void update();

@@ -17,7 +17,6 @@ void BabySlime::init() {
 	life = 40;
 	currentAnimation = idleE;
 	weight = 2;
-	Entity::init();
 
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
 	Texture *tx1 = rm_master->getTexture("playerAttRec.png");

@@ -9,8 +9,9 @@
 #define ATT_FORCE 2.f
 #define ATT_BASE_STR 10
 
+int Player::entityType = 1;
+
 void Player::init() {
-	Entity::init();
 	// Initialize inherited variables
 	name = "El";
 	cWidth = 16;
@@ -96,16 +97,15 @@ void Player::init() {
 	keyWatchlist.push_back((int)Keyboard::Right);
 	keyWatchlist.push_back((int)Keyboard::LShift);	// Run modifier
 	keyWatchlist.push_back((int)Keyboard::Space);	// Attack button
-
-	keyWatchlist.push_back((int)Keyboard::LControl); // TEMP KEYS
+	// TEMP KEYS ///////////////////////////////////////////////////////////
+	keyWatchlist.push_back((int)Keyboard::LControl);
 	keyWatchlist.push_back((int)Keyboard::RControl);
 	keyWatchlist.push_back((int)Keyboard::RShift);
 	keyWatchlist.push_back((int)Keyboard::Q);
 	
-	std::cout << "player initialized\n";
+	std::cout << "Player initialized\n";
 }
 
-//Player::~Player() {};
 Player::Player(ResourceManager *rm) {
 	rm_master = rm;
 	init();
@@ -120,6 +120,10 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 
 void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
 	entityList = list;
+}
+
+int Player::getType() {
+	return Player::entityType;
 }
 
 float Player::getSpeed() {
@@ -146,13 +150,16 @@ void Player::update() {
 	case DASH: dash(); break;
 	default: std::cout << "wat\n";
 	}
-
 	// If the Player has been hit, flash the current sprite.
 	flashCurrentSprite(oldAnimation);
 
 	updatePosition();
 }
 
+/*
+ *	Switch states depending on the current state and what actions the player wants
+ *	to perform.
+ */
 void Player::updateState() {
 	switch (state) {
 	case IDLE:
@@ -289,17 +296,17 @@ void Player::generateAttack() {
 	std::vector<std::pair<Vector2f, Vector2f>> attLines;
 	Texture *t;
 	Animation *anim;
-	Vector2f f, pos;
+	Vector2f pos, f;
 	switch (attackType) {
 	case 0:
 	case 1:
 		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
-		f = Vector2f(0, 0);
+		attLines.push_back(createNormalAttackLine(LENGTH / 2, DISTANCE + 5));
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
 		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
-		createAttack(pos, 1, 10, int(ATT_BASE_STR), f, attLines, anim);
+		createAttack(pos, 1, 10, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
 		break;
 	case 2:
 	case 3:
@@ -317,8 +324,7 @@ void Player::generateAttack() {
 
 /*
  *	Create short line normal to the direction the Player is facing. The line will be positioned
- *	shortly in front of the Player. Useful for interacting with Entities directly in front of the
- *	Player.
+ *	shortly in front of the Player. Used to interact with Entities directly in front of the	Player.
  */
 std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
 	std::pair<Vector2f, Vector2f> line;
@@ -406,30 +412,15 @@ void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::LControl) { damage(32); std::cout << "Life: " << life << "\n"; }
 	if (key == Keyboard::RControl) recover(500);
 	if (key == Keyboard::Q) {
-		/* ENTITY PUSHING TESTS
-		if (weight != 20)
-			weight = 20;
-		else
-			weight = 8;
-		//*/
+		//createNewEntity("Slime", Vector2f(100.f, 100.f));
 		//* ENTITY INTERACTION TESTS
 		// Access entity at position. For things like text box conversations.
 		std::pair<Vector2f, Vector2f> line = getAccessorLineFromDirection(); 
 		Entity * t = getEntityAt(line);
-
 		if (t == nullptr)
 			return;
 
 		std::cout << "Entity is: " << t->ID << "\n";
-		//*/
-		//std::cout << "GridPos: " << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2] << ", " << gridPos[3] << "\n";
-		/* LINE INTERSECTION TESTS
-		std::pair<Vector2f, Vector2f> l; l.first = Vector2f(100.0f, 20.f); l.second = Vector2f(100.0f, 90.f);
-		std::pair<Vector2f, Vector2f> l2; l2.first = Vector2f(130.0f, 20.f); l2.second = Vector2f(170.0f, 90.f);
-		std::pair<Vector2f, Vector2f> l3; l3.first = Vector2f(200.0f, 90.f); l3.second = Vector2f(250.0f, 20.f);
-		std::pair<Vector2f, Vector2f> l4; l4.first = Vector2f(300.0f, 90.f); l4.second = Vector2f(350.0f, 90.f);
-		std::cout << "Intersects: " << intersectsLine(l) << " " << intersectsLine(l2) << " " << intersectsLine(l3) << " " << intersectsLine(l4) << "\n";
-		//*/
 	}
 	if (key == Keyboard::W) up = true;
 	if (key == Keyboard::A) left = true;

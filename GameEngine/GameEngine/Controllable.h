@@ -19,8 +19,6 @@ public:
 	virtual void keyHeld(Keyboard::Key key);
 	virtual void keyPress(Keyboard::Key key);
 	virtual void keyRelease(Keyboard::Key key);
-
-	
 protected:
 	std::vector<int> keyWatchlist;
 };

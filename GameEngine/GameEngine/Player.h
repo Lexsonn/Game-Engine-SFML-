@@ -20,12 +20,13 @@ public:
 	virtual void keyRelease(Keyboard::Key key);
 
 	virtual void render(RenderWindow *window);
+
+	static int entityType;
+	virtual int getType();
 private:
 	std::multimap<unsigned short int, Entity *> *entityList;
 	short int attackType, maxAttacks;
 	float dashTimer;
-
-	virtual void dash();
 
 	void setInvulFalse();
 
@@ -39,5 +40,7 @@ private:
 	virtual float getFlashTimer();
 	virtual void updateState();
 	virtual void setState(stateType newState);
+
+	virtual void dash();
 };
 #endif

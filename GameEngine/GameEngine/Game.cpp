@@ -1,13 +1,17 @@
 #include "Game.h"
 #include "Slime.h" // Eventually make a header with all Enemy types
+#include "BabySlime.h"
 
 #define _DEBUG_MODE true
+#define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller->addControllable(dynamic_cast<Controllable *>(newEntity));
 
 int WWIDTH(640);
 int WHEIGHT(480);
+Game *game(nullptr);
 
 Game::~Game() { }
 Game::Game(RenderWindow* rWindow) {
+	game = this;
 	eID = 0;
 	oID = 0;
 	debug = _DEBUG_MODE;
@@ -15,9 +19,11 @@ Game::Game(RenderWindow* rWindow) {
 	WWIDTH = 800;
 	WHEIGHT = 800;
 
+	initEntityMap();
 	initManagers(rWindow);
 	createWorld();
 
+	//*
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
@@ -26,12 +32,20 @@ Game::Game(RenderWindow* rWindow) {
 	at_master->addAttack(1, 1, 320, 23, lines, anim);
 	at_master->attackList.at(0)->setPosition(210, 190);
 	at_master->attackList.at(0)->setForce(2, 2);
+	//*/
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\tCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\tInputController: " << sizeof(InputController) << "\n";
 	std::cout << "AttackManager : " << sizeof(AttackManager) << "\tAttack: " << sizeof(Attack) << "\n";
 	std::cout << "Player : " << sizeof(Player) << "\t\tEntity: " << sizeof(Entity) << "\n";
 	//*/
+}
+
+void Game::initEntityMap() {
+	entityMap["Entity"] = ENTITY;
+	entityMap["Player"] = PLAYER;
+	entityMap["Slime"] = SLIME;
+	entityMap["BabySlime"] = BABYSLIME;
 }
 
 void Game::initManagers(RenderWindow *rWindow) {
@@ -72,9 +86,39 @@ void Game::createWorld() {
 	addEntity(new Slime(190, 250, rm_master));
 	addEntity(new Slime(340, 340, rm_master));
 
+	addEntity(new BabySlime(300, 160, rm_master));
+	addEntity(new BabySlime(300, 170, rm_master));
+	addEntity(new BabySlime(300, 180, rm_master));
+	addEntity(new BabySlime(300, 190, rm_master));
+	addEntity(new BabySlime(320, 160, rm_master));
+	addEntity(new BabySlime(320, 170, rm_master));
+	addEntity(new BabySlime(320, 180, rm_master));
+	addEntity(new BabySlime(320, 190, rm_master));
+	addEntity(new BabySlime(340, 160, rm_master));
+	addEntity(new BabySlime(340, 170, rm_master));
+	addEntity(new BabySlime(340, 180, rm_master));
+	addEntity(new BabySlime(340, 190, rm_master));
+
 	addObject(new Collidable(370, 140, 40, 240));
 	addObject(new Collidable(80, 290, 210, 20));
 	addObject(new Collidable(140, 270, 60, 60));
+}
+
+void Game::createEntity(std::string entityName, Vector2f pos) {
+	Entity *newEntity = nullptr;
+	EntityType type = UNKNOWN_e;
+	std::map<std::string, EntityType>::iterator it = entityMap.find(entityName);
+	if (it != entityMap.end())
+		type = it->second;
+	switch (type) {
+	case PLAYER: newEntity = new Player(pos.x, pos.y, rm_master); break;
+	case SLIME: newEntity = new Slime(pos.x, pos.y, rm_master); break;
+	case BABYSLIME: newEntity = new BabySlime(pos.x, pos.y, rm_master); break;
+	default: std::cout << "Unable to create entity: " + entityName + "\n";
+	}
+	if (newEntity != nullptr)
+		_CHECK_CONTROLLABLE_FLAG
+		addEntity(newEntity);
 }
 
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush
@@ -93,6 +137,8 @@ void Game::setLetterBoxView() {
 }
 
 void Game::update() {
+	if (count++ == 120)
+		createEntity("Player", Vector2f(100.f, 100.f));
 	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
 	controller->checkKeyState();								// Get Keyboard information
 	for (auto entity : entityList) {
@@ -103,7 +149,6 @@ void Game::update() {
 	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
 	at_master->updateAttacks();									// Update all Attacks
-	
 }
 
 void Game::render() {
@@ -143,20 +188,21 @@ void Game::deleteEntity(unsigned short int _ID) {
 	entityList.erase(it);
 }
 
-/*
- *	Delete a static Collidable from all lists related to the Collidable.
-
-void Game::deleteCollidable(unsigned short int _ID) {
-	std::map<unsigned short int, Entity *>::iterator it = objectList.find(_ID);
-	if (it == objectList.end())
-		return;
-	cGrid->deleteCollidable(it->second);
-	delete it->second;
-	entityList.erase(it);
-}
-//*/
 void Game::addObject(Collidable *object) {
 	object->ID = oID;
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
 	cGrid->addObject(object);
 }
+
+/*
+*	Delete a static Collidable from all lists related to the Collidable.
+*/
+void Game::deleteObject(unsigned short int _ID) {
+	std::map<unsigned short int, Collidable *>::iterator it = objectList.find(_ID);
+	if (it == objectList.end())
+		return;
+	cGrid->deleteObject(it->second);
+	delete it->second;
+	objectList.erase(it);
+}
+//*/

@@ -8,12 +8,12 @@
 using namespace sf;
 
 /************************* COLLIDABLE TYPE BIT OPERATIONS (32 bits) *****************************\
-*																								*
-*	Default: No collision (0)																	*
-*	(1)		Bit 0 -	Object Collidable type														*
-*	(2)		Bit 1 - Player Collidable type														*
-*	(4)		Bit 2 - Entity Collidable type														*
-*																								*
+ *																								*
+ *	Default: No collision (0)																	*
+ *	(1)		Bit 0 -	Collidable with static Objects												*
+ *	(2)		Bit 1 - Collidable with Player														*
+ *	(4)		Bit 2 - Collidable with basic Entity												*
+ *																								*
 \************************************************************************************************/
 
 class Collidable {

@@ -74,6 +74,9 @@ public:
 	Vector2f getEntityOverlap(Entity *other);
 
 	virtual void render(RenderWindow *window);
+
+	static int entityType;
+	virtual int getType();
 protected:
 	std::map<animType, Animation *> animationList;
 	std::vector<SpriteEffect *> spriteEffectList;
@@ -93,6 +96,7 @@ protected:
 	bool updateDirection();
 	bool updateDashDirection();
 	void updatePosition();
+	void createNewEntity(std::string entityName, Vector2f pos);
 
 	virtual void init();
 	virtual float getSpeed();
@@ -100,7 +104,7 @@ protected:
 	virtual void updateState();
 	virtual void setState(stateType type);
 
-	void createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
+	int createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
 	Vector2f generateForceFromDirection(float strength);
 	std::pair<Vector2f, Vector2f> createNormalAttackLine(float length, float distance);
 	std::pair<Vector2f, Vector2f> createNormalAttackLineFromAngle(float length, float distance, float angle);
