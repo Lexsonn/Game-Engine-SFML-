@@ -14,14 +14,11 @@ public:
 
 	virtual void update();
 private:
-	float panicTimer;
-	bool panicMode;
+	void init();
 
 	virtual void decideDirection();
 	virtual void updateState();
 	virtual void setState(stateType newState);
-
-	virtual void init();
 
 	virtual void walk();
 	virtual void run();

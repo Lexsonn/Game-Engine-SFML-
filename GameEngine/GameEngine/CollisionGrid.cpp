@@ -144,31 +144,6 @@ void CollisionGrid::addObject(Collidable *object) {
 	}
 }
 
-void CollisionGrid::deleteObject(Collidable *object) {
-	int cX, cW, cY, cH;
-	cX = object->cX / GRID_WIDTH;
-	cW = (object->cX + object->cWidth) / GRID_WIDTH;
-	cY = object->cY / GRID_WIDTH;
-	cH = (object->cY + object->cHeight) / GRID_HEIGHT;
-
-	for (int i = cX; i <= cW; i++) {
-		for (int j = cY; j <= cH; j++) {
-			int gridPos = i * (height + 1) + j;
-			if (gridPos < 0 || gridPos >= size)
-				break;
-			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> range;
-			range = objectList.equal_range(gridPos);
-
-			for (std::multimap<unsigned short int, Collidable *>::iterator it = range.first; it != range.second; it++) {
-				if (it->second->ID == object->ID) {
-					objectList.erase(it);
-					break;
-				}
-			}
-		}
-	}
-}
-
 /*
  *	Add a static Collidable object to the multimap of Collidables ordered by grid position.
  */
@@ -184,14 +159,11 @@ void CollisionGrid::printList() {
 	}
 	std::cout << "\nObject IDs: ";
 	for (auto object : objectList) {
-		std::cout << object.first << "(" << object.second->ID << ") ";
+		std::cout << object.first << "(" << object.second->cX << "," << object.second->cY << ") ";
 	}
 	std::cout << std::endl;
 }
 
-/*
- *	(DEBUG) Draw CollisionGrid grid
- */
 void CollisionGrid::render(RenderWindow *window) {
 	for (unsigned int i = 0; i <= width + 1; i++) {
 		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, (height + 1) * GRID_HEIGHT * 1.f)) };

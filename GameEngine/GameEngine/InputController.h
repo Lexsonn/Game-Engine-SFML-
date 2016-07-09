@@ -14,7 +14,7 @@ public:
 	void addControllable(Controllable* controllable);
 
 private:
-	std::vector<bool> keyPressed;
+	bool keyPressed[Keyboard::KeyCount];
 	std::vector<Controllable*> controllableList;
 };
 #endif

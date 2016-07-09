@@ -39,12 +39,16 @@ Slime::Slime(float startX, float startY, ResourceManager *rm) {
 
 void Slime::update() { 
 	// AI decision making
+	int decision = 100;
 	decisionMake += decisionSpeed;
+	
 	if (decisionMake >= 1) {
+		decision = getDecision();
 		decisionMake -= 1;
-		if (getDecision() <= 8)
-			setDestination();
 	}
+	if (decision <= 8)
+		setDestination();
+
 	decideDirection();
 
 	// Typical Entity update

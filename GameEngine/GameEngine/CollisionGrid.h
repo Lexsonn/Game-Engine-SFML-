@@ -18,7 +18,6 @@ public:
 	void updateEntity(Entity *entity);
 	void deleteEntity(Entity *entity);
 	void addObject(Collidable *object);
-	void deleteObject(Collidable *object);
 
 	std::multimap<unsigned short int, Entity *> *getEntityList();
 	std::multimap<unsigned short int, Collidable *> *getObjectList();

@@ -1,9 +1,7 @@
 #include "Entity.h"
-#include "Game.h"
 
 extern int WWIDTH;
 extern int WHEIGHT;
-extern Game *game;
 
 void Entity::init() { 
 	for (int i = 0; i < 4; i++)
@@ -25,10 +23,10 @@ Entity::~Entity() {
 	spriteEffectList.clear();
 	animationList.clear();
 }
-
-Entity::Entity() : life(100), maxLife(100), invulnerable(false) { init(); }
-Entity::Entity(ResourceManager *rm) : life(100), maxLife(100) { rm_master = rm; init();  }
-Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), maxLife(100) {
+Entity::Entity() { }
+Entity::Entity(ResourceManager *rm) { rm_master = rm; }
+Entity::Entity(float startX, float startY, ResourceManager *rm) { 
+	life = 100; 
 	rm_master = rm;
 	x = startX;
 	y = startY;
@@ -116,8 +114,7 @@ void Entity::damage(int dmg) {
 	if (invulnerable)
 		return;
 	setState(DAMAGED);
-	if (isInAnimList(currentAnimation))
-		animationList[currentAnimation]->restart();
+	animationList[currentAnimation]->restart();
 	life -= dmg;
 	if (life < 0)
 		life = 0;
@@ -207,11 +204,6 @@ void Entity::applyForce(Vector2f f) {
 	dy = f.y;
 }
 
-void Entity::createNewEntity(std::string entityName, Vector2f pos) {
-	if (game != nullptr)
-		game->createEntity(entityName, pos);
-}
-
 void Entity::moveOutsideCollidable(Collidable *other) {
 	if (other == nullptr)
 		return;
@@ -239,10 +231,10 @@ Vector2f Entity::getEntityOverlap(Entity *other) {
 
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
 
-	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
 	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
 	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
 	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
+	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
@@ -261,12 +253,12 @@ void Entity::update() { }
 void Entity::updateState() { }
 void Entity::setState(stateType newState) { }
 
-int Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
+void Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
 	Attack *newAttack;
-	newAttack = new Attack(ID, type, life, str, attackLines, anim);
+	newAttack = new Attack(0, ID, type, life, str, attackLines, anim);
 	newAttack->setForce(force.x, force.y);
 	newAttack->setPosition(pos);
-	return at_master->addAttack(newAttack);
+	at_master->addAttack(newAttack);
 }
 
 Vector2f Entity::generateForceFromDirection(float strength) {
@@ -305,7 +297,7 @@ std::pair<Vector2f, Vector2f> Entity::createNormalAttackLineFromAngle(float leng
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
-	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * PI / 180.f);
+	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * float(direction) * PI / 180.f);
 	return line;
 }
 
