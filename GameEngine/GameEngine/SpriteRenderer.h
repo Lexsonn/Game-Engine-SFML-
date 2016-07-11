@@ -11,11 +11,11 @@ public:
 	~SpriteRenderer();
 	SpriteRenderer();
 
-	void addSprite(int z, Sprite &spr);
+	void addSprite(int z, const Sprite &spr);
 	void clearList();
 	void render(RenderWindow *window);
 private:
-	std::multimap<int, Sprite &> zOrderedSpriteList;
+	std::multimap<int, const Sprite &> zOrderedSpriteList;
 };
 
 #endif

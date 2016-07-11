@@ -3,8 +3,8 @@
 SpriteRenderer::~SpriteRenderer() { }
 SpriteRenderer::SpriteRenderer() { }
 
-void SpriteRenderer::addSprite(int z, Sprite &spr) {
-	zOrderedSpriteList.insert(std::pair<int, Sprite &>(z, spr));
+void SpriteRenderer::addSprite(int z, const Sprite &spr) {
+	zOrderedSpriteList.insert(std::pair<int, const Sprite &>(z, spr));
 }
 
 void SpriteRenderer::clearList() {
@@ -12,7 +12,7 @@ void SpriteRenderer::clearList() {
 }
 
 void SpriteRenderer::render(RenderWindow *window) {
-	std::multimap<int, Sprite &>::iterator it = zOrderedSpriteList.begin();
+	std::multimap<int, const Sprite &>::iterator it = zOrderedSpriteList.begin();
 	while (it != zOrderedSpriteList.end())
 		window->draw(it++->second);
 }

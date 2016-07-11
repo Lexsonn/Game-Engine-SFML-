@@ -2,15 +2,16 @@
 #define TEXLIST_H
 
 enum texType {
-	UNKNOWN_t = -1,
-	playerIdle = 0,
-	playerWalk,
-	playerRun,
-	playerABS,
-	playerAttack1,
-	playerAttack2,
-	playerAttack3,
-	playerAttRec,
-	playerAttackAnim1,
+	UNKNOWN_t = -1
+	, tileset1
+	, playerIdle
+	, playerWalk
+	, playerRun
+	, playerABS
+	, playerAttack1
+	, playerAttack2
+	, playerAttack3
+	, playerAttRec
+	, playerAttackAnim1
 };
 #endif

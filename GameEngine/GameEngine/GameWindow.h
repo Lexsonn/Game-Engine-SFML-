@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "CollisionGrid.h"
+#include "TileMap.h"
 
 using namespace sf;
 
@@ -23,6 +24,7 @@ public:
 	void renderDO(DrawableObject *d);
 	void render(std::pair<Vector2f, Vector2f> line);
 	void render(Collidable *c);
+	void render(const TileMap &tileMap);
 	void render(SpriteRenderer *sr);
 	void render(CollisionGrid *cg);
 	void render(CollisionGrid *cg, short int gridPos[]);

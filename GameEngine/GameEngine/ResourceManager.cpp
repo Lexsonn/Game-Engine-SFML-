@@ -4,6 +4,7 @@ using namespace sf;
 
 // Initialize the texture list with player sprites.
 void ResourceManager::init() {
+	addTexture("Tilesets/tileset1.png");
 	addTexture("playerIdle.png");
 	addTexture("playerWalk.png");
 	addTexture("playerRun.png");
@@ -33,7 +34,8 @@ void ResourceManager::setView(View *view) {
 // TEXTURE MANAGEMENT //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-texType ResourceManager::getTextureType(std::string texPath) {
+texType ResourceManager::getTextureType(const std::string &texPath) {
+	if (texPath == "Tilesets/tileset1.png") { return tileset1; }
 	if (texPath == "playerIdle.png") { return playerIdle; }
 	if (texPath == "playerWalk.png") { return playerWalk; }
 	if (texPath == "playerRun.png") { return playerRun; }
@@ -45,7 +47,7 @@ texType ResourceManager::getTextureType(std::string texPath) {
 	return UNKNOWN_t;
 }
 
-Texture *ResourceManager::getTexture(std::string texPath) {
+Texture *ResourceManager::getTexture(const std::string &texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	std::cout << "LOADING " << fullpath << " ... ";
 	texType type = getTextureType(texPath);
@@ -64,7 +66,7 @@ Texture *ResourceManager::getTexture(std::string texPath) {
 	return textureList[type];
 }
 
-bool ResourceManager::addTexture(std::string texPath) {
+bool ResourceManager::addTexture(const std::string &texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	texType type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
@@ -89,7 +91,7 @@ bool ResourceManager::addTexture(std::string texPath) {
 	return true;
 }
 
-bool ResourceManager::deleteTexture(std::string texPath) {
+bool ResourceManager::deleteTexture(const std::string &texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
 	std::cout << "DELETING " << fullpath << "... ";
 	texType type = getTextureType(texPath);
@@ -117,11 +119,11 @@ bool ResourceManager::deleteTexture(std::string texPath) {
 // SOUND MANAGEMENT ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-sfxType ResourceManager::getSoundType(std::string sfxPath) {
+sfxType ResourceManager::getSoundType(const std::string &sfxPath) {
 	return UNKNOWN_s;
 }
 
-Sound ResourceManager::getSound(std::string sfxPath) { 
+Sound ResourceManager::getSound(const std::string &sfxPath) { 
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
 	std::cout << "LOADING " << fullpath << " ... ";
 	sfxType type = getSoundType(sfxPath);
@@ -140,7 +142,7 @@ Sound ResourceManager::getSound(std::string sfxPath) {
 	return Sound(soundList[type]);
 }
 
-bool ResourceManager::addSound(std::string sfxPath) {
+bool ResourceManager::addSound(const std::string &sfxPath) {
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
 	sfxType type = getSoundType(sfxPath);
 	if (type == UNKNOWN_s) {
@@ -163,7 +165,7 @@ bool ResourceManager::addSound(std::string sfxPath) {
 	return true;
 }
 
-bool ResourceManager::deleteSound(std::string sfxPath) {
+bool ResourceManager::deleteSound(const std::string &sfxPath) {
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
 	std::cout << "DELETING " << fullpath << "... ";
 	sfxType type = getSoundType(sfxPath);
@@ -190,11 +192,11 @@ bool ResourceManager::deleteSound(std::string sfxPath) {
 // MUSIC MANAGEMENT ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-musicType ResourceManager::getMusicType(std::string musicPath) {
+musicType ResourceManager::getMusicType(const std::string &musicPath) {
 	return UNKNOWN_m;
 }
 
-Music *ResourceManager::getMusic(std::string musicPath) { 
+Music *ResourceManager::getMusic(const std::string &musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
 	std::cout << "LOADING " << fullpath << " ... ";
 	musicType type = getMusicType(musicPath);
@@ -213,7 +215,7 @@ Music *ResourceManager::getMusic(std::string musicPath) {
 	return songList[type];
 }
 
-bool ResourceManager::addMusic(std::string musicPath) {
+bool ResourceManager::addMusic(const std::string &musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
 	musicType type = getMusicType(musicPath);
 	if (type == UNKNOWN_m) {
@@ -236,7 +238,7 @@ bool ResourceManager::addMusic(std::string musicPath) {
 	return true;
 }
 
-bool ResourceManager::deleteMusic(std::string musicPath) {
+bool ResourceManager::deleteMusic(const std::string &musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
 	std::cout << "DELETING " << fullpath << "... ";
 	musicType type = getMusicType(musicPath);
@@ -273,7 +275,7 @@ void ResourceManager::setSpriteRenderer(SpriteRenderer *sprRenderer) {
  *	a z value can be added to the y to move it forward) and returns true if the sprite is inside the view. 
  *	If the sprite is outside the current view, the sprite is not inserted, and the function returns false.
  */
-bool ResourceManager::addSprite(int z, Sprite &spr) {
+bool ResourceManager::addSprite(int z, const Sprite &spr) {
 	if (isInsideView(spr)) {
 		renderer->addSprite(z, spr);
 		return true;
@@ -285,7 +287,7 @@ bool ResourceManager::addSprite(int z, Sprite &spr) {
  *	Returns true if the bounding box of the passed sprite is within the bounds of the view.
  *	Returns false otherwise.
  */
-bool ResourceManager::isInsideView(Sprite &spr) {
+bool ResourceManager::isInsideView(const Sprite &spr) {
 	FloatRect bound = spr.getGlobalBounds();
 	float vcX, vcY, vsX, vsY;
 

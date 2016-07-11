@@ -3,8 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 
-#define DO_BASE 0
-
 using namespace sf;
 
 class DrawableObject {
@@ -15,11 +13,9 @@ public:
 	DrawableObject();
 
 	virtual void render(RenderWindow *window);
-	virtual int getDrawableType();
 	
 	void setVisible(bool isVisible);
 	bool isVisible();
-
 protected:
 	bool visible;
 };

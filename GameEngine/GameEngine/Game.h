@@ -4,6 +4,7 @@
 #include "InputController.h"
 #include "CollisionManager.h"
 #include "GameWindow.h"
+#include "TileMap.h"
 #include "Player.h"
 
 using namespace sf;
@@ -37,6 +38,7 @@ private:
 	AttackManager *at_master;
 	GameWindow* window;
 	Player *player;
+	TileMap tileMap;
 
 	std::map<std::string, EntityType> entityMap;			// Map for creation of Entities by string
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities

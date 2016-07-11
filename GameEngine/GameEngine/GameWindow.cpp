@@ -125,11 +125,15 @@ void GameWindow::render(std::pair<Vector2f, Vector2f> line) {
 
 void GameWindow::render(Collidable *c) {
 	RectangleShape sh(Vector2f(c->cWidth*1.f, c->cHeight*1.f));
-	sh.setFillColor(Color(0, 128, 0, 216));
+	sh.setFillColor(Color(0, 128, 0, 160));
 	sh.setOutlineColor(Color::Green);
 	sh.setOutlineThickness(1.0f);
 	sh.setPosition((float)c->cX, (float)c->cY);
 	nativeRenderer->draw(sh);
+}
+
+void GameWindow::render(const TileMap &tileMap) {
+	nativeRenderer->draw(tileMap);
 }
 
 void GameWindow::render(SpriteRenderer *sr) {

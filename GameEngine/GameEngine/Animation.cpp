@@ -21,14 +21,14 @@ Animation::Animation(Texture *t, float x, float y, int w, int h, int frameCount,
 		return;
 	}
 
-	for (int i = 0; i<frameCount; i++)
+	for (int i = 0; i < frameCount; i++)
 		frames.push_back(IntRect(int(x) + i*w, int(y), w, h));
 
 	sprite.setTexture(*t);
 	sprite.setOrigin(float(w / 2), float(h / 2));
 	sprite.setTextureRect(frames[0]);
 
-	frameSize = frames.size();
+	frameSize = (int)frames.size();
 }
 
 void Animation::setRotation(float angle) {

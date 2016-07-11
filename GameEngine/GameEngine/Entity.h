@@ -31,14 +31,14 @@
 
 // Faces for 8 Directions
 enum dir {
-	EAST = 0x0,
-	NORTHEAST,
-	NORTH,
-	NORTHWEST,
-	WEST,
-	SOUTHWEST,
-	SOUTH,
-	SOUTHEAST
+	EAST = 0x0
+	, NORTHEAST
+	, NORTH
+	, NORTHWEST
+	, WEST
+	, SOUTHWEST
+	, SOUTH
+	, SOUTHEAST
 };
 
 class Entity : public DrawableObject, public Collidable {
@@ -65,7 +65,6 @@ public:
 	void damage(int dmg);
 	void recover(int heal);
 
-	virtual int getDrawableType();
 	virtual void update();
 
 	void applyForce(Vector2f f);

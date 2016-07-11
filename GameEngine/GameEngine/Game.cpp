@@ -5,8 +5,8 @@
 #define _DEBUG_MODE true
 #define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller->addControllable(dynamic_cast<Controllable *>(newEntity));
 
-int WWIDTH(640);
-int WHEIGHT(480);
+int WWIDTH(800);
+int WHEIGHT(800);
 Game *game(nullptr);
 
 Game::~Game() { }
@@ -16,13 +16,21 @@ Game::Game(RenderWindow* rWindow) {
 	oID = 0;
 	debug = _DEBUG_MODE;
 
-	WWIDTH = 800;
-	WHEIGHT = 800;
+	const int level[] = {
+		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,
+		1,  5,  9,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,
+		2,  6,  10, 5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,
+		1,  5,  5,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,
+		1,  5,  5,  5,  5,  6,  10, 12, 2,  6,  6,  6,  10, 2,  5,  9,
+		1,  5,  5,  5,  9,  12, 12, 12, 13, 13, 13, 13, 13, 14, 2,  10,
+		2,  6,  6,  6,  10, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14,
+		12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14,
+	};
 
 	initEntityMap();
 	initManagers(rWindow);
+	tileMap = TileMap("Tilesets/tileset1.png", Vector2u(40, 40), level, 16, 8, rm_master);
 	createWorld();
-
 	//*
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
@@ -116,9 +124,10 @@ void Game::createEntity(std::string entityName, Vector2f pos) {
 	case BABYSLIME: newEntity = new BabySlime(pos.x, pos.y, rm_master); break;
 	default: std::cout << "Unable to create entity: " + entityName + "\n";
 	}
-	if (newEntity != nullptr)
+	if (newEntity != nullptr) {
 		_CHECK_CONTROLLABLE_FLAG
 		addEntity(newEntity);
+	}
 }
 
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush
@@ -137,21 +146,20 @@ void Game::setLetterBoxView() {
 }
 
 void Game::update() {
-	if (count++ == 120)
-		createEntity("Player", Vector2f(100.f, 100.f));
 	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
 	controller->checkKeyState();								// Get Keyboard information
 	for (auto entity : entityList) {
 		entity.second->update();								// Update every entity
 		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
 	}
-	window->updateView(player);									// Update view to follow player
 	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
+	window->updateView(player);									// Update view to follow player
 	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
 	at_master->updateAttacks();									// Update all Attacks
 }
 
 void Game::render() {
+	window->render(tileMap);
 	if (debug) {
 		window->render(cGrid, player->gridPos);							// Render collision grid positions of player (debug)
 		window->render(cGrid);											// Render collision grid lines (debug)

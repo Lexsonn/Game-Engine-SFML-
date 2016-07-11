@@ -68,6 +68,9 @@ void CollisionGrid::updateEntity(Entity *entity) {
 	addEntity(gridPos, entity);
 }
 
+/*
+ *	Delete an Entity from all CollisionGrid positions.
+ */
 void CollisionGrid::deleteEntity(Entity *entity) {
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0) {
@@ -105,8 +108,7 @@ void CollisionGrid::addEntity(int gridPos[], Entity *entity) {
 }
 
 /*
- *	Remove entity from grid positions not included in the new grid positions, being careful 
- *	not to delete any entries that are in the new grid positions.
+ *	Remove entity from grid positions not included in the new grid positions.
  */
 void CollisionGrid::removeEntity(int gridPos[], Entity *entity) {
 	for (int i = 0; i < 4; i++) {
@@ -144,6 +146,9 @@ void CollisionGrid::addObject(Collidable *object) {
 	}
 }
 
+/*
+ *	Delete a static Collidable from all its CollisionGrid positions.
+ */
 void CollisionGrid::deleteObject(Collidable *object) {
 	int cX, cW, cY, cH;
 	cX = object->cX / GRID_WIDTH;

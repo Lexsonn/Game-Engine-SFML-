@@ -135,10 +135,6 @@ void Entity::recover(int heal) {
 		life = maxLife;
 }
 
-int Entity::getDrawableType() {
-	return DO_ENTITY;
-}
-
 bool Entity::issuedDash() {
 	return (dashU || dashL || dashD || dashR);
 }

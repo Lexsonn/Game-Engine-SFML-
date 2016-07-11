@@ -25,22 +25,22 @@ public:
 
 	void setView(View *view);
 
-	texType getTextureType(std::string texPath);
-	Texture *getTexture(std::string texPath);
-	bool addTexture(std::string texPath);
-	bool deleteTexture(std::string texPath);
+	texType getTextureType(const std::string &texPath);
+	Texture *getTexture(const std::string &texPath);
+	bool addTexture(const std::string &texPath);
+	bool deleteTexture(const std::string &texPath);
 
-	sfxType getSoundType(std::string sfxPath);
-	Sound getSound(std::string sfxPath);
-	bool addSound(std::string sfxPath);
-	bool deleteSound(std::string sfxPath);
+	sfxType getSoundType(const std::string &sfxPath);
+	Sound getSound(const std::string &sfxPath);
+	bool addSound(const std::string &sfxPath);
+	bool deleteSound(const std::string &sfxPath);
 
-	musicType getMusicType(std::string musicPath);
-	Music *getMusic(std::string musicPath);
-	bool addMusic(std::string musicPath);
-	bool deleteMusic(std::string musicPath);
+	musicType getMusicType(const std::string &musicPath);
+	Music *getMusic(const std::string &musicPath);
+	bool addMusic(const std::string &musicPath);
+	bool deleteMusic(const std::string &musicPath);
 
-	bool addSprite(int z, Sprite &spr);
+	bool addSprite(int z, const Sprite &spr);
 	void setSpriteRenderer(SpriteRenderer *sprRenderer);
 private:
 	std::map<texType, Texture *> textureList;
@@ -50,6 +50,6 @@ private:
 	View *view;
 
 	void init();
-	bool isInsideView(Sprite &spr);
+	bool isInsideView(const Sprite &spr);
 };
 #endif
