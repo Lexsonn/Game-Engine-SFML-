@@ -175,6 +175,7 @@
     <ClCompile Include="..\GameEngine\Slime.cpp" />
     <ClCompile Include="..\GameEngine\SpriteEffect.cpp" />
     <ClCompile Include="..\GameEngine\SpriteRenderer.cpp" />
+    <ClCompile Include="..\GameEngine\TileMap.cpp" />
     <ClCompile Include="Entity_Tests.cpp" />
   </ItemGroup>
   <ItemGroup>

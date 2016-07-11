@@ -147,6 +147,7 @@
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="SpriteEffect.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="TileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="TexList.h" />
+    <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

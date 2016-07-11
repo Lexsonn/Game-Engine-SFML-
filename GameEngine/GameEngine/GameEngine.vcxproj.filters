@@ -132,6 +132,9 @@
     <ClCompile Include="BabySlime.cpp">
       <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>Source Files\Game\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="BabySlime.h">
       <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>Header Files\Game\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
