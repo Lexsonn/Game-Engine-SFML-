@@ -2,42 +2,40 @@
 
 TileMap::~TileMap() { }
 TileMap::TileMap() : m_tileset(nullptr) { }
-TileMap::TileMap(const std::string &tileset, Vector2u tileSize, const int * tiles, 
-				 unsigned int width, unsigned int height, ResourceManager *rm) { 
-	// load the tileset texture
+TileMap::TileMap(const std::string &tileset, Vector2u tileSize, const int * tiles, Vector2u offset, ResourceManager *rm) { 
 	m_tileset = rm->getTexture(tileset);
 	if (m_tileset == nullptr)
 		return;
 
-	// resize the vertex array to fit the level size
-	m_vertices.setPrimitiveType(sf::Quads);
-	m_vertices.resize(width * height * 4);
+	Vector2u min = Vector2u(offset.x * SSX, offset.y * SSY);
+	Vector2u max = Vector2u(std::min(offset.x * SSX + SSX, (unsigned int)tiles[0]), std::min(offset.y * SSY + SSY, (unsigned int)tiles[1]));
 
-	for (unsigned int i = 0; i < width; i++) {
-		for (unsigned int j = 0; j < height; j++) {
-			// get the current tile number
-			int tileNumber = tiles[i + j * width];
+	m_vertices.setPrimitiveType(Quads);
+	m_vertices.resize((max.x - min.x) * (max.y - min.y) * 4);
 
-			// find its position in the tileset texture
+	for (unsigned int i = min.x; i < max.x; i++) {
+		for (unsigned int j = min.y; j < max.y; j++) {
+			// The tile number corresponding to the current tile
+			int tileNumber = tiles[i + j * tiles[0] + 2];
+			// x and y position of the current tile's texture
 			int tx = tileNumber / (m_tileset->getSize().x / tileSize.x);
 			int ty = tileNumber % (m_tileset->getSize().x / tileSize.x);
 
-			// Define a quad as the 4 points of a Vertex at the tile's position (x4)
-			sf::Vertex *quad = &m_vertices[(i + j * width) * 4];
-
-			quad[0].position = sf::Vector2f(float(i * tileSize.x), float(j * tileSize.y));
-			quad[1].position = sf::Vector2f(float((i + 1) * tileSize.x), float(j * tileSize.y));
-			quad[2].position = sf::Vector2f(float((i + 1) * tileSize.x), float((j + 1) * tileSize.y));
-			quad[3].position = sf::Vector2f(float(i * tileSize.x), float((j + 1) * tileSize.y));
-
-			quad[0].texCoords = sf::Vector2f(float(tx * tileSize.x), float(ty * tileSize.y));
-			quad[1].texCoords = sf::Vector2f(float((tx + 1) * tileSize.x), float(ty * tileSize.y));
-			quad[2].texCoords = sf::Vector2f(float((tx + 1) * tileSize.x), float((ty + 1) * tileSize.y));
-			quad[3].texCoords = sf::Vector2f(float(tx * tileSize.x), float((ty + 1) * tileSize.y));
+			// Specify the 4 corners of the current tile.
+			sf::Vertex *quad = &m_vertices[((i - min.x) + (j - min.y) * (max.x - min.x)) * 4];
+			// Specify the global position of the tile in the world.
+			quad[0].position = Vector2f(float(i * tileSize.x), float(j * tileSize.y));
+			quad[1].position = Vector2f(float((i + 1) * tileSize.x), float(j * tileSize.y));
+			quad[2].position = Vector2f(float((i + 1) * tileSize.x), float((j + 1) * tileSize.y));
+			quad[3].position = Vector2f(float(i * tileSize.x), float((j + 1) * tileSize.y));
+			// Specify the texture position of the current tile in the tileset
+			quad[0].texCoords = Vector2f(float(tx * tileSize.x), float(ty * tileSize.y));
+			quad[1].texCoords = Vector2f(float((tx + 1) * tileSize.x), float(ty * tileSize.y));
+			quad[2].texCoords = Vector2f(float((tx + 1) * tileSize.x), float((ty + 1) * tileSize.y));
+			quad[3].texCoords = Vector2f(float(tx * tileSize.x), float((ty + 1) * tileSize.y));
 		}
 	}
-
-	std::cout << "Loaded tilemap (" << width << "," << height << ").\n";
+	std::cout << "Loaded tilemap at (" << offset.x << "," << offset.y << "), of size (" << (max.x - min.x) << "," << (max.y - min.y) << ").\n";
 }
 
 void TileMap::draw(RenderTarget &target, RenderStates states) const {

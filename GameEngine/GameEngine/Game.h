@@ -27,6 +27,7 @@ public:
 	void createEntity(std::string entityName, Vector2f pos);
 private:
 	bool debug;
+	const int *level;
 	unsigned short int eID, oID;
 	int count = 0;
 
@@ -38,7 +39,7 @@ private:
 	AttackManager *at_master;
 	GameWindow* window;
 	Player *player;
-	TileMap tileMap;
+	std::vector<TileMap> tileMap;
 
 	std::map<std::string, EntityType> entityMap;			// Map for creation of Entities by string
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
