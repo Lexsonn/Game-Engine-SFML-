@@ -23,7 +23,8 @@ public:
 	std::multimap<unsigned short int, Entity *> *getEntityList();
 	std::multimap<unsigned short int, Collidable *> *getObjectList();
 
-	void printList();
+	void printLists();
+	void clearLists();
 	void render(RenderWindow *window);
 	void render(RenderWindow *window, short int gridPos[]);
 	void render(RenderWindow *window, std::map<short int, unsigned short int> gridPos);

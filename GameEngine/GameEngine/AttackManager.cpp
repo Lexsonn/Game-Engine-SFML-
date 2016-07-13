@@ -50,3 +50,10 @@ void AttackManager::updateAttacks() {
 		}
 	}
 }
+
+void AttackManager::clearAttacks() {
+	while (!attackList.empty()) {
+		std::map<unsigned short int, Attack *>::iterator it = attackList.begin();
+		deleteAttack(it->first);
+	}
+}

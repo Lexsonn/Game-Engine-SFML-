@@ -23,7 +23,7 @@ Entity::~Entity() {
 		delete spriteEffectList.at(i);
 	for (std::map<animType, Animation *>::iterator it = animationList.begin(); it != animationList.end(); it++)
 		delete it->second;
-
+	
 	spriteEffectList.clear();
 	animationList.clear();
 }

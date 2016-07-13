@@ -6,7 +6,7 @@
 
 using namespace sf;
 
-#define SSX 12
+#define SSX 12	// Tricky
 #define SSY 12
 #define TILESIZE_X 40
 #define TILESIZE_Y 40

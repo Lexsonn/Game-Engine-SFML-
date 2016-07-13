@@ -20,6 +20,7 @@ public:
 	int addAttack(Attack *attack);
 	void deleteAttack(unsigned short int _ID);
 	void updateAttacks();
+	void clearAttacks();
 private:
 	unsigned short int ID;
 	ResourceManager *rm_master;

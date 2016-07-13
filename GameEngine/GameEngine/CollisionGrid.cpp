@@ -182,7 +182,10 @@ void CollisionGrid::addObject(int gridPos, Collidable *object) {
 		objectList.insert(std::pair<unsigned short int, Collidable *>(gridPos, object));
 }
 
-void CollisionGrid::printList() {
+/*
+ *	Prints a list of current Entities and Collidables by ID and their corresponding grid positions.
+ */
+void CollisionGrid::printLists() {
 	std::cout << "Entity IDs: ";
 	for (auto entity : entityList) {
 		std::cout << entity.first  << "(" << entity.second->ID << ") ";
@@ -192,6 +195,15 @@ void CollisionGrid::printList() {
 		std::cout << object.first << "(" << object.second->ID << ") ";
 	}
 	std::cout << std::endl;
+}
+
+/*
+ *	Clear the lists of Entity and Collidable grid positions. 
+ */
+void CollisionGrid::clearLists() {
+	// Simply clear the reference list of Entities and Collidables, no need to delete.
+	entityList.clear();
+	objectList.clear();
 }
 
 /*

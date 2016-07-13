@@ -36,6 +36,8 @@ View *GameWindow::getView() {
 }
 
 void GameWindow::updateView(Entity *entity) {
+	if (entity == nullptr || (view.getSize().x > WWIDTH && view.getSize().y > WHEIGHT))
+		return;
 	boundViewX(entity->x);
 	boundViewY(entity->y);
 	nativeRenderer->setView(view);

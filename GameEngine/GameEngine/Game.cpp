@@ -2,7 +2,7 @@
 #include "Slime.h" // Eventually make a header with all Enemy types
 #include "BabySlime.h"
 
-#define _DEBUG_MODE true
+#define _DEBUG_MODE 0x1
 #define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller->addControllable(dynamic_cast<Controllable *>(newEntity));
 
 int WWIDTH(800);
@@ -10,11 +10,10 @@ int WHEIGHT(800);
 Game *game(nullptr);
 
 Game::~Game() { }
-Game::Game(RenderWindow* rWindow) {
+Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	game = this;
 	eID = 0;
 	oID = 0;
-	debug = _DEBUG_MODE;
 
 	const int l[] = { 25, 25, // load dis from txt file pls
 		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,  3,  3,  3,  3,  3,  3,  3,  3,  1,
@@ -25,12 +24,12 @@ Game::Game(RenderWindow* rWindow) {
 		1,  5,  5,  5,  9,  12, 12, 12, 13, 13, 13, 13, 13, 14, 2,  10, 3,  3,  3,  3,  3,  3,  3,  3,  1,
 		2,  6,  6,  6,  10, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 3,  3,  3,  3,  3,  3,  3,  3,  1,
 		12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 3,  3,  3,  3,  3,  3,  3,  3,  1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 0,  4,  4,  4,  8,  14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  9,  14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  8,  13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  9,  13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  9,  13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
+		12, 12, 12, 12, 12, 12, 12, 2,  6,  6,  6,  6,  10, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
 		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
 		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
 		4,  4,  4,  4,  4,  4,  8,  13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 0,  8,
@@ -141,7 +140,25 @@ void Game::createWorld() {
 	addObject(new Collidable(140, 270, 60, 60));
 }
 
-void Game::createEntity(std::string entityName, Vector2f pos) {
+void Game::destroyWorld() {
+	WWIDTH = 160;
+	WHEIGHT = 160;
+	cGrid->clearLists();
+	player = nullptr;
+	while (!objectList.empty()) {
+		std::map<unsigned short int, Collidable *>::iterator it = objectList.begin();
+		deleteObject(it->first);
+	}
+	while (!entityList.empty()) {
+		std::map<unsigned short int, Entity *>::iterator it = entityList.begin();
+		deleteEntity(it->first);
+	}
+	at_master->clearAttacks();
+	tileMap.clear();
+	cGrid->build();
+}
+
+Entity *Game::createEntity(std::string entityName, Vector2f pos) {
 	Entity *newEntity = nullptr;
 	EntityType type = UNKNOWN_e;
 	std::map<std::string, EntityType>::iterator it = entityMap.find(entityName);
@@ -156,6 +173,7 @@ void Game::createEntity(std::string entityName, Vector2f pos) {
 	if (newEntity != nullptr) {
 		_CHECK_CONTROLLABLE_FLAG
 		addEntity(newEntity);
+		return newEntity;
 	}
 }
 
@@ -175,16 +193,21 @@ void Game::setLetterBoxView() {
 }
 
 void Game::update() {
-	for (auto entity : entityList) entity.second->beginUpdate();// Begin update for every entity
-	controller->checkKeyState();								// Get Keyboard information
-	for (auto entity : entityList) {
-		entity.second->update();								// Update every entity
-		cGrid->updateEntity(entity.second);						// Update CollisionGrid position
+	if (count++ == 120) {
+		destroyWorld();
+		player = dynamic_cast<Player *>(createEntity("Player", Vector2f(100.f, 100.f)));
+		cGrid->printLists();
 	}
-	cMaster->resolveEntityCollisions();							// Resolve collisions for every entity
-	window->updateView(player);									// Update view to follow player
-	for (auto entity : entityList) entity.second->endUpdate();	// End updates for every entity
-	at_master->updateAttacks();									// Update all Attacks
+	for (auto entity : entityList) entity.second->beginUpdate(); // Begin update for every entity
+	controller->checkKeyState();								 // Get Keyboard information
+	for (auto entity : entityList) {
+		entity.second->update();	 							 // Update every entity
+		cGrid->updateEntity(entity.second);						 // Update CollisionGrid position
+	}
+	cMaster->resolveEntityCollisions();							 // Resolve collisions for every entity
+	window->updateView(player);									 // Update view to follow player
+	for (auto entity : entityList) entity.second->endUpdate();	 // End updates for every entity
+	at_master->updateAttacks();									 // Update all Attacks
 }
 
 void Game::render() {
@@ -225,6 +248,9 @@ void Game::deleteEntity(unsigned short int _ID) {
 	entityList.erase(it);
 }
 
+/*
+ *	Add a static Collidable to the game world, and the collision grid.
+ */
 void Game::addObject(Collidable *object) {
 	object->ID = oID;
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));

@@ -24,9 +24,9 @@ public:
 
 	void runLoop();
 	void setLetterBoxView();
-	void createEntity(std::string entityName, Vector2f pos);
+	Entity *createEntity(std::string entityName, Vector2f pos);
 private:
-	bool debug;
+	const bool debug;
 	const int *level;
 	unsigned short int eID, oID;
 	int count = 0;
@@ -48,6 +48,7 @@ private:
 	void initEntityMap();
 	void initManagers(RenderWindow *rWindow);
 	void createWorld();
+	void destroyWorld();
 	void update();
 	void render();
 
