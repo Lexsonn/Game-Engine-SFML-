@@ -2,6 +2,8 @@
 
 using namespace sf;
 
+float AI::decisionSpeed = 0.05f;
+
 AI::~AI() { }
 AI::AI() { }
 

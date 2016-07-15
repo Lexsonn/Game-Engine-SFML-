@@ -1,13 +1,13 @@
 #include "Slime.h"
 
 void Slime::init() {
+	std::cout << "sleme init\n";
 	// AI vars
 	generateRND(int(time(NULL)), 99);
 	destination.x = int(x);
 	destination.y = int(y);
 	setBounds(120, 120, 240, 240);	// Temporary
 	decisionMake = 0;
-	decisionSpeed = 0.05f;
 	// Entity vars
 	name = "Slime";
 	cWidth = 20;
@@ -18,12 +18,15 @@ void Slime::init() {
 
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
 	Texture *tx1 = rm_master->getTexture("playerAttRec.png");
+	Texture *tx2 = rm_master->getTexture("playerDeath.png");
 
 	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.75, 0.75);
 	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.1f, true); animationList[damageE]->setScale(0.75, 0.75);
+	animationList[deathE] = new Animation(tx2, 0.f, 0.f, 50, 50, 8, 0.1f, true); animationList[deathE]->setScale(0.75, 0.75);
 }
 
 Slime::~Slime() { }
+Slime::Slime() { std::cout << "en tity init\n"; Entity::init(); init(); }
 Slime::Slime(ResourceManager *rm) { 
 	rm_master = rm;
 	init();
@@ -55,6 +58,7 @@ void Slime::update() {
 	case WALK: walk(); break;
 	case RUN: run(); break;
 	case DAMAGED: damaged(); break;
+	case DEAD: dead(); break;
 	}
 
 	// If the Slime has been hit, flash the current sprite.
@@ -79,6 +83,13 @@ void Slime::updateState() {
 		if (animFinished)
 			setState(IDLE);
 		break;
+	case DEAD:
+		if (animFinished && !isDead) {
+			createNewEntity("BabySlime", Vector2f(x - 5, y));
+			createNewEntity("BabySlime", Vector2f(x + 5, y));
+			isDead = true;
+		}
+		break;
 	default: std::cout << "What did you do now?\n";
 	}
 }
@@ -100,6 +111,13 @@ void Slime::setState(stateType newState) {
 		hit = true;
 		currentAnimation = damageE;
 		break;
+	case DEAD:
+		animFinished = false;
+		phased = true;
+		invulnerable = true;
+		hit = false;
+		currentAnimation = deathE;
+		break;
 	}
 	state = newState;
 }
@@ -110,12 +128,12 @@ void Slime::decideDirection() {
 	up = false;
 	down = false;
 
-	if (std::abs(int(x - destination.x)) > std::max(ENTITY_SPEED / 2, std::abs(dx))) {
+	if (std::abs(int(x - destination.x)) > std::max(getSpeed() / 2, std::abs(dx))) {
 		if (x < destination.x) right = true;
 		else left = true;
 	}
 
-	if (std::abs(y - destination.y) > std::max(ENTITY_SPEED / 2, std::abs(dy))) {
+	if (std::abs(y - destination.y) > std::max(getSpeed() / 2, std::abs(dy))) {
 		if (y < destination.y) down = true;
 		else up = true;
 	}
@@ -155,4 +173,10 @@ void Slime::run() {
 		// currentAnimation = animType(direction + RUN_ANIM);
 	}
 	else setState(IDLE); // Idle animation if currently not moving.
+}
+
+void Slime::dead() {
+	dx *= 0.95f;
+	dy *= 0.95f;
+	animFinished = animationList[currentAnimation]->isLastFrame();
 }

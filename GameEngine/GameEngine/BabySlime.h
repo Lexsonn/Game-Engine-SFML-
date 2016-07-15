@@ -20,7 +20,9 @@ private:
 
 	virtual void init();
 	virtual float getSpeed();
+
 	virtual void walk();
 	virtual void run();
+	virtual void dead();
 };
 #endif

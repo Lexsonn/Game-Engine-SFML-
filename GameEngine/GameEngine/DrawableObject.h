@@ -11,11 +11,12 @@ public:
 
 	~DrawableObject();
 	DrawableObject();
-
-	virtual void render(RenderWindow *window);
 	
 	void setVisible(bool isVisible);
 	bool isVisible();
+
+	//virtual Sprite &getSprite();
+	virtual void render(RenderWindow *window);
 protected:
 	bool visible;
 };

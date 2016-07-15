@@ -9,20 +9,22 @@ void BabySlime::init() {
 	destination.y = int(y);
 	setBounds(120, 120, 240, 240);	// Temporary
 	decisionMake = 0;
-	decisionSpeed = 0.05f;
 	// Entity vars
 	name = "Baby Slime";
 	cWidth = 10;
 	cHeight = 10;
 	life = 40;
+	maxLife = 40;
 	currentAnimation = idleE;
 	weight = 2;
 
 	Texture *tx0 = rm_master->getTexture("playerIdle.png");
 	Texture *tx1 = rm_master->getTexture("playerAttRec.png");
+	Texture *tx2 = rm_master->getTexture("playerDeath.png");
 
 	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setScale(0.35f, 0.35f);
 	animationList[damageE] = new Animation(tx1, 0.f, 0.f, 50, 50, 6, 0.1f, true); animationList[damageE]->setScale(0.35f, 0.35f);
+	animationList[deathE] = new Animation(tx2, 0.f, 0.f, 50, 50, 8, 0.1f, true); animationList[deathE]->setScale(0.35f, 0.35f);
 }
 
 BabySlime::~BabySlime() { }
@@ -61,6 +63,7 @@ void BabySlime::update() {
 	case WALK: walk(); break;
 	case RUN: run(); break;
 	case DAMAGED: damaged(); break;
+	case DEAD: dead(); break;
 	}
 
 	// If the Slime has been hit, flash the current sprite.
@@ -85,6 +88,10 @@ void BabySlime::updateState() {
 		if (animFinished)
 			setState(IDLE);
 		break;
+	case DEAD:
+		if (animFinished && !isDead)
+			isDead = true;
+		break;
 	default: std::cout << "What did you do now?\n";
 	}
 }
@@ -105,6 +112,13 @@ void BabySlime::setState(stateType newState) {
 		invulnerable = true;
 		hit = true;
 		currentAnimation = damageE;
+		break;
+	case DEAD:
+		animFinished = false;
+		phased = true;
+		invulnerable = true;
+		hit = false;
+		currentAnimation = deathE;
 		break;
 	}
 	state = newState;
@@ -161,4 +175,10 @@ void BabySlime::run() {
 		// currentAnimation = animType(direction + RUN_ANIM);
 	}
 	else setState(IDLE); // Idle animation if currently not moving.
+}
+
+void BabySlime::dead() {
+	dx *= 0.95f;
+	dy *= 0.95f;
+	animFinished = animationList[currentAnimation]->isLastFrame();
 }

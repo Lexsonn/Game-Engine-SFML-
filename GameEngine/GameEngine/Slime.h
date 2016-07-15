@@ -9,11 +9,12 @@ using namespace sf;
 class Slime : public Entity, public AI {
 public:
 	~Slime();
+	Slime();
 	Slime(ResourceManager *rm);
 	Slime(float startX, float startY, ResourceManager *rm);
 
 	virtual void update();
-private:
+protected:
 	float panicTimer;
 	bool panicMode;
 
@@ -25,5 +26,6 @@ private:
 
 	virtual void walk();
 	virtual void run();
+	virtual void dead();
 };
 #endif

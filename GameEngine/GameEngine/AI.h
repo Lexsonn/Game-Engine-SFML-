@@ -19,9 +19,10 @@ public:
 	void setDestination();
 
 	virtual void decideDirection();
+	static float decisionSpeed;
 protected:
 	Vector2i destination, bound, maxBound;
-	float decisionSpeed, decisionMake;
+	float decisionMake;
 	
 	std::uniform_int_distribution<int> decisionRange;
 	std::random_device rd;

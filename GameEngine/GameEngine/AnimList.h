@@ -91,5 +91,13 @@ enum animType {
 	, dashSW
 	, dashS
 	, dashSE
+	, deathE		// DEATH ANIMATION
+	, deathNE
+	, deathN
+	, deathNW
+	, deathW
+	, deathSW
+	, deathS
+	, deathSE
 };
 #endif

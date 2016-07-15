@@ -51,7 +51,7 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	initEntityMap();
 	initManagers(rWindow);
 	createWorld();
-	//*
+	/*
 	std::vector<std::pair<Vector2f, Vector2f>> lines;
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
 	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
@@ -155,7 +155,6 @@ void Game::destroyWorld() {
 	}
 	at_master->clearAttacks();
 	tileMap.clear();
-	cGrid->build();
 }
 
 Entity *Game::createEntity(std::string entityName, Vector2f pos) {
@@ -175,6 +174,7 @@ Entity *Game::createEntity(std::string entityName, Vector2f pos) {
 		addEntity(newEntity);
 		return newEntity;
 	}
+	return nullptr;
 }
 
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush
@@ -193,21 +193,27 @@ void Game::setLetterBoxView() {
 }
 
 void Game::update() {
+	/*
 	if (count++ == 120) {
 		destroyWorld();
+		cGrid->build();
 		player = dynamic_cast<Player *>(createEntity("Player", Vector2f(100.f, 100.f)));
 		cGrid->printLists();
 	}
-	for (auto entity : entityList) entity.second->beginUpdate(); // Begin update for every entity
-	controller->checkKeyState();								 // Get Keyboard information
+	//*/
+	std::vector<int> toDelete;
+	for (auto entity : entityList) entity.second->beginUpdate();	 // Begin update for every entity
+	controller->checkKeyState();									 // Get Keyboard information
 	for (auto entity : entityList) {
-		entity.second->update();	 							 // Update every entity
-		cGrid->updateEntity(entity.second);						 // Update CollisionGrid position
+		entity.second->update();									 // Update every entity
+		if (entity.second->isDead) toDelete.push_back(entity.first); // Mark entity for deletion
+		else cGrid->updateEntity(entity.second);					 // Update CollisionGrid position
 	}
-	cMaster->resolveEntityCollisions();							 // Resolve collisions for every entity
-	window->updateView(player);									 // Update view to follow player
-	for (auto entity : entityList) entity.second->endUpdate();	 // End updates for every entity
-	at_master->updateAttacks();									 // Update all Attacks
+	for (int i : toDelete) deleteEntity(i);							 // Delete all Entities that have been marked for deletion
+	cMaster->resolveEntityCollisions();								 // Resolve collisions for every entity
+	window->updateView(player);										 // Update view to follow player
+	for (auto entity : entityList) entity.second->endUpdate();		 // End updates for every entity
+	at_master->updateAttacks();										 // Update all Attacks
 }
 
 void Game::render() {
@@ -268,4 +274,3 @@ void Game::deleteObject(unsigned short int _ID) {
 	delete it->second;
 	objectList.erase(it);
 }
-//*/

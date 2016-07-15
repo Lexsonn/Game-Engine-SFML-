@@ -25,6 +25,7 @@ public:
 	void runLoop();
 	void setLetterBoxView();
 	Entity *createEntity(std::string entityName, Vector2f pos);
+	void deleteEntity(unsigned short int _ID);
 private:
 	const bool debug;
 	const int *level;
@@ -53,7 +54,6 @@ private:
 	void render();
 
 	void addEntity(Entity *entity);
-	void deleteEntity(unsigned short int _ID);
 	void addObject(Collidable *object);
 	void deleteObject(unsigned short int _ID);
 };

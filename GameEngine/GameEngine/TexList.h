@@ -12,6 +12,7 @@ enum texType {
 	, playerAttack2
 	, playerAttack3
 	, playerAttRec
+	, playerDeath
 	, playerAttackAnim1
 };
 #endif

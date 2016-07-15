@@ -9,25 +9,21 @@ using namespace sf;
 *	(2)		Bit 1 - Rainbow effect																*
 *	(4)		Bit 2 - Shrink/Grow effect. (set -1 for shrink)										*
 *	(8)		Bit 3 -	Rotatation effect (negative for counter-clockwise)							*
-*	(16)	Bit 4 -																				*
+*	(16)	Bit 4 -	Flash effect																*
 *	(32)	Bit 5 - 																			*
 *																								*
 \************************************************************************************************/
 
 SpriteEffect::~SpriteEffect() { }
-SpriteEffect::SpriteEffect() : currentLife(100), maxLife(100), rotationSpeed(4), finalScale(-1) { }
-SpriteEffect::SpriteEffect(Sprite spr, float x, float y, int life, int t) : rotationSpeed(4), finalScale(-1) {
+SpriteEffect::SpriteEffect() : type(0), currentLife(1), maxLife(1) { }
+SpriteEffect::SpriteEffect(Sprite spr, float x, float y, int life, int t) : type(t), maxLife(life) {
+	rotationSpeed = 4;
+	finalScale = -1;
 	sprite = spr;
 	sprite.setPosition(x, y);
 	this->x = x;
 	this->y = y;
 	currentLife = life + 1;
-	maxLife = life;
-	type = t;
-}
-
-int SpriteEffect::getDrawableType() {
-	return DO_SPRITE_EFFECT;
 }
 
 /*
@@ -37,7 +33,7 @@ int SpriteEffect::getDrawableType() {
 bool SpriteEffect::update() {
 	if (--currentLife <= 0) 
 		return false;
-
+	
 	if (type & 1) fade();			// Bit 0
 	else fastFade();				// Default
 	if (type & 2) rainbow();		// Bit 1

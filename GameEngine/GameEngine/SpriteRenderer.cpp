@@ -11,6 +11,8 @@ void SpriteRenderer::clearList() {
 	zOrderedSpriteList.clear();
 }
 
+//Sprite &SpriteRenderer::getSprite() { }
+
 void SpriteRenderer::render(RenderWindow *window) {
 	std::multimap<int, const Sprite &>::iterator it = zOrderedSpriteList.begin();
 	while (it != zOrderedSpriteList.end())

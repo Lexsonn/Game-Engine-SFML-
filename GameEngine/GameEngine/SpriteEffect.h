@@ -3,9 +3,6 @@
 
 #include "SFML/Graphics.hpp"
 #include "DrawableObject.h"
-#include <iostream>
-
-#define DO_SPRITE_EFFECT 2
 
 using namespace sf;
 
@@ -29,14 +26,13 @@ public:
 	SpriteEffect();
 	SpriteEffect(Sprite spr, float x, float y, int life, int t);
 
-	virtual int getDrawableType();
-
 	bool update();
 	void setRotationSpeed(float rotSpeed);
 	void setScale(float scale);
 protected:
-	unsigned int type;
-	int currentLife, maxLife;
+	const unsigned int type;
+	const int  maxLife;
+	int currentLife;
 	float rotationSpeed, finalScale;
 
 	void fastFade();	// Default

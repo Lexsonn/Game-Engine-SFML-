@@ -30,6 +30,7 @@ void Player::init() {
 	Texture *tx5 = rm_master->getTexture("playerAtt2.png");
 	Texture *tx6 = rm_master->getTexture("playerAttRec.png");
 	Texture *tx7 = rm_master->getTexture("playerHit.png");
+	Texture *tx8 = rm_master->getTexture("playerDeath.png");
 	// IDLE ANIMATIONS //////////////////////////////////////////////////////
 	animationList[idleE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleE]->setRotation(270); 
 	animationList[idleNE] = new Animation(tx0, 0.f, 0.f, 50, 50, 4, 0.2f, true); animationList[idleNE]->setRotation(315);
@@ -86,6 +87,15 @@ void Player::init() {
 	animationList[attRecS] = new Animation(tx6, 0.f, 0.f, 50, 50, 6, 0.2f, false); animationList[attRecS]->setRotation(180);
 	animationList[attRecSE] = new Animation(tx6, 0.f, 0.f, 50, 50, 6, 0.2f, false); animationList[attRecSE]->setRotation(225);
 	// DAMAGED ANIMATIONS ///////////////////////////////////////////////////
+	// DEATH ANIMATIONS /////////////////////////////////////////////////////
+	animationList[deathE] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathE]->setRotation(270);
+	animationList[deathNE] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathNE]->setRotation(315);
+	animationList[deathN] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false);
+	animationList[deathNW] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathNW]->setRotation(45);
+	animationList[deathW] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathW]->setRotation(90);
+	animationList[deathSW] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathSW]->setRotation(135);
+	animationList[deathS] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathS]->setRotation(180);
+	animationList[deathSE] = new Animation(tx8, 0.f, 0.f, 50, 50, 8, 0.2f, false); animationList[deathSE]->setRotation(225);
 	// List of keys used by Player
 	keyWatchlist.push_back((int)Keyboard::W);		// Player movement (WASD)
 	keyWatchlist.push_back((int)Keyboard::A);
@@ -148,6 +158,7 @@ void Player::update() {
 	case ATTACK_RECOVER: attRec();  break;
 	case DAMAGED: damaged(); break;
 	case DASH: dash(); break;
+	case DEAD: dead(); break;
 	default: std::cout << "wat\n";
 	}
 	// If the Player has been hit, flash the current sprite.
@@ -201,6 +212,10 @@ void Player::updateState() {
 			setInvulFalse();
 		}
 		break;
+	case DEAD: 
+		if (issuedDash()) // REVIVE!!!! for testing purposes of course.
+			setState(DASH);
+		break;
 	default: std::cout << "What did you do now?\n";
 	}
 }
@@ -251,6 +266,13 @@ void Player::setState(stateType newState) {
 	case DASH:
 		phased = true;
 		invulnerable = true;
+		break;
+	case DEAD:
+		animFinished = false;
+		phased = true;
+		hit = false;
+		invulnerable = true;
+		currentAnimation = animType(direction + DEAD_ANIM);
 		break;
 	}
 	state = newState;
@@ -420,7 +442,8 @@ void Player::keyPress(Keyboard::Key key) {
 		if (t == nullptr)
 			return;
 
-		std::cout << "Entity is: " << t->ID << "\n";
+		std::cout << "Entity is: " << t->name << " (" << t->ID << "), life: (" << t->life <<
+			"/" << t->maxLife << ")\n";
 	}
 	if (key == Keyboard::W) up = true;
 	if (key == Keyboard::A) left = true;

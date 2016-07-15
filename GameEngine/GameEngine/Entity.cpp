@@ -11,11 +11,9 @@ void Entity::init() {
 	for (int i = 0; i < 4; i++)
 		gridPos[i] = -1;
 	visible = true;
+	isDead = false;
 	direction = EAST;
 	state = IDLE;
-
-	cX = int(x) - cWidth / 2;
-	cY = int(y) - cHeight / 2;
 }
 
 Entity::~Entity() {
@@ -121,12 +119,16 @@ void Entity::endUpdate() {
 void Entity::damage(int dmg) {
 	if (invulnerable)
 		return;
-	setState(DAMAGED);
+
 	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->restart();
+	
 	life -= dmg;
-	if (life < 0)
+	if (life <= 0) {
+		setState(DEAD);
 		life = 0;
+	} 
+	else setState(DAMAGED);
 }
 
 void Entity::recover(int heal) {
@@ -241,10 +243,10 @@ Vector2f Entity::getEntityOverlap(Entity *other) {
 
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
 
-	if (angle >= -45.f && angle <= 45.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
-	if (angle <= -45.f && angle >= -135.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
-	if (angle <= -135.f || angle >= 135.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
-	if (angle >= 45.f && angle <= 135.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
+	if (angle >= -48.f && angle <= 42.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
+	if (angle <= -42.f && angle >= -138.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
+	if (angle <= -132.f || angle >= 132.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
+	if (angle >= 42.f && angle <= 138.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
@@ -327,7 +329,11 @@ void Entity::walk() {
 		}
 		currentAnimation = animType(direction + WALK_ANIM);
 	}
-	else setState(IDLE); // Idle animation if currently not moving.
+	else { // Idle animation if currently not moving.
+		currentAnimation = animType(direction);
+		dx = 0;
+		dy = 0;
+	}
 }
 void Entity::run() { 
 	if (updateDirection()) {
@@ -344,7 +350,11 @@ void Entity::run() {
 		}
 		currentAnimation = animType(direction + RUN_ANIM);
 	}
-	else setState(IDLE); // Idle animation if currently not moving.
+	else { // Idle animation if currently not moving.
+		currentAnimation = animType(direction);
+		dx = 0;
+		dy = 0;
+	}
 }
 
 void Entity::abs() { 
@@ -366,3 +376,13 @@ void Entity::damaged() {
 }
 
 void Entity::dash() { }
+
+void Entity::dead() {
+	dx *= 0.95f;
+	dy *= 0.95f;
+	animFinished = animationList[currentAnimation]->isLastFrame();
+	if (animFinished) {
+		dx = 0; dy = 0;
+		invulnerable = false; // Die here
+	}
+}

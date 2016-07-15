@@ -28,6 +28,7 @@
 #define AREC_ANIM 64
 #define DAMG_ANIM 72
 #define DASH_ANIM 8 //80
+#define DEAD_ANIM 88 //88
 
 // Faces for 8 Directions
 enum dir {
@@ -46,7 +47,7 @@ public:
 	std::string name;
 	float dx, dy;
 	short int maxLife, life, gridPos[4];
-	bool invulnerable;
+	bool invulnerable, isDead;
 	dir direction;
 
 	~Entity();
@@ -116,5 +117,6 @@ protected:
 	virtual void attRec();
 	virtual void damaged();
 	virtual void dash();
+	virtual void dead();
 };
 #endif
