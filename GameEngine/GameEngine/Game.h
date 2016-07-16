@@ -24,6 +24,7 @@ public:
 
 	void runLoop();
 	void setLetterBoxView();
+	void addDrawable(DrawableObject *drawObj);
 	Entity *createEntity(std::string entityName, Vector2f pos);
 	void deleteEntity(unsigned short int _ID);
 private:
@@ -40,7 +41,9 @@ private:
 	AttackManager *at_master;
 	GameWindow* window;
 	Player *player;
-	std::vector<TileMap> tileMap;
+
+	std::vector<TileMap> tileMap;				// Vector for Tilemap sections (move to sprite renderer)
+	std::vector<DrawableObject *> drawableList;	// Vector for DrawableObjects that don't belong to other groups
 
 	std::map<std::string, EntityType> entityMap;			// Map for creation of Entities by string
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
@@ -51,6 +54,7 @@ private:
 	void createWorld();
 	void destroyWorld();
 	void update();
+	void updateDrawable();
 	void render();
 
 	void addEntity(Entity *entity);

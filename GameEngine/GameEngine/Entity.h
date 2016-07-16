@@ -60,6 +60,7 @@ public:
 	Animation *getCurrentAnimation();
 	void addAnimation(Animation *anim, animType name);
 	virtual void flashCurrentSprite(animType oldAnimation);
+	virtual Sprite &getSprite();
 
 	void beginUpdate();
 	void endUpdate();
@@ -79,7 +80,6 @@ public:
 	virtual int getType();
 protected:
 	std::map<animType, Animation *> animationList;
-	std::vector<SpriteEffect *> spriteEffectList;
 	ResourceManager *rm_master;
 	AttackManager *at_master;
 	animType currentAnimation;
@@ -97,6 +97,7 @@ protected:
 	bool updateDashDirection();
 	void updatePosition();
 	void createNewEntity(std::string entityName, Vector2f pos);
+	void createSpriteEffect(SpriteEffect *sprEffect);
 
 	virtual void init();
 	virtual float getSpeed();

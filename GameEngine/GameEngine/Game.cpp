@@ -5,6 +5,8 @@
 #define _DEBUG_MODE 0x1
 #define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller->addControllable(dynamic_cast<Controllable *>(newEntity));
 
+#define _CHECK_SPRITE_EFFECT_FLAG if (dO->getDrawableType() == 1) { SpriteEffect *eff = dynamic_cast<SpriteEffect *>(dO); if (!eff->update()) { dO; it = drawableList.erase(it); draw = false; }}
+
 int WWIDTH(800);
 int WHEIGHT(800);
 Game *game(nullptr);
@@ -15,7 +17,7 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	eID = 0;
 	oID = 0;
 
-	const int l[] = { 25, 25, // load dis from txt file pls
+	const int l[] = { 25, 25, // load dis from txt file pls ty
 		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,  3,  3,  3,  3,  3,  3,  3,  3,  1,
 		1,  5,  9,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
 		2,  6,  10, 5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
@@ -51,21 +53,12 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	initEntityMap();
 	initManagers(rWindow);
 	createWorld();
-	/*
-	std::vector<std::pair<Vector2f, Vector2f>> lines;
-	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(130, 250), Vector2f(420, 110)));
-	lines.push_back(std::pair<Vector2f, Vector2f>(Vector2f(330, 150), Vector2f(330, 410)));
-	Animation *anim = new Animation(rm_master->getTexture("playerAtt1.png"), 0, 0, 50, 50, 5, 0.4f, true);
-	//Attack * att = new Attack(0, 0, 1, 60, 23, lines);
-	at_master->addAttack(1, 1, 320, 23, lines, anim);
-	at_master->attackList.at(0)->setPosition(210, 190);
-	at_master->attackList.at(0)->setForce(2, 2);
-	//*/
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\tCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\tInputController: " << sizeof(InputController) << "\n";
 	std::cout << "AttackManager : " << sizeof(AttackManager) << "\tAttack: " << sizeof(Attack) << "\n";
 	std::cout << "Player : " << sizeof(Player) << "\t\tEntity: " << sizeof(Entity) << "\n";
+	std::cout << "Game : " << sizeof(Game) << "\t\tTileMap " << sizeof(TileMap) << "\n";
 	//*/
 }
 
@@ -76,6 +69,9 @@ void Game::initEntityMap() {
 	entityMap["BabySlime"] = BABYSLIME;
 }
 
+/*
+ *	Initialize all managers, and set up their relationships.
+ */
 void Game::initManagers(RenderWindow *rWindow) {
 	rm_master = new ResourceManager();
 	spr_renderer = new SpriteRenderer();
@@ -87,8 +83,7 @@ void Game::initManagers(RenderWindow *rWindow) {
 	player = new Player(200, 200, rm_master);
 	// Manager/player setup
 	at_master->setResourceManager(rm_master);
-	rm_master->setSpriteRenderer(spr_renderer);
-	rm_master->setView(window->getView());
+	spr_renderer->setView(window->getView());
 	controller->addControllable(player);
 	player->setEntityList(cGrid->getEntityList());
 	// CollisionManager setup
@@ -99,6 +94,9 @@ void Game::initManagers(RenderWindow *rWindow) {
 	cMaster->setObjectPosList(cGrid->getObjectList());
 }
 
+/*
+ *	Eventually, this will load a world from a file. maybe?
+ */
 void Game::createWorld() {
 	// All dis gon b loaded in txt file <3 <3 <3
 	for (int i = 0; i <= level[0] / SSX; i++) {
@@ -140,6 +138,9 @@ void Game::createWorld() {
 	addObject(new Collidable(140, 270, 60, 60));
 }
 
+/*
+ *	Destroy all objects related to the current level.
+ */
 void Game::destroyWorld() {
 	WWIDTH = 160;
 	WHEIGHT = 160;
@@ -157,6 +158,9 @@ void Game::destroyWorld() {
 	tileMap.clear();
 }
 
+/*
+ *	Create an entity from a passed in string, and position.
+ */
 Entity *Game::createEntity(std::string entityName, Vector2f pos) {
 	Entity *newEntity = nullptr;
 	EntityType type = UNKNOWN_e;
@@ -186,21 +190,29 @@ void Game::runLoop() {
 	spr_renderer->clearList();	// Clear list of drawable sprites
 }
 
+/*
+ *	Called when the window has been resized. Sets the View to letterbox itself accordingly.
+ */
 void Game::setLetterBoxView() {
 	if (window == nullptr)
 		return;
 	window->setLetterboxView();
 }
 
+/*
+ *	Add DrawableObject to the drawable list, and set its renderer.
+ */
+void Game::addDrawable(DrawableObject *drawObj) {
+	if (drawObj == nullptr)
+		return;
+	drawObj->setRenderer(spr_renderer);
+	drawableList.push_back(drawObj);
+}
+
+/*
+ *	The game update step. All game logic goes in here.
+ */
 void Game::update() {
-	/*
-	if (count++ == 120) {
-		destroyWorld();
-		cGrid->build();
-		player = dynamic_cast<Player *>(createEntity("Player", Vector2f(100.f, 100.f)));
-		cGrid->printLists();
-	}
-	//*/
 	std::vector<int> toDelete;
 	for (auto entity : entityList) entity.second->beginUpdate();	 // Begin update for every entity
 	controller->checkKeyState();									 // Get Keyboard information
@@ -210,12 +222,32 @@ void Game::update() {
 		else cGrid->updateEntity(entity.second);					 // Update CollisionGrid position
 	}
 	for (int i : toDelete) deleteEntity(i);							 // Delete all Entities that have been marked for deletion
+	updateDrawable();												 // Update all Drawable Objects, deleting if necessary
 	cMaster->resolveEntityCollisions();								 // Resolve collisions for every entity
 	window->updateView(player);										 // Update view to follow player
 	for (auto entity : entityList) entity.second->endUpdate();		 // End updates for every entity
 	at_master->updateAttacks();										 // Update all Attacks
 }
 
+/*
+ *	Iterate through the list of all drawable objects, deleting them if needed.
+ *	If they aren't deleted, they are sent to the SpriteRenderer to check for rendering.
+ */
+void Game::updateDrawable() {
+	if (!drawableList.empty()) {
+		std::vector<DrawableObject *>::iterator it;
+		for (it = drawableList.begin(); it < drawableList.end(); ) {
+			DrawableObject *dO = *it;
+			bool draw = true;
+			_CHECK_SPRITE_EFFECT_FLAG
+			if (draw) { dO->addToRenderer(dO->y); it++; }
+		}
+	}
+}
+
+/*
+ *	Render all Game objects that require rendering.
+ */
 void Game::render() {
 	for (int i = 0; i < tileMap.size(); i++) window->render(tileMap.at(i));
 	if (debug) {
@@ -239,6 +271,7 @@ void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
 	entity->setAttackManager(at_master);
+	entity->setRenderer(spr_renderer);
 	cGrid->initEntity(entity);
 }
 

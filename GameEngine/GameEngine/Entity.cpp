@@ -17,12 +17,9 @@ void Entity::init() {
 }
 
 Entity::~Entity() {
-	for (unsigned int i = 0; i < spriteEffectList.size(); i++)
-		delete spriteEffectList.at(i);
 	for (std::map<animType, Animation *>::iterator it = animationList.begin(); it != animationList.end(); it++)
 		delete it->second;
 	
-	spriteEffectList.clear();
 	animationList.clear();
 }
 
@@ -84,6 +81,14 @@ void Entity::flashCurrentSprite(animType oldAnimation) {
 	if (oldAnimation != currentAnimation) animationList[oldAnimation]->setColor(Color(255, 255, 255));
 }
 
+Sprite &Entity::getSprite() {
+	if (isInAnimList(currentAnimation))
+		return animationList[currentAnimation]->sprite;
+	//Texture t = nullptr;
+	//return Sprite(t ,IntRect(-1, -1, 1, 1));
+	return Sprite();
+}
+
 void Entity::beginUpdate() {
 	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->beginUpdate();
@@ -98,22 +103,8 @@ void Entity::endUpdate() {
 	
 	if (!isVisible())
 		return;
-	if (!spriteEffectList.empty()) {
-		std::vector<SpriteEffect *>::iterator it;
-		for (it = spriteEffectList.begin(); it < spriteEffectList.end(); ) {
-			SpriteEffect *spr = *it;
-			if (!spr->update()) {
-				delete spr;
-				it = spriteEffectList.erase(it);
-			}
-			else {
-				rm_master->addSprite(int(spr->sprite.getPosition().y), spr->sprite);
-				it++;
-			}
-		}
-	}
-	// Allow the entity to be drawn on top of its own sprite effects on same level by inserting last.
-	rm_master->addSprite(int(y), animationList[currentAnimation]->sprite);
+	
+	addToRenderer(int(y));
 }
 
 void Entity::damage(int dmg) {
@@ -216,12 +207,15 @@ void Entity::createNewEntity(std::string entityName, Vector2f pos) {
 		game->createEntity(entityName, pos);
 }
 
-void Entity::moveOutsideCollidable(Collidable *other) {
-	if (other == nullptr)
+void Entity::createSpriteEffect(SpriteEffect *sprEffect) {
+	if (sprEffect == nullptr || game == nullptr)
 		return;
-	Vector2f vec;
+	game->addDrawable(sprEffect);
+}
+
+void Entity::moveOutsideCollidable(Collidable *other) {
 	if (insideCollidable(other)) {
-		vec = getStaticOverlap(other);
+		Vector2f vec = getStaticOverlap(other);
 		updatePosition(vec);
 	}
 }
@@ -266,10 +260,10 @@ void Entity::updateState() { }
 void Entity::setState(stateType newState) { }
 
 int Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
-	Attack *newAttack;
-	newAttack = new Attack(ID, type, life, str, attackLines, anim);
-	newAttack->setForce(force.x, force.y);
+	Attack *newAttack = new Attack(ID, type, life, str, attackLines, anim);
+	newAttack->setForce(force);
 	newAttack->setPosition(pos);
+	newAttack->setRenderer(renderer);
 	return at_master->addAttack(newAttack);
 }
 

@@ -29,6 +29,11 @@ public:
 	bool update();
 	void setRotationSpeed(float rotSpeed);
 	void setScale(float scale);
+
+	virtual Sprite &getSprite();
+
+	static unsigned short int drawableType;
+	virtual unsigned short int getDrawableType();
 protected:
 	const unsigned int type;
 	const int  maxLife;

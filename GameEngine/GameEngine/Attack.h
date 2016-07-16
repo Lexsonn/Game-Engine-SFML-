@@ -30,7 +30,9 @@ public:
 	void setPosition(Vector2f position);
 	void setRotation(float angle);
 	void setForce(float dx, float dy);
-	Sprite &getSprite();
+	void setForce(Vector2f f);
+
+	virtual Sprite &getSprite();
 private:
 	Animation *animation;
 	int formAt;

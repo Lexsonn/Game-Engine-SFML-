@@ -52,6 +52,12 @@ void Attack::setForce(float dx, float dy) {
 	force = Vector2f(dx, dy);
 }
 
+void Attack::setForce(Vector2f f) {
+	force = f;
+}
+
 Sprite &Attack::getSprite() {
+	if (animation == nullptr)
+		return Sprite();
 	return animation->sprite;
 }

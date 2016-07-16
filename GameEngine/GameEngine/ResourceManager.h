@@ -23,7 +23,7 @@ public:
 	~ResourceManager();
 	ResourceManager();
 
-	void setView(View *view);
+	//void setView(View *view);
 
 	texType getTextureType(const std::string &texPath);
 	Texture *getTexture(const std::string &texPath);
@@ -40,16 +40,16 @@ public:
 	bool addMusic(const std::string &musicPath);
 	bool deleteMusic(const std::string &musicPath);
 
-	bool addSprite(int z, const Sprite &spr);
-	void setSpriteRenderer(SpriteRenderer *sprRenderer);
+	//bool addSprite(int z, const Sprite &spr);
+	//void setSpriteRenderer(SpriteRenderer *sprRenderer);
 private:
 	std::map<texType, Texture *> textureList;
 	std::map<sfxType, SoundBuffer> soundList;
 	std::map<musicType, Music *> songList;
-	SpriteRenderer *renderer;
-	View *view;
+	//SpriteRenderer *renderer;
+	//View *view;
 
 	void init();
-	bool isInsideView(const Sprite &spr);
+	//bool isInsideView(const Sprite &spr);
 };
 #endif

@@ -307,7 +307,8 @@ void Player::dash() {
 
 	if (int(dashTimer*20) % 2 == 0) {
 		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
-		spriteEffectList.push_back(spr);
+		createSpriteEffect(spr);
+		//spriteEffectList.push_back(spr);
 	}
 }
 
@@ -428,8 +429,8 @@ void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::LShift) running = true; 
 	if (key == Keyboard::RShift) { 
 		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 50, 16); 
-		spriteEffectList.push_back(spr); 
 		spr->setRotationSpeed(8); 
+		createSpriteEffect(spr);
 	}
 	if (key == Keyboard::LControl) { damage(32); std::cout << "Life: " << life << "\n"; }
 	if (key == Keyboard::RControl) recover(500);

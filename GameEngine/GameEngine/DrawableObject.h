@@ -2,6 +2,7 @@
 #define DRAWABLEOBJECT_H
 
 #include <SFML/Graphics.hpp>
+#include "SpriteRenderer.h"
 
 using namespace sf;
 
@@ -11,13 +12,21 @@ public:
 
 	~DrawableObject();
 	DrawableObject();
+
+	void setRenderer(SpriteRenderer *renderer);
 	
 	void setVisible(bool isVisible);
 	bool isVisible();
 
-	//virtual Sprite &getSprite();
+	virtual Sprite &getSprite();
+	void addToRenderer(int z);
 	virtual void render(RenderWindow *window);
+
+	static unsigned short int drawableType;
+	virtual unsigned short int getDrawableType();
 protected:
+	SpriteRenderer *renderer;
+
 	bool visible;
 };
 #endif

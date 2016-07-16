@@ -14,6 +14,8 @@ using namespace sf;
 *																								*
 \************************************************************************************************/
 
+unsigned short int SpriteEffect::drawableType = 1;
+
 SpriteEffect::~SpriteEffect() { }
 SpriteEffect::SpriteEffect() : type(0), currentLife(1), maxLife(1) { }
 SpriteEffect::SpriteEffect(Sprite spr, float x, float y, int life, int t) : type(t), maxLife(life) {
@@ -52,6 +54,14 @@ void SpriteEffect::setScale(float scale) {
 	finalScale = scale;
 	if (finalScale < -1.f)
 		finalScale = -1.f;
+}
+
+Sprite &SpriteEffect::getSprite() {
+	return sprite;
+}
+
+unsigned short int SpriteEffect::getDrawableType() {
+	return drawableType;
 }
 
 void SpriteEffect::fastFade() {
