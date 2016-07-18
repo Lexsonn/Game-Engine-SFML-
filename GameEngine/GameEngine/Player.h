@@ -11,8 +11,6 @@ public:
 	Player(ResourceManager *rm);
 	Player(float startX, float startY, ResourceManager *rm);
 
-	void setEntityList(std::multimap<unsigned short int, Entity *> *list);
-
 	virtual void update();
 
 	virtual void keyHeld(Keyboard::Key key);
@@ -21,19 +19,15 @@ public:
 
 	virtual void render(RenderWindow *window);
 
-	static int entityType;
+	const static int entityType;
 	virtual int getType();
 private:
-	std::multimap<unsigned short int, Entity *> *entityList;
 	short int attackType, maxAttacks;
 	float dashTimer;
 
 	void setInvulFalse();
 
 	void generateAttack();
-
-	std::pair<Vector2f, Vector2f> getAccessorLineFromDirection();
-	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void init();
 	virtual float getSpeed();

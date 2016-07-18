@@ -5,16 +5,13 @@
 
 using namespace sf;
 
-class InputController {
+struct InputController {
 public:
-	InputController();
-	~InputController();
-
-	void checkKeyState();
-	void addControllable(Controllable* controllable);
-
+	void update();
+	void addControllable(Controllable *controllable);
+	void clearControllables();
 private:
-	std::vector<bool> keyPressed;
-	std::vector<Controllable*> controllableList;
+	static std::vector<bool> keyPressed;
+	static std::vector<Controllable *> controllableList;
 };
 #endif

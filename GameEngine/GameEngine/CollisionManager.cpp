@@ -1,40 +1,30 @@
 #include "CollisionManager.h"
+#include "AttackManager.h"
+#include "CollisionGrid.h"
 
-CollisionManager::~CollisionManager() { }
-CollisionManager::CollisionManager() { }
+std::map<unsigned short int, Entity *> *CollisionManager::entityList;
 
-void CollisionManager::setAttackManager(AttackManager *manager) {
-	at_master = manager;
+void CollisionManager::initialize(std::map<unsigned short int, Entity *> *eList) {
+	entityList = eList;
 }
 
-void CollisionManager::setEntityList(std::map<unsigned short int, Entity *> *list) {
-	entityList = list;
-}
-
-void CollisionManager::setObjectList(std::map<unsigned short int, Collidable *> *list) {
-	objectList = list;
-}
-
-void CollisionManager::setEntityPosList(std::multimap<unsigned short int, Entity *> *list) {
-	entityPosList = list;
-}
-
-void CollisionManager::setObjectPosList(std::multimap<unsigned short int, Collidable *> *list) {
-	objectPosList = list;
-}
-
-void CollisionManager::resolveEntityCollisions() {
+/*
+ *	Resolve all entity collisions with other entities, static collidables, and attacks.
+ */
+void CollisionManager::update() {
 	for (std::map<unsigned short int, Entity *>::iterator it = entityList->begin(); it != entityList->end(); it++) {
-		// Resolve Entity collisions with Attacks (if Entity is not invulnerable)
-		if (!it->second->invulnerable)
-			resolveEntitiyAttackCollision(it->second);
-		// Resolve Entity collisions with other Entities and static Collidables
+		resolveEntitiyAttackCollision(it->second);
 		moveEntityOutsideCollision(it->second);
 	}
 }
 
+/*
+ *	Resolve all entity collisions with attacks if Entity is not invulnerable
+ */
 void CollisionManager::resolveEntitiyAttackCollision(Entity * entity) {
-	for (auto attack : at_master->attackList) {
+	if (entity->invulnerable)
+		return;
+	for (auto attack : AttackManager::attackList) {
 		if (entity->ID != attack.second->parent) {
 			for (auto line : attack.second->attackLines) {
 				if (entity->intersectsLine(line)) {
@@ -47,13 +37,16 @@ void CollisionManager::resolveEntitiyAttackCollision(Entity * entity) {
 	}
 }
 
+/*
+ *	Resolve Entity collisions with other Entities and static Collidables
+ */
 void CollisionManager::moveEntityOutsideCollision(Entity *entity) {
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0) {
 			if (!entity->phased) {
 				std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-				range = entityPosList->equal_range(entity->gridPos[i]);
-				// Cycle through Entities first, since it is permissable to be partially inside one.
+				range = CollisionGrid::entityPosList.equal_range(entity->gridPos[i]);
+				// Cycle through Entities first, because it is permissable to be partially inside one.
 				for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 					if (it->second->ID != entity->ID) {
 						moveEntityOutsideEntity(entity, it->second);
@@ -61,14 +54,17 @@ void CollisionManager::moveEntityOutsideCollision(Entity *entity) {
 				}
 			}
 			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
-			cRange = objectPosList->equal_range(entity->gridPos[i]);
-			// Cycle through Collidable objects last, since those can not move. Entities cannot pass through.
+			cRange = CollisionGrid::objectPosList.equal_range(entity->gridPos[i]);
+			// Cycle through Collidable objects last, since static collidables can not move. Entities cannot pass through.
 			for (std::multimap<unsigned short int, Collidable *>::iterator it = cRange.first; it != cRange.second; it++)
 				entity->moveOutsideCollidable(it->second);
 		}
 	}
 }
 
+/*
+ *	Resolve collision with another entity, taking  phased and weight into account
+ */
 void CollisionManager::moveEntityOutsideEntity(Entity *entity, Entity *other) {
 	if (other == nullptr)
 		return;
@@ -96,15 +92,15 @@ bool CollisionManager::willEntityCollide(Entity *entity, unsigned short int _ID,
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0) {
 			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> cRange;
-			cRange = objectPosList->equal_range(entity->gridPos[i]);
+			cRange = CollisionGrid::objectPosList.equal_range(entity->gridPos[i]);
 
 			for (std::multimap<unsigned short int, Collidable *>::iterator it = cRange.first; it != cRange.second; it++) {
 				if (entity->willCollide(it->second, _dx, _dy))
 					return true;
 			}
-
+			
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityPosList->equal_range(entity->gridPos[i]);
+			range = CollisionGrid::entityPosList.equal_range(entity->gridPos[i]);
 
 			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID != entity->ID && it->second->ID != _ID) {

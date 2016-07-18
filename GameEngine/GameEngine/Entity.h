@@ -55,7 +55,7 @@ public:
 	Entity(ResourceManager *rm);
 	Entity(float startX, float startY, ResourceManager *rm);
 
-	void setAttackManager(AttackManager *manager);
+	void setAttackManager(const AttackManager &manager);
 	
 	Animation *getCurrentAnimation();
 	void addAnimation(Animation *anim, animType name);
@@ -76,12 +76,12 @@ public:
 
 	virtual void render(RenderWindow *window);
 
-	static int entityType;
+	const static int entityType;
 	virtual int getType();
 protected:
 	std::map<animType, Animation *> animationList;
 	ResourceManager *rm_master;
-	AttackManager *at_master;
+	AttackManager at_master;
 	animType currentAnimation;
 	stateType state;
 	float flashDmg;
@@ -107,8 +107,10 @@ protected:
 
 	int createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
 	Vector2f generateForceFromDirection(float strength);
-	std::pair<Vector2f, Vector2f> createNormalAttackLine(float length, float distance);
-	std::pair<Vector2f, Vector2f> createNormalAttackLineFromAngle(float length, float distance, float angle);
+	std::pair<Vector2f, Vector2f> createNormalLine(float length, float distance);
+	std::pair<Vector2f, Vector2f> createNormalLineFromAngle(float length, float distance, float angle);
+
+	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
 
 	virtual void idle();
 	virtual void walk();

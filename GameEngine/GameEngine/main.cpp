@@ -3,6 +3,7 @@
  **	GAME ENGINE																		 **
  **																					 ** 
  **	Created by Daimen "Lexsonn" Estevez												 **
+ ** (u no dis gon b gud)															 ** 
  **																					 **
 \**************************************************************************************/
 
@@ -15,7 +16,8 @@ int main() {
 	Event event;
 	RenderWindow window(VideoMode(1280, 960), "GAME ENGINE v0.04");
 
-	window.setFramerateLimit(60);
+	// BAD DEVELOPER BAD! Change this shit to not be tied to framerate you filthy casual
+	window.setFramerateLimit(60); // REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 
 	Game game(&window);
 

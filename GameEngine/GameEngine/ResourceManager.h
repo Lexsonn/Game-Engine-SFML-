@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
-#include "SpriteRenderer.h"
 #include "MusicList.h"
 #include "TexList.h"
 #include "SFXList.h"
@@ -23,8 +22,6 @@ public:
 	~ResourceManager();
 	ResourceManager();
 
-	//void setView(View *view);
-
 	texType getTextureType(const std::string &texPath);
 	Texture *getTexture(const std::string &texPath);
 	bool addTexture(const std::string &texPath);
@@ -39,17 +36,11 @@ public:
 	Music *getMusic(const std::string &musicPath);
 	bool addMusic(const std::string &musicPath);
 	bool deleteMusic(const std::string &musicPath);
-
-	//bool addSprite(int z, const Sprite &spr);
-	//void setSpriteRenderer(SpriteRenderer *sprRenderer);
 private:
 	std::map<texType, Texture *> textureList;
 	std::map<sfxType, SoundBuffer> soundList;
 	std::map<musicType, Music *> songList;
-	//SpriteRenderer *renderer;
-	//View *view;
 
 	void init();
-	//bool isInsideView(const Sprite &spr);
 };
 #endif

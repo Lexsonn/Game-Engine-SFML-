@@ -1,7 +1,6 @@
 #include "Slime.h"
 
 void Slime::init() {
-	std::cout << "sleme init\n";
 	// AI vars
 	generateRND(int(time(NULL)), 99);
 	destination.x = int(x);

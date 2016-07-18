@@ -5,12 +5,11 @@ extern int WWIDTH;
 extern int WHEIGHT;
 extern Game *game;
 
-int Entity::entityType = 0;
+const int Entity::entityType = 0;
 
 void Entity::init() { 
-	for (int i = 0; i < 4; i++)
+	for (unsigned short int i = 0; i < 4; i++)
 		gridPos[i] = -1;
-	visible = true;
 	isDead = false;
 	direction = EAST;
 	state = IDLE;
@@ -32,7 +31,7 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), max
 	init();
 }
 
-void Entity::setAttackManager(AttackManager *manager) {
+void Entity::setAttackManager(const AttackManager &manager) {
 	at_master = manager;
 }
 
@@ -84,9 +83,7 @@ void Entity::flashCurrentSprite(animType oldAnimation) {
 Sprite &Entity::getSprite() {
 	if (isInAnimList(currentAnimation))
 		return animationList[currentAnimation]->sprite;
-	//Texture t = nullptr;
-	//return Sprite(t ,IntRect(-1, -1, 1, 1));
-	return Sprite();
+	return emptySprite;
 }
 
 void Entity::beginUpdate() {
@@ -208,7 +205,7 @@ void Entity::createNewEntity(std::string entityName, Vector2f pos) {
 }
 
 void Entity::createSpriteEffect(SpriteEffect *sprEffect) {
-	if (sprEffect == nullptr || game == nullptr)
+	if (game == nullptr)
 		return;
 	game->addDrawable(sprEffect);
 }
@@ -263,8 +260,7 @@ int Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f for
 	Attack *newAttack = new Attack(ID, type, life, str, attackLines, anim);
 	newAttack->setForce(force);
 	newAttack->setPosition(pos);
-	newAttack->setRenderer(renderer);
-	return at_master->addAttack(newAttack);
+	return at_master.addAttack(newAttack);
 }
 
 Vector2f Entity::generateForceFromDirection(float strength) {
@@ -285,7 +281,7 @@ Vector2f Entity::generateForceFromDirection(float strength) {
  *	Returns a line of specified length, normal to the direction of the Entity, at a specified 
  *	distance away from the Entity's direction.
  */
-std::pair<Vector2f, Vector2f> Entity::createNormalAttackLine(float length, float distance) {
+std::pair<Vector2f, Vector2f> Entity::createNormalLine(float length, float distance) {
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
@@ -299,12 +295,28 @@ std::pair<Vector2f, Vector2f> Entity::createNormalAttackLine(float length, float
  *	Returns a line of specified length, normal to the specified direction, at a specified
  *	distance away from the direction. The angle entered is in degrees.
  */
-std::pair<Vector2f, Vector2f> Entity::createNormalAttackLineFromAngle(float length, float distance, float angle) {
+std::pair<Vector2f, Vector2f> Entity::createNormalLineFromAngle(float length, float distance, float angle) {
 	std::pair<Vector2f, Vector2f> line;
 	line.first = Vector2f(x + distance, y - length / 2);
 	line.second = Vector2f(x + distance, y + length / 2);
 	line = rotateLineAboutPoint(line, Vector2f(x, y), angle * PI / 180.f);
 	return line;
+}
+
+Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
+	Vector2f mid = findMidpointOfLine(line);
+	int gridPosition = getGrid(int(mid.x), int(mid.y));
+	if (gridPosition >= 0) {
+		std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
+		range = CollisionGrid::entityPosList.equal_range(gridPosition);
+
+		for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
+			if (it->second->ID != ID)
+				if (it->second->intersectsLine(line))
+					return it->second;
+		}
+	}
+	return nullptr;
 }
 
 void Entity::idle() { }
@@ -329,6 +341,7 @@ void Entity::walk() {
 		dy = 0;
 	}
 }
+
 void Entity::run() { 
 	if (updateDirection()) {
 		switch (direction) {

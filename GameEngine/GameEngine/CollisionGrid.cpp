@@ -3,10 +3,12 @@
 extern int WWIDTH;
 extern int WHEIGHT;
 
-CollisionGrid::~CollisionGrid() { }
-CollisionGrid::CollisionGrid() {
-	build();
-}
+unsigned int CollisionGrid::width = 0;
+unsigned int CollisionGrid::height = 0;
+unsigned int CollisionGrid::size = 1;
+
+std::multimap<unsigned short int, Entity *> CollisionGrid::entityPosList;
+std::multimap<unsigned short int, Collidable *> CollisionGrid::objectPosList;
 
 /*
  *	Create bounds for the CollisionGrid. Called whenever the game world has changed.
@@ -47,7 +49,7 @@ void CollisionGrid::initEntity(Entity *entity) {
 
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0)
-			entityList.insert(std::pair<unsigned short int, Entity *>(gridPos[i], entity));
+			entityPosList.insert(std::pair<unsigned short int, Entity *>(gridPos[i], entity));
 		entity->gridPos[i] = gridPos[i];
 	}
 }
@@ -75,24 +77,16 @@ void CollisionGrid::deleteEntity(Entity *entity) {
 	for (int i = 0; i < 4; i++) {
 		if (entity->gridPos[i] >= 0) {
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList.equal_range(entity->gridPos[i]);
+			range = entityPosList.equal_range(entity->gridPos[i]);
 
 			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID == entity->ID) {
-					entityList.erase(it);
+					entityPosList.erase(it);
 					break;
 				}
 			}
 		}
 	}
-}
-
-std::multimap<unsigned short int, Entity *> *CollisionGrid::getEntityList() {
-	return &entityList;
-}
-
-std::multimap<unsigned short int, Collidable *> *CollisionGrid::getObjectList() {
-	return &objectList;
 }
 
 /*
@@ -102,7 +96,7 @@ std::multimap<unsigned short int, Collidable *> *CollisionGrid::getObjectList() 
 void CollisionGrid::addEntity(int gridPos[], Entity *entity) {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0 && gridPos[i] != entity->gridPos[i]) 
-			entityList.insert(std::pair<unsigned short int, Entity *>(gridPos[i], entity));
+			entityPosList.insert(std::pair<unsigned short int, Entity *>(gridPos[i], entity));
 		entity->gridPos[i] = gridPos[i];
 	}
 }
@@ -115,12 +109,12 @@ void CollisionGrid::removeEntity(int gridPos[], Entity *entity) {
 		if (entity->gridPos[i] >= 0 && gridPos[i] != entity->gridPos[i]) {
 			//std::cout << "Removing " << entity->gridPos[i] << "... ";
 			std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-			range = entityList.equal_range(entity->gridPos[i]);
+			range = entityPosList.equal_range(entity->gridPos[i]);
 
 			for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID == entity->ID) {
 					//std::cout << "ERASE " << entity->ID << "\n";
-					entityList.erase(it);
+					entityPosList.erase(it);
 					break;
 				}
 			}
@@ -162,11 +156,11 @@ void CollisionGrid::deleteObject(Collidable *object) {
 			if (gridPos < 0 || gridPos >= size)
 				break;
 			std::pair<std::multimap<unsigned short int, Collidable *>::iterator, std::multimap<unsigned short int, Collidable *>::iterator> range;
-			range = objectList.equal_range(gridPos);
+			range = objectPosList.equal_range(gridPos);
 
 			for (std::multimap<unsigned short int, Collidable *>::iterator it = range.first; it != range.second; it++) {
 				if (it->second->ID == object->ID) {
-					objectList.erase(it);
+					objectPosList.erase(it);
 					break;
 				}
 			}
@@ -179,7 +173,7 @@ void CollisionGrid::deleteObject(Collidable *object) {
  */
 void CollisionGrid::addObject(int gridPos, Collidable *object) {
 	if (gridPos >= 0 && gridPos < size)
-		objectList.insert(std::pair<unsigned short int, Collidable *>(gridPos, object));
+		objectPosList.insert(std::pair<unsigned short int, Collidable *>(gridPos, object));
 }
 
 /*
@@ -187,11 +181,11 @@ void CollisionGrid::addObject(int gridPos, Collidable *object) {
  */
 void CollisionGrid::printLists() {
 	std::cout << "Entity IDs: ";
-	for (auto entity : entityList) {
+	for (auto entity : entityPosList) {
 		std::cout << entity.first  << "(" << entity.second->ID << ") ";
 	}
 	std::cout << "\nObject IDs: ";
-	for (auto object : objectList) {
+	for (auto object : objectPosList) {
 		std::cout << object.first << "(" << object.second->ID << ") ";
 	}
 	std::cout << std::endl;
@@ -201,15 +195,14 @@ void CollisionGrid::printLists() {
  *	Clear the lists of Entity and Collidable grid positions. 
  */
 void CollisionGrid::clearLists() {
-	// Simply clear the reference list of Entities and Collidables, no need to delete.
-	entityList.clear();
-	objectList.clear();
+	entityPosList.clear();
+	objectPosList.clear();
 }
 
 /*
  *	(DEBUG) Draw CollisionGrid grid
  */
-void CollisionGrid::render(RenderWindow *window) {
+void CollisionGrid::render(RenderWindow *window) const {
 	for (unsigned int i = 0; i <= width + 1; i++) {
 		Vertex line[] = { Vertex(Vector2f(GRID_WIDTH * i * 1.f, 0.f)), Vertex(Vector2f(GRID_WIDTH * i * 1.f, (height + 1) * GRID_HEIGHT * 1.f)) };
 		line[0].color = Color(0, 255, 64); line[1].color = Color(0, 64, 255);
@@ -225,7 +218,7 @@ void CollisionGrid::render(RenderWindow *window) {
 /*
  *	(DEBUG) Draw CollisionGrid positions for Entities
  */
-void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
+void CollisionGrid::render(RenderWindow *window, short int gridPos[]) const {
 	for (int i = 0; i < 4; i++) {
 		if (gridPos[i] >= 0) {
 			Vector2i v = getCoords(gridPos[i]);
@@ -240,7 +233,7 @@ void CollisionGrid::render(RenderWindow *window, short int gridPos[]) {
 /*
  *	(DEBUG) Draw CollisionGrid positions for Attacks
  */
-void CollisionGrid::render(RenderWindow *window, std::map<short int, unsigned short int> gridPos) {
+void CollisionGrid::render(RenderWindow *window, std::map<short int, unsigned short int> gridPos) const {
 	for (auto pos : gridPos) {
 		Vector2i v = getCoords(pos.first);
 		RectangleShape sh(Vector2f(GRID_WIDTH, GRID_HEIGHT));

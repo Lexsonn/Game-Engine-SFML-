@@ -1,18 +1,12 @@
 #include "AttackManager.h"
 
-AttackManager::~AttackManager() { }
-AttackManager::AttackManager() { 
-	ID = 0;
-}
+unsigned short int AttackManager::ID = 0;
+std::map<unsigned short int, Attack *> AttackManager::attackList;
 
-AttackManager::AttackManager(ResourceManager *rm) {
-	ID = 0;
-	rm_master = rm;
-}
-
-void AttackManager::setResourceManager(ResourceManager *rm) {
-	rm_master = rm;
-}
+//AttackManager::~AttackManager() { }
+//AttackManager::AttackManager() { 
+//	ID = 0;
+//}
 
 int AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, short int str, 
 							  std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *animation) {
@@ -45,10 +39,14 @@ void AttackManager::updateAttacks() {
 			it = attackList.erase(it);
 		}
 		else if (it->second->isVisible()) {
-			it->second->addToRenderer(it->second->y);
+			it->second->addToRenderer(int(it->second->y));
 			it++;
 		}
 	}
+}
+
+std::map<unsigned short int, Attack *> *AttackManager::getAttackList() {
+	return &attackList;
 }
 
 void AttackManager::clearAttacks() {

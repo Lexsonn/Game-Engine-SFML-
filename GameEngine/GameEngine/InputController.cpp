@@ -1,11 +1,14 @@
 #include "InputController.h"
 
-InputController::~InputController() {}
-InputController::InputController() {
-	keyPressed.resize((int) Keyboard::KeyCount, false);
-}
+// Keypress values representing whether the current key is being held
+std::vector<bool> InputController::keyPressed((int)Keyboard::KeyCount);
+// List of controllables
+std::vector<Controllable *> InputController::controllableList;
 
-void InputController::checkKeyState() {
+/*
+ *	Update keyPress information for all controllables.
+ */
+void InputController::update() {
 	//Temp keyPressed values, so multiple input objects can be properly handled
 	std::vector<bool> _keyPressed = keyPressed;
 	for (Controllable* controllable : controllableList) {
@@ -26,6 +29,16 @@ void InputController::checkKeyState() {
 	keyPressed = _keyPressed;
 }
 
+/*
+ *	Add a Controllable to the controllable list
+ */
 void InputController::addControllable(Controllable* controllable) {
 	controllableList.push_back(controllable);
+}
+
+/*
+ *	Clear the list of controllables
+ */
+void InputController::clearControllables() {
+	controllableList.clear();
 }

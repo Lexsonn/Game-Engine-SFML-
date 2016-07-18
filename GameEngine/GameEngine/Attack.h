@@ -24,7 +24,7 @@ public:
 	Attack(unsigned short int parentID, unsigned short int _type, short int life, short int str, 
 		   std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *anim);
 
-	void update();
+	bool update();
 	void setFormed(int formAt);
 	void setPosition(float _x, float _y);
 	void setPosition(Vector2f position);
@@ -37,9 +37,5 @@ private:
 	Animation *animation;
 	int formAt;
 	bool formed;
-
-	// void generateGridPos();
-	// bool validGridPos(int x, int y);
-	// bool gridIntersects(int x, int y, std::pair<Vector2f, Vector2f> line);
 };
 #endif

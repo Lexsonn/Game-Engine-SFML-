@@ -113,19 +113,32 @@ void GameWindow::boundViewY(float centerY) {
 	view.setCenter(view.getCenter().x, y);
 }
 
-void GameWindow::renderDO(DrawableObject *d) {
+void GameWindow::renderDO(DrawableObject *d) const {
 	if (d->isVisible())
 		d->render(nativeRenderer);
 }
 
-void GameWindow::render(std::pair<Vector2f, Vector2f> line) {
+void GameWindow::renderTiles(const SpriteRenderer &sr) const {
+	sr.renderTiles(nativeRenderer);
+}
+
+void GameWindow::render(const std::pair<Vector2f, Vector2f> &line) const {
 	Vertex l[2];
 	l[0] = Vertex(line.first);
 	l[1] = Vertex(line.second);
 	nativeRenderer->draw(l, 2, Lines);
 }
 
-void GameWindow::render(Collidable *c) {
+void GameWindow::render(const FloatRect &rect) const {
+	RectangleShape sh(Vector2f(rect.width, rect.height));
+	sh.setFillColor(Color(0, 0, 0, 0));
+	sh.setOutlineColor(Color::White);
+	sh.setOutlineThickness(1.0f);
+	sh.setPosition(rect.left, rect.top);
+	nativeRenderer->draw(sh);
+}
+
+void GameWindow::render(Collidable *c) const {
 	RectangleShape sh(Vector2f(c->cWidth*1.f, c->cHeight*1.f));
 	sh.setFillColor(Color(0, 128, 0, 160));
 	sh.setOutlineColor(Color::Green);
@@ -134,22 +147,22 @@ void GameWindow::render(Collidable *c) {
 	nativeRenderer->draw(sh);
 }
 
-void GameWindow::render(const TileMap &tileMap) {
+void GameWindow::render(const TileMap &tileMap) const {
 	nativeRenderer->draw(tileMap);
 }
 
-void GameWindow::render(SpriteRenderer *sr) {
-	sr->render(nativeRenderer);
+void GameWindow::render(const SpriteRenderer &sr) const {
+	sr.render(nativeRenderer);
 }
 
-void GameWindow::render(CollisionGrid *cg) {
-	cg->render(nativeRenderer);
+void GameWindow::render(const CollisionGrid &cg) const {
+	cg.render(nativeRenderer);
 }
 
-void GameWindow::render(CollisionGrid *cg, short int gridPos[]) {
-	cg->render(nativeRenderer, gridPos);
+void GameWindow::render(const CollisionGrid &cg, short int gridPos[]) const {
+	cg.render(nativeRenderer, gridPos);
 }
 
-void GameWindow::render(CollisionGrid *cg, std::map<short int, unsigned short int> gridPos) {
-	cg->render(nativeRenderer, gridPos);
+void GameWindow::render(const CollisionGrid &cg, std::map<short int, unsigned short int> gridPos) const {
+	cg.render(nativeRenderer, gridPos);
 }

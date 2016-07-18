@@ -16,15 +16,15 @@ Attack::Attack(unsigned short int parentID, unsigned short int _type, short int 
 	animation = anim;
 }
 
-void Attack::update() {
+bool Attack::update() {
 	if (currentLife-- <= 0)
-		return;
+		return false;
 	if (currentLife == formAt)
 		formed = true;
 
 	animation->beginUpdate();
-
 	animation->endUpdate();
+	return true;
 }
 
 void Attack::setFormed(int formAt) {
@@ -58,6 +58,6 @@ void Attack::setForce(Vector2f f) {
 
 Sprite &Attack::getSprite() {
 	if (animation == nullptr)
-		return Sprite();
+		return emptySprite;
 	return animation->sprite;
 }

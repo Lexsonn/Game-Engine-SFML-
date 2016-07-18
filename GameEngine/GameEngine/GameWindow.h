@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "CollisionGrid.h"
+#include "SpriteRenderer.h"
 #include "TileMap.h"
 
 using namespace sf;
@@ -21,14 +22,16 @@ public:
 	void setViewBounds(float width, float height);
 	void setLetterboxView();
 
-	void renderDO(DrawableObject *d);
-	void render(std::pair<Vector2f, Vector2f> line);
-	void render(Collidable *c);
-	void render(const TileMap &tileMap);
-	void render(SpriteRenderer *sr);
-	void render(CollisionGrid *cg);
-	void render(CollisionGrid *cg, short int gridPos[]);
-	void render(CollisionGrid *cg, std::map<short int, unsigned short int> gridPos);
+	void renderDO(DrawableObject *d) const;
+	void renderTiles(const SpriteRenderer &sr) const;
+	void render(const std::pair<Vector2f, Vector2f> &line) const;
+	void render(const FloatRect &rect) const;
+	void render(Collidable *c) const;
+	void render(const TileMap &tileMap) const;
+	void render(const SpriteRenderer &sr) const;
+	void render(const CollisionGrid &cg) const;
+	void render(const CollisionGrid &cg, short int gridPos[]) const;
+	void render(const CollisionGrid &cg, std::map<short int, unsigned short int> gridPos) const;
 private:
 	float rectW, rectH;
 	bool limited;

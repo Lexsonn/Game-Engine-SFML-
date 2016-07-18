@@ -1,15 +1,15 @@
 #include "DrawableObject.h"
+#include "Game.h"
+
+extern Game* game;
 
 using namespace sf;
 
+Sprite DrawableObject::emptySprite;
 unsigned short int DrawableObject::drawableType = 0;
 
 DrawableObject::~DrawableObject() {}
-DrawableObject::DrawableObject() : visible(true) {}
-
-void DrawableObject::setRenderer(SpriteRenderer *renderer) {
-	this->renderer = renderer;
-}
+DrawableObject::DrawableObject() : visible(true) { }
 
 bool DrawableObject::isVisible() {
 	return visible;
@@ -23,12 +23,13 @@ unsigned short int DrawableObject::getDrawableType() {
 	return drawableType;
 }
 
-Sprite &DrawableObject::getSprite() { return Sprite(); }
+Sprite &DrawableObject::getSprite() { return emptySprite; }
 
+/*
+ *	Send position and sprite information to be processed by the SpriteRenderer
+ */
 void DrawableObject::addToRenderer(int z) {
-	if (renderer == nullptr)
-		return;
-	renderer->addSprite(z, getSprite());
+	game->addSprite(z, getSprite());
 }
 
 void DrawableObject::render(RenderWindow *window) {

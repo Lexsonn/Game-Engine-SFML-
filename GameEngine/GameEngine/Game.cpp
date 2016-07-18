@@ -1,11 +1,8 @@
 #include "Game.h"
-#include "Slime.h" // Eventually make a header with all Enemy types
-#include "BabySlime.h"
+#include "Enemies.h"
 
 #define _DEBUG_MODE 0x1
-#define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller->addControllable(dynamic_cast<Controllable *>(newEntity));
-
-#define _CHECK_SPRITE_EFFECT_FLAG if (dO->getDrawableType() == 1) { SpriteEffect *eff = dynamic_cast<SpriteEffect *>(dO); if (!eff->update()) { dO; it = drawableList.erase(it); draw = false; }}
+#define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller.addControllable(dynamic_cast<Controllable *>(newEntity));
 
 int WWIDTH(800);
 int WHEIGHT(800);
@@ -16,7 +13,7 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	game = this;
 	eID = 0;
 	oID = 0;
-
+	attList = AttackManager::getAttackList();
 	const int l[] = { 25, 25, // load dis from txt file pls ty
 		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,  3,  3,  3,  3,  3,  3,  3,  3,  1,
 		1,  5,  9,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
@@ -70,28 +67,16 @@ void Game::initEntityMap() {
 }
 
 /*
- *	Initialize all managers, and set up their relationships.
+ *	Initialize all necessary Game world objects, and set up their relationships.
  */
 void Game::initManagers(RenderWindow *rWindow) {
 	rm_master = new ResourceManager();
-	spr_renderer = new SpriteRenderer();
-	controller = new InputController();
-	cGrid = new CollisionGrid();
-	cMaster = new CollisionManager();
-	at_master = new AttackManager();
 	window = new GameWindow(rWindow, 640.f, 480.f, true);
 	player = new Player(200, 200, rm_master);
-	// Manager/player setup
-	at_master->setResourceManager(rm_master);
-	spr_renderer->setView(window->getView());
-	controller->addControllable(player);
-	player->setEntityList(cGrid->getEntityList());
-	// CollisionManager setup
-	cMaster->setAttackManager(at_master);
-	cMaster->setEntityList(&entityList);
-	cMaster->setObjectList(&objectList);
-	cMaster->setEntityPosList(cGrid->getEntityList());
-	cMaster->setObjectPosList(cGrid->getObjectList());
+	// Setup manager relationships
+	spr_renderer.setView(window->getView());
+	controller.addControllable(player);
+	cMaster.initialize(&entityList);
 }
 
 /*
@@ -102,9 +87,11 @@ void Game::createWorld() {
 	for (int i = 0; i <= level[0] / SSX; i++) {
 		for (int j = 0; j <= level[1] / SSY; j++) {
 			Vector2u offset = Vector2u(i, j);
-			tileMap.push_back(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), level, offset, rm_master));
+			spr_renderer.addTile(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), level, offset, rm_master));
 		}
 	}
+
+	cGrid.build(); // build after setting level size.
 
 	addEntity(player);
 	addEntity(new Slime(100, 100, rm_master));
@@ -144,18 +131,21 @@ void Game::createWorld() {
 void Game::destroyWorld() {
 	WWIDTH = 160;
 	WHEIGHT = 160;
-	cGrid->clearLists();
+	cGrid.clearLists();
+	do_master.clearDrawableList();
+	spr_renderer.clearAll();
 	player = nullptr;
 	while (!objectList.empty()) {
 		std::map<unsigned short int, Collidable *>::iterator it = objectList.begin();
-		deleteObject(it->first);
+		delete it->second;
+		objectList.erase(it);
 	}
 	while (!entityList.empty()) {
 		std::map<unsigned short int, Entity *>::iterator it = entityList.begin();
-		deleteEntity(it->first);
+		delete it->second;
+		entityList.erase(it);
 	}
-	at_master->clearAttacks();
-	tileMap.clear();
+	at_master.clearAttacks();
 }
 
 /*
@@ -187,7 +177,7 @@ void Game::runLoop() {
 	window->start();			// Clear the window
 	render();					// Draw everything
 	window->end();				// Update the window
-	spr_renderer->clearList();	// Clear list of drawable sprites
+	spr_renderer.clearList();	// Clear list of drawable sprites
 }
 
 /*
@@ -199,69 +189,69 @@ void Game::setLetterBoxView() {
 	window->setLetterboxView();
 }
 
+void Game::addSprite(int z, const Sprite &spr) {
+	spr_renderer.addSprite(z, spr);
+}
+
 /*
  *	Add DrawableObject to the drawable list, and set its renderer.
  */
 void Game::addDrawable(DrawableObject *drawObj) {
 	if (drawObj == nullptr)
 		return;
-	drawObj->setRenderer(spr_renderer);
-	drawableList.push_back(drawObj);
+	do_master.addDrawableObject(drawObj);
 }
 
 /*
  *	The game update step. All game logic goes in here.
  */
 void Game::update() {
+	/* TEST DESTROY WORLD (and rebuild grid of size 1 and add a player)
+	if (count++ == 120) {
+		destroyWorld();
+		cGrid->build();
+		player = dynamic_cast<Player *>(createEntity("Player", Vector2f(100.f, 100.f)));
+	}
+	//*/
 	std::vector<int> toDelete;
 	for (auto entity : entityList) entity.second->beginUpdate();	 // Begin update for every entity
-	controller->checkKeyState();									 // Get Keyboard information
+	controller.update();											 // Update keyboard information
 	for (auto entity : entityList) {
 		entity.second->update();									 // Update every entity
-		if (entity.second->isDead) toDelete.push_back(entity.first); // Mark entity for deletion
-		else cGrid->updateEntity(entity.second);					 // Update CollisionGrid position
+		if (entity.second->isDead) toDelete.push_back(entity.first); // Mark entity for deletion if dead
+		else cGrid.updateEntity(entity.second);						 // Update CollisionGrid position if not dead
 	}
 	for (int i : toDelete) deleteEntity(i);							 // Delete all Entities that have been marked for deletion
-	updateDrawable();												 // Update all Drawable Objects, deleting if necessary
-	cMaster->resolveEntityCollisions();								 // Resolve collisions for every entity
+	at_master.updateAttacks();										 // Update all Attacks
+	cMaster.update();												 // Resolve collisions for every entity
 	window->updateView(player);										 // Update view to follow player
 	for (auto entity : entityList) entity.second->endUpdate();		 // End updates for every entity
-	at_master->updateAttacks();										 // Update all Attacks
-}
-
-/*
- *	Iterate through the list of all drawable objects, deleting them if needed.
- *	If they aren't deleted, they are sent to the SpriteRenderer to check for rendering.
- */
-void Game::updateDrawable() {
-	if (!drawableList.empty()) {
-		std::vector<DrawableObject *>::iterator it;
-		for (it = drawableList.begin(); it < drawableList.end(); ) {
-			DrawableObject *dO = *it;
-			bool draw = true;
-			_CHECK_SPRITE_EFFECT_FLAG
-			if (draw) { dO->addToRenderer(dO->y); it++; }
-		}
-	}
+	do_master.update();												 // Update all Drawable Objects, deleting if necessary
 }
 
 /*
  *	Render all Game objects that require rendering.
  */
 void Game::render() {
-	for (int i = 0; i < tileMap.size(); i++) window->render(tileMap.at(i));
+	window->renderTiles(spr_renderer);									// Render all tile sections currently in view
 	if (debug) {
-		window->render(cGrid, player->gridPos);							// Render collision grid positions of player (debug)
-		window->render(cGrid);											// Render collision grid lines (debug)
+		window->render(cGrid, player->gridPos);							// Render collision grid positions of player
+		window->render(cGrid);											// Render collision grid lines
 	}
 	window->render(spr_renderer);										// Render all animations and sprite effects
 	if (debug) {
-		for (auto object : objectList) window->render(object.second);	// Render every static collidable (debug)
-		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes (debug)
-		for (auto att : at_master->attackList)							// Render all attack collision lines (debug)
+		for (auto object : objectList) window->render(object.second);	// Render every static collidable
+		for (auto entity : entityList) window->renderDO(entity.second);	// Render all entity collision boxes
+		for (auto att : AttackManager::attackList)						// Render all attack collision lines
 			for (auto line : att.second->attackLines) 
 				window->render(line);
 	}
+	/* DRAW RECTANGLE FOR CHECKING IF RENDERING OBJECTS OUTSIDE VIEW
+	Vector2f lt, wh;
+	lt = window->getView()->getCenter() - window->getView()->getSize()/4.f;
+	wh = window->getView()->getSize()/2.f;
+	window->render(FloatRect(lt, wh));
+	//*/
 }
 
 /*
@@ -271,8 +261,7 @@ void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
 	entity->setAttackManager(at_master);
-	entity->setRenderer(spr_renderer);
-	cGrid->initEntity(entity);
+	cGrid.initEntity(entity);
 }
 
 /*
@@ -282,7 +271,7 @@ void Game::deleteEntity(unsigned short int _ID) {
 	std::map<unsigned short int, Entity *>::iterator it = entityList.find(_ID);
 	if (it == entityList.end())
 		return;
-	cGrid->deleteEntity(it->second);
+	cGrid.deleteEntity(it->second);
 	delete it->second;
 	entityList.erase(it);
 }
@@ -293,7 +282,7 @@ void Game::deleteEntity(unsigned short int _ID) {
 void Game::addObject(Collidable *object) {
 	object->ID = oID;
 	objectList.insert(std::pair<unsigned short int, Collidable *>(oID++, object));
-	cGrid->addObject(object);
+	cGrid.addObject(object);
 }
 
 /*
@@ -303,7 +292,7 @@ void Game::deleteObject(unsigned short int _ID) {
 	std::map<unsigned short int, Collidable *>::iterator it = objectList.find(_ID);
 	if (it == objectList.end())
 		return;
-	cGrid->deleteObject(it->second);
+	cGrid.deleteObject(it->second);
 	delete it->second;
 	objectList.erase(it);
 }

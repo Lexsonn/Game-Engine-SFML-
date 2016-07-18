@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "CollisionGrid.h"
 
 #define SPEED 2.f
 #define DASH_TIMER_SPEED 0.05f
@@ -9,7 +10,7 @@
 #define ATT_FORCE 2.f
 #define ATT_BASE_STR 10
 
-int Player::entityType = 1;
+const int Player::entityType = 1;
 
 void Player::init() {
 	// Initialize inherited variables
@@ -128,9 +129,9 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 	init();
 }
 
-void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
-	entityList = list;
-}
+//void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
+//	entityList = list;
+//}
 
 int Player::getType() {
 	return Player::entityType;
@@ -308,7 +309,6 @@ void Player::dash() {
 	if (int(dashTimer*20) % 2 == 0) {
 		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
 		createSpriteEffect(spr);
-		//spriteEffectList.push_back(spr);
 	}
 }
 
@@ -323,19 +323,19 @@ void Player::generateAttack() {
 	switch (attackType) {
 	case 0:
 	case 1:
-		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
-		attLines.push_back(createNormalAttackLine(LENGTH / 2, DISTANCE + 5));
+		attLines.push_back(createNormalLine(LENGTH, DISTANCE));
+		attLines.push_back(createNormalLine(LENGTH / 2, DISTANCE + 5));
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
 		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
-		createAttack(pos, 1, 10, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
+		createAttack(pos, 1, 180, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
 		break;
 	case 2:
 	case 3:
 	default:
-		attLines.push_back(createNormalAttackLine(LENGTH, DISTANCE));
-		attLines.push_back(createNormalAttackLine(LENGTH/2, DISTANCE + 5));
+		attLines.push_back(createNormalLine(LENGTH, DISTANCE));
+		attLines.push_back(createNormalLine(LENGTH/2, DISTANCE + 5));
 		f = generateForceFromDirection(ATT_FORCE);
 		t = rm_master->getTexture("playerAttackAnim1.png");
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
@@ -343,67 +343,6 @@ void Player::generateAttack() {
 		pos = findMidpointOfLine(attLines.at(0));
 		createAttack(pos, 1, 10, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
 	}
-}
-
-/*
- *	Create short line normal to the direction the Player is facing. The line will be positioned
- *	shortly in front of the Player. Used to interact with Entities directly in front of the	Player.
- */
-std::pair<Vector2f, Vector2f> Player::getAccessorLineFromDirection() {
-	std::pair<Vector2f, Vector2f> line;
-	line.first = line.second = Vector2f(-1.f, -1.f);
-
-	switch (direction) {
-	case EAST:
-		line.first = Vector2f(x + cWidth / 2 + 4, y - cHeight / 4);
-		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 4);
-		break;
-	case NORTHEAST:
-		line.first = Vector2f(x + cWidth / 2 - 4, y - cHeight / 2 + 4);
-		line.second = Vector2f(x + cWidth / 2 + 4, y - cHeight / 2 - 4);
-		break;
-	case NORTH:
-		line.first = Vector2f(x - cWidth / 4, y - cHeight / 2 - 4);
-		line.second = Vector2f(x + cWidth / 4, y - cHeight / 2 - 4);
-		break;
-	case NORTHWEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 2 - 4);
-		line.second = Vector2f(x - cWidth / 2 + 4, y - cHeight / 2 + 4);
-		break;
-	case WEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y - cHeight / 4);
-		line.second = Vector2f(x - cWidth / 2 - 4, y + cHeight / 4);
-		break;
-	case SOUTHWEST:
-		line.first = Vector2f(x - cWidth / 2 - 4, y + cHeight / 2 - 4);
-		line.second = Vector2f(x - cWidth / 2 + 4, y + cHeight / 2 + 4);
-		break;
-	case SOUTH:
-		line.first = Vector2f(x - cWidth / 4, y + cHeight / 2 + 4);
-		line.second = Vector2f(x + cWidth / 4, y + cHeight / 2 + 4);
-		break;
-	case SOUTHEAST:
-		line.first = Vector2f(x + cWidth / 2 - 4, y + cHeight / 2 + 4);
-		line.second = Vector2f(x + cWidth / 2 + 4, y + cHeight / 2 - 4);
-		break;
-	}
-	return line;
-}
-
-Entity* Player::getEntityAt(std::pair<Vector2f, Vector2f> line) {
-	Vector2f mid = findMidpointOfLine(line);
-	int gridPosition = getGrid(int(mid.x), int(mid.y));
-	if (gridPosition >= 0) {
-		std::pair<std::multimap<unsigned short int, Entity *>::iterator, std::multimap<unsigned short int, Entity *>::iterator> range;
-		range = entityList->equal_range(gridPosition);
-
-		for (std::multimap<unsigned short int, Entity *>::iterator it = range.first; it != range.second; it++) {
-			if (it->second->ID != ID)
-				if (it->second->intersectsLine(line))
-					return it->second;
-		}
-	}
-	return nullptr;
 }
 
 void Player::keyHeld(Keyboard::Key key) {
@@ -437,9 +376,8 @@ void Player::keyPress(Keyboard::Key key) {
 	if (key == Keyboard::Q) {
 		//createNewEntity("Slime", Vector2f(100.f, 100.f));
 		//* ENTITY INTERACTION TESTS
-		// Access entity at position. For things like text box conversations.
-		std::pair<Vector2f, Vector2f> line = getAccessorLineFromDirection(); 
-		Entity * t = getEntityAt(line);
+		// Access entity at position. For things like text box conversations, or pressing a button.
+		Entity * t = getEntityAt(createNormalLine(8.f, float(cWidth/2 + 8)));
 		if (t == nullptr)
 			return;
 
