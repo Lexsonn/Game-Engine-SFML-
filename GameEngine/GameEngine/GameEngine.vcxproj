@@ -136,6 +136,7 @@
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Controllable.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
+    <ClCompile Include="DrawableObjectManager.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameWindow.cpp" />
@@ -158,6 +159,8 @@
     <ClInclude Include="BabySlime.h" />
     <ClInclude Include="Calculations.h" />
     <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="DrawableObjectManager.h" />
+    <ClInclude Include="Enemies.h" />
     <ClInclude Include="MusicList.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollisionGrid.h" />

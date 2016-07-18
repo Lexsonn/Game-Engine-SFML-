@@ -67,6 +67,18 @@
     <Filter Include="Source Files\Game\Game World\Collision">
       <UniqueIdentifier>{f1ef503b-4933-4e2f-80b8-57f7d24059c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Graphics\Animations">
+      <UniqueIdentifier>{31e66d84-ef70-49a7-8e2e-16737dcf644e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Graphics\Textures">
+      <UniqueIdentifier>{3d7b5ed0-8f79-438a-8e9a-ce2a8f40ce49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Graphics\Animations">
+      <UniqueIdentifier>{ad1bb855-759c-43b0-9e4b-a3f7acce9c7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Graphics\Textures">
+      <UniqueIdentifier>{4d111166-bb7e-401a-a838-fa7243d3babb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -93,14 +105,8 @@
     <ClCompile Include="DrawableObject.cpp">
       <Filter>Source Files\Game\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files\Game\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteEffect.cpp">
-      <Filter>Source Files\Game\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Slime.cpp">
       <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
@@ -132,7 +138,16 @@
     <ClCompile Include="BabySlime.cpp">
       <Filter>Source Files\Game\Game World\Entity\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Game\Graphics\Animations</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteEffect.cpp">
+      <Filter>Source Files\Game\Graphics\Animations</Filter>
+    </ClCompile>
     <ClCompile Include="TileMap.cpp">
+      <Filter>Source Files\Game\Graphics\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableObjectManager.cpp">
       <Filter>Source Files\Game\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,23 +173,11 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="AnimList.h">
-      <Filter>Header Files\Game\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="TexList.h">
-      <Filter>Header Files\Game\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files\Game\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="States.h">
       <Filter>Header Files\Game\Game World\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteEffect.h">
-      <Filter>Header Files\Game\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Slime.h">
       <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
@@ -212,8 +215,26 @@
     <ClInclude Include="BabySlime.h">
       <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Game\Graphics\Animations</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimList.h">
+      <Filter>Header Files\Game\Graphics\Animations</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteEffect.h">
+      <Filter>Header Files\Game\Graphics\Animations</Filter>
+    </ClInclude>
     <ClInclude Include="TileMap.h">
+      <Filter>Header Files\Game\Graphics\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="TexList.h">
+      <Filter>Header Files\Game\Graphics\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawableObjectManager.h">
       <Filter>Header Files\Game\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemies.h">
+      <Filter>Header Files\Game\Game World\Entity\Enemies</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

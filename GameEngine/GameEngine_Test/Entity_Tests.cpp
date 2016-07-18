@@ -13,7 +13,6 @@ TEST(testEntity, entityDefaultParamTest) {
 	EXPECT_FLOAT_EQ(entity->y, 0.f);
 	EXPECT_FLOAT_EQ(entity->dx, 0.f);
 	EXPECT_FLOAT_EQ(entity->dy, 0.f);
-	EXPECT_EQ(entity->getDrawableType(), 1);
 	EXPECT_EQ(entity->life, 100);
 	EXPECT_EQ(entity->maxLife, 100);
 	EXPECT_EQ(entity->direction, EAST);

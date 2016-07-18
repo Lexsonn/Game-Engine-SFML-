@@ -152,9 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\GameEngine\AI.cpp" />
     <ClCompile Include="..\GameEngine\Animation.cpp" />
     <ClCompile Include="..\GameEngine\Attack.cpp" />
@@ -166,6 +163,7 @@
     <ClCompile Include="..\GameEngine\CollisionManager.cpp" />
     <ClCompile Include="..\GameEngine\Controllable.cpp" />
     <ClCompile Include="..\GameEngine\DrawableObject.cpp" />
+    <ClCompile Include="..\GameEngine\DrawableObjectManager.cpp" />
     <ClCompile Include="..\GameEngine\Entity.cpp" />
     <ClCompile Include="..\GameEngine\Game.cpp" />
     <ClCompile Include="..\GameEngine\GameWindow.cpp" />
