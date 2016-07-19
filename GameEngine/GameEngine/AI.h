@@ -15,7 +15,7 @@ public:
 	void generateRND(unsigned int seed, int maxRange);
 	int getDecision();
 
-	void setBounds(int x, int y, int mX, int mY);
+	void setBounds(int x, int y, unsigned int w, unsigned int h);
 	void setDestination();
 
 	virtual void decideDirection();

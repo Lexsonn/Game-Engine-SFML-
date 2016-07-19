@@ -6,9 +6,6 @@
 
 using namespace sf;
 
-struct Attackmanager;
-struct CollisionGrid;
-
 struct CollisionManager {
 public:
 	void initialize(std::map<unsigned short int, Entity *> *eList);

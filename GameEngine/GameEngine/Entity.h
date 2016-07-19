@@ -45,7 +45,7 @@ enum dir {
 class Entity : public DrawableObject, public Collidable {
 public:
 	std::string name;
-	float dx, dy;
+	Vector2f v;
 	short int maxLife, life, gridPos[4];
 	bool invulnerable, isDead;
 	dir direction;
@@ -54,8 +54,6 @@ public:
 	Entity();
 	Entity(ResourceManager *rm);
 	Entity(float startX, float startY, ResourceManager *rm);
-
-	void setAttackManager(const AttackManager &manager);
 	
 	Animation *getCurrentAnimation();
 	void addAnimation(Animation *anim, animType name);
@@ -81,7 +79,6 @@ public:
 protected:
 	std::map<animType, Animation *> animationList;
 	ResourceManager *rm_master;
-	AttackManager at_master;
 	animType currentAnimation;
 	stateType state;
 	float flashDmg;
@@ -104,6 +101,7 @@ protected:
 	virtual float getFlashTimer();
 	virtual void updateState();
 	virtual void setState(stateType type);
+	virtual void setInvulFalse();
 
 	int createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim);
 	Vector2f generateForceFromDirection(float strength);

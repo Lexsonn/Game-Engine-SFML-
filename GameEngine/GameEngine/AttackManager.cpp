@@ -3,19 +3,6 @@
 unsigned short int AttackManager::ID = 0;
 std::map<unsigned short int, Attack *> AttackManager::attackList;
 
-//AttackManager::~AttackManager() { }
-//AttackManager::AttackManager() { 
-//	ID = 0;
-//}
-
-int AttackManager::addAttack(unsigned short int parentID, unsigned short int type, short int life, short int str, 
-							  std::vector<std::pair<Vector2f, Vector2f>> lineList, Animation *animation) {
-	Attack *attack = new Attack(parentID, type, life, str, lineList, animation);
-	attack->ID = ID;
-	attackList.insert(std::pair<unsigned short int, Attack *>(ID, attack));
-	return ID++;
-}
-
 int AttackManager::addAttack(Attack *attack) {
 	attack->ID = ID;
 	attackList.insert(std::pair<unsigned short int, Attack *>(ID, attack));

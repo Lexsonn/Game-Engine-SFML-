@@ -8,13 +8,9 @@ extern int WHEIGHT;
 GameWindow::~GameWindow(void) {}
 GameWindow::GameWindow(RenderWindow* window, float width, float height, bool isLimited) {
 	nativeRenderer = window;
-
 	limited = isLimited;
-	rectW = 80;
-	rectH = 60;
-	view = View();
-	view.setCenter(width/2, height/2);
-	view.setSize(width, height);
+	bounds = Vector2u(80, 60);
+	view = View(Vector2f(width / 2, height / 2), Vector2f(width, height));
 
 	nativeRenderer->setView(view);
 }
@@ -35,6 +31,10 @@ View *GameWindow::getView() {
 	return &view;
 }
 
+void GameWindow::setLimit(bool limit) {
+	limited = limit;
+}
+
 void GameWindow::updateView(Entity *entity) {
 	if (entity == nullptr || (view.getSize().x > WWIDTH && view.getSize().y > WHEIGHT))
 		return;
@@ -43,9 +43,8 @@ void GameWindow::updateView(Entity *entity) {
 	nativeRenderer->setView(view);
 }
 
-void GameWindow::setViewBounds(float width, float height) {
-	rectW = abs(width);
-	rectH = abs(height);
+void GameWindow::setViewBounds(unsigned int width, unsigned int height) {
+	bounds = Vector2u(width, height);
 }
 
 void GameWindow::setLetterboxView() {
@@ -79,15 +78,15 @@ void GameWindow::boundViewX(float centerX) {
 	vsX = view.getSize().x;
 	x = view.getCenter().x;
 
-	if (centerX > x + rectW / 2) 		// Right edge case
-		x += centerX - (x + rectW / 2);
-	else if (centerX < x - rectW / 2)	// Left edge case
-		x -= (x - rectW / 2) - centerX;
+	if (centerX > x + bounds.x / 2) 	 // Right edge case
+		x += centerX - (x + bounds.x / 2);
+	else if (centerX < x - bounds.x / 2) // Left edge case
+		x -= (x - bounds.x / 2) - centerX;
 
 	if (limited) {
-		if (x < vsX / 2)				// Leftmost bound
+		if (x < vsX / 2)				 // Leftmost bound
 			x = vsX / 2;
-		else if (x > WWIDTH - vsX / 2)	// Rightmost bound
+		else if (x > WWIDTH - vsX / 2)	 // Rightmost bound
 			x = WWIDTH - vsX / 2;
 	}
 	view.setCenter(x, view.getCenter().y);
@@ -99,15 +98,15 @@ void GameWindow::boundViewY(float centerY) {
 	vsY = view.getSize().y;
 	y = view.getCenter().y;
 
-	if (centerY > y + rectH / 2) 		// Bottom edge case
-		y += centerY - (y + rectH / 2);
-	else if (centerY < y - rectH / 2)	// Top edge case
-		y -= (y - rectH / 2) - centerY;
+	if (centerY > y + bounds.y / 2) 	 // Bottom edge case
+		y += centerY - (y + bounds.y / 2);
+	else if (centerY < y - bounds.y / 2) // Top edge case
+		y -= (y - bounds.y / 2) - centerY;
 
 	if (limited) {
-		if (y < vsY / 2)				// Topmost bound
+		if (y < vsY / 2)				 // Topmost bound
 			y = vsY / 2;
-		else if (y > WHEIGHT - vsY / 2)	// Bottommost bound
+		else if (y > WHEIGHT - vsY / 2)	 // Bottommost bound
 			y = WHEIGHT - vsY / 2;
 	}
 	view.setCenter(view.getCenter().x, y);

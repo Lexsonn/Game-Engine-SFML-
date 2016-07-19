@@ -6,7 +6,6 @@
 #include "CollisionManager.h"
 #include "SpriteRenderer.h"
 #include "GameWindow.h"
-#include "TileMap.h"
 #include "Player.h"
 
 using namespace sf;
@@ -45,13 +44,11 @@ private:
 	CollisionGrid cGrid;
 	CollisionManager cMaster;
 	AttackManager at_master;
-	
-	//std::vector<TileMap> tileMap;				// Vector for Tilemap sections (move to sprite renderer)
 
 	std::map<std::string, EntityType> entityMap;			// Map for creation of Entities by string
 	std::map<unsigned short int, Entity *> entityList;		// Map for Entities
 	std::map<unsigned short int, Collidable *> objectList;	// Map for static collidable objects
-	std::map<unsigned short int, Attack *> *attList;
+	
 	void initEntityMap();
 	void initManagers(RenderWindow *rWindow);
 	void createWorld();

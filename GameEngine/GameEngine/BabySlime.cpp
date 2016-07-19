@@ -1,4 +1,5 @@
 #include "BabySlime.h"
+#include <iostream>
 
 #define SPEED 0.5f
 
@@ -7,7 +8,7 @@ void BabySlime::init() {
 	generateRND(int(time(NULL)), 99);
 	destination.x = int(x);
 	destination.y = int(y);
-	setBounds(120, 120, 240, 240);	// Temporary
+	setBounds(120, 120, 120, 120);	// Temporary
 	decisionMake = 0;
 	// Entity vars
 	name = "Baby Slime";
@@ -103,13 +104,11 @@ void BabySlime::setState(stateType newState) {
 
 	switch (newState) {
 	case IDLE:
-		dx = 0;
-		dy = 0;
+		v = Vector2f(0.f, 0.f);
 		currentAnimation = idleE;
 		break;
 	case DAMAGED:
 		animFinished = false;
-		invulnerable = true;
 		hit = true;
 		currentAnimation = damageE;
 		break;
@@ -130,12 +129,12 @@ void BabySlime::decideDirection() {
 	up = false;
 	down = false;
 
-	if (std::abs(int(x - destination.x)) > std::max(SPEED / 2, std::abs(dx))) {
+	if (std::abs(int(x - destination.x)) > std::max(SPEED / 2, std::abs(v.x))) {
 		if (x < destination.x) right = true;
 		else left = true;
 	}
 
-	if (std::abs(y - destination.y) > std::max(SPEED / 2, std::abs(dy))) {
+	if (std::abs(y - destination.y) > std::max(SPEED / 2, std::abs(v.y))) {
 		if (y < destination.y) down = true;
 		else up = true;
 	}
@@ -144,14 +143,14 @@ void BabySlime::decideDirection() {
 void BabySlime::walk() {
 	if (updateDirection()) {
 		switch (direction) {
-		case EAST: dx = getSpeed() / 2; dy = 0; break;
-		case NORTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -getSpeed() / 2; break;
-		case NORTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
-		case WEST: dx = -getSpeed() / 2; dy = 0; break;
-		case SOUTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = getSpeed() / 2; break;
-		case SOUTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		case EAST: v = Vector2f(getSpeed() / 2, 0); break;
+		case NORTHEAST: v = Vector2f(getSpeed() / 2 * DIAG_MOD, -getSpeed() / 2 * DIAG_MOD); break;
+		case NORTH: v = Vector2f(0, -getSpeed() / 2); break;
+		case NORTHWEST: v = Vector2f(-getSpeed() / 2 * DIAG_MOD, -getSpeed() / 2 * DIAG_MOD); break;
+		case WEST: v = Vector2f(-getSpeed() / 2, 0); break;
+		case SOUTHWEST: v = Vector2f(-getSpeed() / 2 * DIAG_MOD, getSpeed() / 2 * DIAG_MOD); break;
+		case SOUTH: v = Vector2f(0, getSpeed() / 2); break;
+		case SOUTHEAST: v = Vector2f(getSpeed() / 2 * DIAG_MOD, getSpeed() / 2 * DIAG_MOD); break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
 		// currentAnimation = animType(direction + WALK_ANIM);
@@ -162,14 +161,14 @@ void BabySlime::walk() {
 void BabySlime::run() {
 	if (updateDirection()) {
 		switch (direction) {
-		case EAST: dx = getSpeed(); dy = 0; break;
-		case NORTHEAST: dx = getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -getSpeed(); break;
-		case NORTHWEST: dx = -getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
-		case WEST: dx = -getSpeed(); dy = 0; break;
-		case SOUTHWEST: dx = -getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = getSpeed(); break;
-		case SOUTHEAST: dx = getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		case EAST: v = Vector2f(getSpeed(), 0); break;
+		case NORTHEAST: v = Vector2f(getSpeed() * DIAG_MOD, -getSpeed() * DIAG_MOD); break;
+		case NORTH: v = Vector2f(0, -getSpeed()); break;
+		case NORTHWEST: v = Vector2f(-getSpeed() * DIAG_MOD, -getSpeed() * DIAG_MOD); break;
+		case WEST: v = Vector2f(-getSpeed(), 0); break;
+		case SOUTHWEST: v = Vector2f(-getSpeed() * DIAG_MOD, getSpeed() * DIAG_MOD); break;
+		case SOUTH: Vector2f(0, getSpeed()); break;
+		case SOUTHEAST: Vector2f(getSpeed() * DIAG_MOD, getSpeed() * DIAG_MOD); break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
 		// currentAnimation = animType(direction + RUN_ANIM);
@@ -178,7 +177,6 @@ void BabySlime::run() {
 }
 
 void BabySlime::dead() {
-	dx *= 0.95f;
-	dy *= 0.95f;
+	v *= 0.95f;
 	animFinished = animationList[currentAnimation]->isLastFrame();
 }

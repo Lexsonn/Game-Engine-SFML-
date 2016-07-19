@@ -5,7 +5,7 @@ using namespace sf;
 float AI::decisionSpeed = 0.05f;
 
 AI::~AI() { }
-AI::AI() { }
+AI::AI() : moves(false) { }
 
 void AI::generateRND(unsigned int seed, int maxRange) {
 	srand(seed);
@@ -17,27 +17,16 @@ int AI::getDecision() {
 	return decisionRange(rd);
 }
 
-void AI::setBounds(int x, int y, int mX, int mY) {
+void AI::setBounds(int x, int y, unsigned int w, unsigned int h) {
 	int minX, maxX, minY, maxY;
 
-	minX = x; maxX = mX;
-	minY = y; maxY = mY;
-
-	if (x > mX) {
-		minX = mX;
-		maxX = x;
-	}
-	if (y > mY) {
-		minY = mY;
-		maxY = y;
-	}
+	minX = x; maxX = x + w;
+	minY = y; maxY = y + h;
 
 	bound = Vector2i(minX, minY);
 	maxBound = Vector2i(maxX, maxY);
 
-	if (x == mX && y == mY)
-		moves = false;
-	else
+	if (w != 0 || h != 0)
 		moves = true;
 }
 

@@ -14,7 +14,7 @@ using namespace sf;
 
 int main() {
 	Event event;
-	RenderWindow window(VideoMode(1280, 960), "GAME ENGINE v0.04");
+	RenderWindow window(VideoMode(1280, 960), "GAME ENGINE v0.07");
 
 	// BAD DEVELOPER BAD! Change this shit to not be tied to framerate you filthy casual
 	window.setFramerateLimit(60); // REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE

@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "CollisionGrid.h"
+#include <iostream>
 
 #define SPEED 2.f
 #define DASH_TIMER_SPEED 0.05f
@@ -129,10 +129,6 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 	init();
 }
 
-//void Player::setEntityList(std::multimap<unsigned short int, Entity *> *list) {
-//	entityList = list;
-//}
-
 int Player::getType() {
 	return Player::entityType;
 }
@@ -232,8 +228,7 @@ void Player::setState(stateType newState) {
 
 	switch (newState) {
 	case IDLE:
-		dx = 0;
-		dy = 0;
+		v = Vector2f(0.f, 0.f);
 		attackType = 0;
 		phased = false;
 		dashU = false; dashL = false; dashD = false; dashR = false;
@@ -241,16 +236,13 @@ void Player::setState(stateType newState) {
 		break;
 	case ATTACK_BACKSWING:
 		animFinished = false;
-		if (attackType <= maxAttacks) {
-			dx = 0;
-			dy = 0;
-		}
+		if (attackType <= maxAttacks) 
+			v = Vector2f(0.f, 0.f);
 		currentAnimation = animType(direction + ABS_ANIM);
 		break;
 	case ATTACK_SWING:
 		animFinished = false;
-		dx = 0; 
-		dy = 0; 
+		v = Vector2f(0.f, 0.f);
 		currentAnimation = animType(direction + ATT1_ANIM);
 		generateAttack();
 		break;
@@ -287,31 +279,6 @@ void Player::setInvulFalse() {
 		invulnerable = false;
 }
 
-// Player dash behavior
-void Player::dash() {
-	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
-	// at some point.
-	if (updateDashDirection() && (dashTimer < 0.11)) {
-		switch (direction) {
-		case EAST: dx = SPEED * 2.f; dy = 0; break;
-		case NORTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = -SPEED * 2.f * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -SPEED * 2.f; break;
-		case NORTHWEST: dx = -SPEED * 2.f * DIAG_MOD; dy = -SPEED *2.f * DIAG_MOD; break;
-		case WEST: dx = -SPEED * 2.f; dy = 0; break;
-		case SOUTHWEST: dx = -SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = SPEED * 2.f; break;
-		case SOUTHEAST: dx = SPEED * 2.f * DIAG_MOD; dy = SPEED * 2.f * DIAG_MOD; break;
-		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
-		}
-		currentAnimation = animType(direction + DASH_ANIM);
-	}
-
-	if (int(dashTimer*20) % 2 == 0) {
-		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
-		createSpriteEffect(spr);
-	}
-}
-
 /*
  *	Generate an attack with proper animation and force depending on the current attackType
  */
@@ -329,7 +296,7 @@ void Player::generateAttack() {
 		anim = new Animation(t, 0.f, 0.f, 16, 32, 5, 0.4f, false);
 		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
-		createAttack(pos, 1, 180, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
+		createAttack(pos, 1, 10, int(ATT_BASE_STR), Vector2f(0,0), attLines, anim);
 		break;
 	case 2:
 	case 3:
@@ -342,6 +309,30 @@ void Player::generateAttack() {
 		anim->setRotation(-float(direction) * 45);
 		pos = findMidpointOfLine(attLines.at(0));
 		createAttack(pos, 1, 10, int(ATT_BASE_STR * 1.5f), f, attLines, anim);
+	}
+}
+
+void Player::dash() {
+	// Remove the dashTimer condition for fully controllable dash. Plan on making this a player upgrade to dash
+	// at some point.
+	if (updateDashDirection() && (dashTimer < 0.11)) {
+		switch (direction) {
+		case EAST: v = Vector2f(SPEED * 2.f, 0); break;
+		case NORTHEAST: v = Vector2f(SPEED * 2.f * DIAG_MOD, -SPEED * 2.f * DIAG_MOD); break;
+		case NORTH: v = Vector2f(0, -SPEED * 2.f); break;
+		case NORTHWEST: v = Vector2f(-SPEED * 2.f * DIAG_MOD, -SPEED *2.f * DIAG_MOD); break;
+		case WEST: v = Vector2f(-SPEED * 2.f, 0); break;
+		case SOUTHWEST: v = Vector2f(-SPEED * 2.f * DIAG_MOD, SPEED * 2.f * DIAG_MOD); break;
+		case SOUTH: v = Vector2f(0, SPEED * 2.f); break;
+		case SOUTHEAST: v = Vector2f(SPEED * 2.f * DIAG_MOD, SPEED * 2.f * DIAG_MOD); break;
+		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
+		}
+		currentAnimation = animType(direction + DASH_ANIM);
+	}
+
+	if (int(dashTimer * 20) % 2 == 0) {
+		SpriteEffect *spr = new SpriteEffect(animationList[currentAnimation]->sprite, x, y, 26, 2);
+		createSpriteEffect(spr);
 	}
 }
 

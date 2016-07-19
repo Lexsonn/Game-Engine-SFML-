@@ -18,8 +18,9 @@ public:
 	RenderWindow *getNative();
 	View *getView();
 
+	void setLimit(bool limit);
 	void updateView(Entity *entity);
-	void setViewBounds(float width, float height);
+	void setViewBounds(const unsigned int width, const unsigned int height);
 	void setLetterboxView();
 
 	void renderDO(DrawableObject *d) const;
@@ -33,12 +34,10 @@ public:
 	void render(const CollisionGrid &cg, short int gridPos[]) const;
 	void render(const CollisionGrid &cg, std::map<short int, unsigned short int> gridPos) const;
 private:
-	float rectW, rectH;
-	bool limited;
+	Vector2u bounds;
 	RenderWindow *nativeRenderer;
 	View view;
-
-	std::vector<DrawableObject *> *drawableList;
+	bool limited;
 
 	void boundViewX(float centerX);
 	void boundViewY(float centerY);

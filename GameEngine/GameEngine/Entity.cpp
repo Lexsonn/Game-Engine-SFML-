@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Game.h"
+#include <iostream>
 
 extern int WWIDTH;
 extern int WHEIGHT;
@@ -29,10 +30,6 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), max
 	x = startX;
 	y = startY;
 	init();
-}
-
-void Entity::setAttackManager(const AttackManager &manager) {
-	at_master = manager;
 }
 
 int Entity::getType() {
@@ -73,7 +70,7 @@ void Entity::flashCurrentSprite(animType oldAnimation) {
 	if (!hit)
 		return;
 	flashDmg += FLASHTIMER_SPEED;
-	if (flashDmg > getFlashTimer()) { hit = false; flashDmg = 0; invulnerable = false; }
+	if (flashDmg > getFlashTimer()) { hit = false; setInvulFalse(); }
 	if (int(flashDmg) % 2 == 1) animationList[currentAnimation]->setColor(Color(240, 50, 0));
 	else animationList[currentAnimation]->setColor(Color(255, 255, 255));
 	// Checking if sprite changed, and resetting the old sprite back to its original color:
@@ -105,18 +102,23 @@ void Entity::endUpdate() {
 }
 
 void Entity::damage(int dmg) {
-	if (invulnerable)
+	if (invulnerable || hit)
 		return;
 
 	if (isInAnimList(currentAnimation))
 		animationList[currentAnimation]->restart();
-	
+
 	life -= dmg;
 	if (life <= 0) {
 		setState(DEAD);
 		life = 0;
 	} 
-	else setState(DAMAGED);
+	else {
+		hit = true;
+		invulnerable = true;
+		flashDmg = 0;
+		setState(DAMAGED);
+	}
 }
 
 void Entity::recover(int heal) {
@@ -181,8 +183,8 @@ bool Entity::updateDashDirection() {
 }
 
 void Entity::updatePosition() {
-	x += dx;
-	y += dy;
+	x += v.x;
+	y += v.y;
 	cX = int(x) - cWidth / 2;
 	cY = int(y) - cHeight / 2;
 }
@@ -195,8 +197,7 @@ void Entity::updatePosition(Vector2f v) {
 }
 
 void Entity::applyForce(Vector2f f) {
-	dx = f.x;
-	dy = f.y;
+	v = f;
 }
 
 void Entity::createNewEntity(std::string entityName, Vector2f pos) {
@@ -234,10 +235,10 @@ Vector2f Entity::getEntityOverlap(Entity *other) {
 
 	float angle = atan2(center.y - myCenter.y, center.x - myCenter.x) * 180 / 3.1415f;
 
-	if (angle >= -48.f && angle <= 42.f) _x -= std::max(1, int(std::abs(other->dx)));	// EAST
-	if (angle <= -42.f && angle >= -138.f) _y += std::max(1, int(std::abs(other->dy)));	// NORTH
-	if (angle <= -132.f || angle >= 132.f) _x += std::max(1, int(std::abs(other->dx)));	// WEST
-	if (angle >= 42.f && angle <= 138.f) _y -= std::max(1, int(std::abs(other->dy)));	// SOUTH
+	if (angle >= -48.f && angle <= 42.f) _x -= std::max(1, int(std::abs(other->v.x)));	// EAST
+	if (angle <= -42.f && angle >= -138.f) _y += std::max(1, int(std::abs(other->v.y)));	// NORTH
+	if (angle <= -132.f || angle >= 132.f) _x += std::max(1, int(std::abs(other->v.x)));	// WEST
+	if (angle >= 42.f && angle <= 138.f) _y -= std::max(1, int(std::abs(other->v.y)));	// SOUTH
 
 	return Vector2f(_x*1.f, _y*1.f);
 }
@@ -256,11 +257,15 @@ void Entity::update() { }
 void Entity::updateState() { }
 void Entity::setState(stateType newState) { }
 
+void Entity::setInvulFalse() {
+	invulnerable = false;
+}
+
 int Entity::createAttack(Vector2f pos, int type, int life, int str, Vector2f force, std::vector<std::pair<Vector2f, Vector2f>> attackLines, Animation *anim) {
 	Attack *newAttack = new Attack(ID, type, life, str, attackLines, anim);
 	newAttack->setForce(force);
 	newAttack->setPosition(pos);
-	return at_master.addAttack(newAttack);
+	return AttackManager::addAttack(newAttack);
 }
 
 Vector2f Entity::generateForceFromDirection(float strength) {
@@ -323,44 +328,42 @@ void Entity::idle() { }
 void Entity::walk() { 
 	if (updateDirection()) {
 		switch (direction) {
-		case EAST: dx = getSpeed() / 2; dy = 0; break;
-		case NORTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -getSpeed() / 2; break;
-		case NORTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = -getSpeed() / 2 * DIAG_MOD; break;
-		case WEST: dx = -getSpeed() / 2; dy = 0; break;
-		case SOUTHWEST: dx = -getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = getSpeed() / 2; break;
-		case SOUTHEAST: dx = getSpeed() / 2 * DIAG_MOD; dy = getSpeed() / 2 * DIAG_MOD; break;
+		case EAST: v = Vector2f(getSpeed() / 2, 0); break;
+		case NORTHEAST: v = Vector2f(getSpeed() / 2 * DIAG_MOD, -getSpeed() / 2 * DIAG_MOD); break;
+		case NORTH: v = Vector2f(0, -getSpeed() / 2); break;
+		case NORTHWEST: v = Vector2f(-getSpeed() / 2 * DIAG_MOD, -getSpeed() / 2 * DIAG_MOD); break;
+		case WEST: v = Vector2f(-getSpeed() / 2, 0); break;
+		case SOUTHWEST: v = Vector2f(-getSpeed() / 2 * DIAG_MOD, getSpeed() / 2 * DIAG_MOD); break;
+		case SOUTH: v = Vector2f(0, getSpeed() / 2); break;
+		case SOUTHEAST: v = Vector2f(getSpeed() / 2 * DIAG_MOD, getSpeed() / 2 * DIAG_MOD); break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
 		currentAnimation = animType(direction + WALK_ANIM);
 	}
 	else { // Idle animation if currently not moving.
 		currentAnimation = animType(direction);
-		dx = 0;
-		dy = 0;
+		v = Vector2f(0.f, 0.f);
 	}
 }
 
 void Entity::run() { 
 	if (updateDirection()) {
 		switch (direction) {
-		case EAST: dx = getSpeed(); dy = 0; break;
-		case NORTHEAST: dx = getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
-		case NORTH: dx = 0; dy = -getSpeed(); break;
-		case NORTHWEST: dx = -getSpeed() * DIAG_MOD; dy = -getSpeed() * DIAG_MOD; break;
-		case WEST: dx = -getSpeed(); dy = 0; break;
-		case SOUTHWEST: dx = -getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
-		case SOUTH: dx = 0; dy = getSpeed(); break;
-		case SOUTHEAST: dx = getSpeed() * DIAG_MOD; dy = getSpeed() * DIAG_MOD; break;
+		case EAST: v = Vector2f(getSpeed(), 0); break;
+		case NORTHEAST: v = Vector2f(getSpeed() * DIAG_MOD, -getSpeed() * DIAG_MOD); break;
+		case NORTH: v = Vector2f(0, -getSpeed()); break;
+		case NORTHWEST: v = Vector2f(-getSpeed() * DIAG_MOD, -getSpeed() * DIAG_MOD); break;
+		case WEST: v = Vector2f(-getSpeed(), 0); break;
+		case SOUTHWEST: v = Vector2f(-getSpeed() * DIAG_MOD, getSpeed() * DIAG_MOD); break;
+		case SOUTH: v = Vector2f(0, getSpeed()); break;
+		case SOUTHEAST: v = Vector2f(getSpeed() * DIAG_MOD, getSpeed() * DIAG_MOD); break;
 		default: std::cout << "You've done the impossible... You're facing a direction I've never seen before!\n";
 		}
 		currentAnimation = animType(direction + RUN_ANIM);
 	}
 	else { // Idle animation if currently not moving.
 		currentAnimation = animType(direction);
-		dx = 0;
-		dy = 0;
+		v = Vector2f(0.f, 0.f);
 	}
 }
 
@@ -377,19 +380,17 @@ void Entity::attRec() {
 }
 
 void Entity::damaged() { 
-	dx *= 0.95f;
-	dy *= 0.95f;
+	v *= 0.95f;
 	animFinished = animationList[currentAnimation]->isLastFrame();
 }
 
 void Entity::dash() { }
 
 void Entity::dead() {
-	dx *= 0.95f;
-	dy *= 0.95f;
+	v *= 0.95f;
 	animFinished = animationList[currentAnimation]->isLastFrame();
 	if (animFinished) {
-		dx = 0; dy = 0;
+		v = Vector2f(0.f, 0.f);
 		invulnerable = false; // Die here
 	}
 }

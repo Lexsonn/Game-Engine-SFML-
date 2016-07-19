@@ -1,5 +1,3 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
 #include "Animation.h"
 
 using namespace sf;

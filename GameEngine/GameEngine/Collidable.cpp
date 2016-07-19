@@ -28,7 +28,9 @@ bool Collidable::insideCollidable(Collidable *other) {
 
 	return !((cY > otherBottom) || (cX > otherRight) || (cY + cHeight < otherTop) || (cX + cWidth < otherLeft));
 }
+
 Vector2f Collidable::getStaticOverlap(Collidable *other) { 
+	if (other == nullptr) return Vector2f(0.f, 0.f);
 	int _x = 0, _y = 0;
 	int otherLeft = other->cX - 1;						// Left line of rectangle
 	int otherRight = other->cX + other->cWidth + 1;		// Right line of rectangle

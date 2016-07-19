@@ -25,7 +25,7 @@ private:
 	short int attackType, maxAttacks;
 	float dashTimer;
 
-	void setInvulFalse();
+	virtual void setInvulFalse();
 
 	void generateAttack();
 

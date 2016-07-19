@@ -1,7 +1,7 @@
 #ifndef CONTROLLABLE_H
 #define CONTROLLABLE_H
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
 using namespace sf;
 

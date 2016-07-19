@@ -2,7 +2,6 @@
 
 // Keypress values representing whether the current key is being held
 std::vector<bool> InputController::keyPressed((int)Keyboard::KeyCount);
-// List of controllables
 std::vector<Controllable *> InputController::controllableList;
 
 /*

@@ -1,9 +1,9 @@
 #include "Calculations.h"
-#include <iostream>
+
 extern int WWIDTH;
 extern int WHEIGHT;
 
-bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, Vector2f> l) {
+bool lineIntersectsRect(const float &x, const float &y, const float &w, const float &h, const std::pair<Vector2f, Vector2f> &l) {
 	float left = x;
 	float right = x + w;
 	float top = y;
@@ -52,7 +52,7 @@ bool lineIntersectsRect(float x, float y, float w, float h, std::pair<Vector2f, 
 	return true;
 }
 
-float findDistancePointToLine(std::pair<Vector2f, Vector2f> l, Vector2f p) {
+float findDistancePointToLine(const std::pair<Vector2f, Vector2f> &l, const Vector2f &p) {
 	float diffX = l.second.x - l.first.x;
 	float diffY = l.second.y - l.first.y;
 
@@ -80,14 +80,14 @@ float findDistancePointToLine(std::pair<Vector2f, Vector2f> l, Vector2f p) {
 	return sqrt(diffX * diffX + diffY * diffY);
 }
 
-Vector2f findMidpointOfLine(std::pair<Vector2f, Vector2f> l) {
+Vector2f findMidpointOfLine(const std::pair<Vector2f, Vector2f> &l) {
 	float midX = (l.second.x + l.first.x) / 2;
 	float midY = (l.second.y + l.first.y) / 2;
 
 	return Vector2f(midX, midY);
 }
 
-std::pair<Vector2f, Vector2f> rotateLineAboutPoint(std::pair<Vector2f, Vector2f> l, Vector2f p, float angle) {
+std::pair<Vector2f, Vector2f> rotateLineAboutPoint(const std::pair<Vector2f, Vector2f> &l, const Vector2f &p, const float &angle) {
 	float x1, x2, y1, y2;
 	x1 = l.first.x - p.x; y1 = l.first.y - p.y;
 	x2 = l.second.x - p.x; y2 = l.second.y - p.y;
@@ -101,7 +101,7 @@ std::pair<Vector2f, Vector2f> rotateLineAboutPoint(std::pair<Vector2f, Vector2f>
 	return std::pair<Vector2f, Vector2f>(Vector2f(x1 + p.x, y1 + p.y), Vector2f(x2 + p.x, y2 + p.y));
 }
 
-int getGrid(unsigned int x, unsigned int y) {
+int getGrid(const unsigned int &x, const unsigned int &y) {
 	int posX = x / GRID_WIDTH;
 	int posY = y / GRID_HEIGHT;
 	unsigned int width = (WWIDTH - 1) / GRID_WIDTH;
@@ -114,10 +114,21 @@ int getGrid(unsigned int x, unsigned int y) {
 	return i;
 }
 
-Vector2i getCoords(int gridPos) {
+Vector2i getCoords(const int &gridPos) {
 	unsigned int height = (WHEIGHT - 1) / GRID_WIDTH;
 	int x = gridPos / (height + 1);
 	int y = gridPos % (height + 1);
 
 	return Vector2i(x, y);
+}
+
+bool insideView(const FloatRect &bound, View * view) {
+	float vcX, vcY, vsX, vsY;
+
+	vcX = view->getCenter().x;
+	vcY = view->getCenter().y;
+	vsX = view->getSize().x / 2;
+	vsY = view->getSize().y / 2;
+
+	return !((bound.left > vcX + vsX) || (bound.left + bound.width < vcX - vsX) || (bound.top > vcY + vsY) || (bound.top + bound.height < vcY - vsY));
 }

@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+#include <iostream>
 
 using namespace sf;
 

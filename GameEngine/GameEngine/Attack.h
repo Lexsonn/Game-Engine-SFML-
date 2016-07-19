@@ -3,7 +3,6 @@
 
 #include <SFML/System.hpp>
 #include "DrawableObject.h"
-#include "Calculations.h"
 #include "Animation.h"
 #include <vector>
 #include <map>

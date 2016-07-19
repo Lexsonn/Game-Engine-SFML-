@@ -2,6 +2,7 @@
 #define SPRITERENDERER_H
 
 #include <SFML/Graphics.hpp>
+#include "Calculations.h"
 #include "TileMap.h"
 #include <map>
 
@@ -23,9 +24,5 @@ public:
 private:
 	View *view;
 	static std::multimap<int, const Sprite &> zOrderedSpriteList;
-	
-	bool isInsideView(const Sprite &spr) const;
-	bool isInsideView(const TileMap &tmap) const;
-	
 };
 #endif

@@ -1,4 +1,5 @@
 #include "TileMap.h"
+#include <iostream>
 
 TileMap::~TileMap() { }
 TileMap::TileMap() : m_tileset(nullptr) { }
@@ -37,7 +38,7 @@ TileMap::TileMap(const std::string &tileset, Vector2u tileSize, const int * tile
 			quad[3].texCoords = Vector2f(float(tx * tileSize.x), float((ty + 1) * tileSize.y));
 		}
 	}
-	std::cout << "Loaded tilemap at (" << offset.x << "," << offset.y << "), of size (" << (max.x - min.x) << "," << (max.y - min.y) << ").\n";
+	std::cout << "Loaded tilemap at (" << offset.x << "," << offset.y << "), of size (" << (max.x - min.x) << "x" << (max.y - min.y) << ").\n";
 }
 
 void TileMap::draw(RenderTarget &target, RenderStates states) const {

@@ -19,7 +19,7 @@ void SpriteRenderer::addTile(const TileMap &tmap) {
  *	If the sprite is outside the current view, the sprite is not inserted, and the function returns false.
  */
 bool SpriteRenderer::addSprite(int z, const Sprite &spr) {
-	if (isInsideView(spr)) {
+	if (insideView(spr.getGlobalBounds(), view)) {
 		zOrderedSpriteList.insert(std::pair<int, const Sprite &>(z, spr));
 		return true;
 	}
@@ -35,43 +35,10 @@ void SpriteRenderer::clearAll() {
 	tileList.clear();
 }
 
-/*
- *	Returns true if the bounding box of the passed sprite is within the bounds of the view.
- *	Returns false otherwise.
- */
-bool SpriteRenderer::isInsideView(const Sprite &spr) const {
-	if (view == nullptr)
-		return false;
-	FloatRect bound = spr.getGlobalBounds();
-	float vcX, vcY, vsX, vsY;
-
-	vcX = view->getCenter().x;
-	vcY = view->getCenter().y;
-	vsX = view->getSize().x / 2;
-	vsY = view->getSize().y / 2;
-	
-	return !((bound.left > vcX + vsX) || (bound.left + bound.width < vcX - vsX) || (bound.top > vcY + vsY) || (bound.top + bound.height < vcY - vsY));
-}
-
-bool SpriteRenderer::isInsideView(const TileMap &tmap) const {
-	float left, top, right, bottom;
-	left = tmap.getPosition().x;
-	top = tmap.getPosition().y;
-	right = left + SSX * TILESIZE_X;
-	bottom = top + SSY * TILESIZE_Y;
-	
-	float vcX, vcY, vsX, vsY;
-	vcX = view->getCenter().x;
-	vcY = view->getCenter().y;
-	vsX = view->getSize().x / 2;
-	vsY = view->getSize().y / 2;
-
-	return !((left > vcX + vsX) || (right < vcX - vsX) || (top > vcY + vsY) || (bottom < vcY - vsY));
-}
-
 void SpriteRenderer::renderTiles(RenderWindow *window) const {
 	for (const TileMap tmap : tileList) {
-		if (isInsideView(tmap))
+		FloatRect bound = FloatRect(tmap.getPosition(), Vector2f(SSX * TILESIZE_X, SSY * TILESIZE_Y));
+		if (insideView(bound, view))
 			window->draw(tmap);
 	}
 }

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Enemies.h"
+#include <iostream>
 
 #define _DEBUG_MODE 0x1
 #define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller.addControllable(dynamic_cast<Controllable *>(newEntity));
@@ -13,7 +14,7 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	game = this;
 	eID = 0;
 	oID = 0;
-	attList = AttackManager::getAttackList();
+	
 	const int l[] = { 25, 25, // load dis from txt file pls ty
 		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,  3,  3,  3,  3,  3,  3,  3,  3,  1,
 		1,  5,  9,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
@@ -260,8 +261,6 @@ void Game::render() {
 void Game::addEntity(Entity *entity) {
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
-	entity->setAttackManager(at_master);
-	cGrid.initEntity(entity);
 }
 
 /*

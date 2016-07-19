@@ -13,7 +13,6 @@ public:
 
 	void build();
 
-	void initEntity(Entity *entity);
 	void updateEntity(Entity *entity);
 	void deleteEntity(Entity *entity);
 	void addObject(Collidable *object);

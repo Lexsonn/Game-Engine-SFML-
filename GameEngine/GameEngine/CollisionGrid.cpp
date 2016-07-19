@@ -1,4 +1,5 @@
 #include "CollisionGrid.h"
+#include <iostream>
 
 extern int WWIDTH;
 extern int WHEIGHT;
@@ -11,7 +12,7 @@ std::multimap<unsigned short int, Entity *> CollisionGrid::entityPosList;
 std::multimap<unsigned short int, Collidable *> CollisionGrid::objectPosList;
 
 /*
- *	Create bounds for the CollisionGrid. Called whenever the game world has changed.
+ *	Create bounds for the CollisionGrid. To be called whenever the game world has changed.
  */
 void CollisionGrid::build() {
 	width = (WWIDTH - 1) / GRID_WIDTH;
@@ -36,21 +37,6 @@ void CollisionGrid::setGridPos(int gridPos[], Entity *entity) {
 			if (gridPos[i] == gridPos[j])
 				gridPos[j] = -1;
 		}
-	}
-}
-
-/*
- *	Set entity's grid position arrays based on where it is currently located, and add the entity
- *	to the multimap ordered by grid position.
- */
-void CollisionGrid::initEntity(Entity *entity) {
-	int gridPos[4];
-	setGridPos(gridPos, entity);
-
-	for (int i = 0; i < 4; i++) {
-		if (gridPos[i] >= 0)
-			entityPosList.insert(std::pair<unsigned short int, Entity *>(gridPos[i], entity));
-		entity->gridPos[i] = gridPos[i];
 	}
 }
 
