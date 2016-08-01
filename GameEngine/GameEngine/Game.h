@@ -11,8 +11,7 @@
 using namespace sf;
 
 enum EntityType {
-	UNKNOWN_e = -1
-	, ENTITY = 0
+	ENTITY = 0
 	, PLAYER
 	, SLIME
 	, BABYSLIME
@@ -28,12 +27,13 @@ public:
 	void addDrawable(DrawableObject *drawObj);
 	void addSprite(int z, const Sprite &spr);
 	Entity *createEntity(std::string entityName, Vector2f pos);
+	Entity *getEntityById(unsigned short int &id);
 	void deleteEntity(unsigned short int _ID);
 private:
 	const bool debug;
 	const int *level;
 	unsigned short int eID, oID;
-	mutable int count = 0; // fuck you const I do what I want
+	mutable int count = 0;
 
 	ResourceManager *rm_master;
 	GameWindow *window;
@@ -51,7 +51,7 @@ private:
 	
 	void initEntityMap();
 	void initManagers(RenderWindow *rWindow);
-	void createWorld();
+	void createWorld(const std::string &filename, const int &levelnum);
 	void destroyWorld();
 	void update();
 	void render();

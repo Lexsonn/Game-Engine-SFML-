@@ -19,8 +19,8 @@ public:
 
 	virtual void render(RenderWindow *window);
 
-	const static int entityType;
-	virtual int getType();
+	const static unsigned int entityType;
+	virtual unsigned int getType();
 private:
 	short int attackType, maxAttacks;
 	float dashTimer;

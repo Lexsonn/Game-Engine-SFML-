@@ -1,9 +1,11 @@
 #include "Game.h"
 #include "Enemies.h"
 #include <iostream>
+#include <fstream>
 
 #define _DEBUG_MODE 0x1
-#define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 1) controller.addControllable(dynamic_cast<Controllable *>(newEntity));
+#define _CHECK_PLAYER_FLAG if (newEntity->getType() & 0X80000000) player = dynamic_cast<Player *>(newEntity);
+#define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 0X00000001) controller.addControllable(dynamic_cast<Controllable *>(newEntity));
 
 int WWIDTH(800);
 int WHEIGHT(800);
@@ -14,43 +16,10 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	game = this;
 	eID = 0;
 	oID = 0;
-	
-	const int l[] = { 25, 25, // load dis from txt file pls ty
-		0,  4,  8,  4,  4,  4,  8,  12, 0,  4,  4,  4,  8,  0,  4,  8,  3,  3,  3,  3,  3,  3,  3,  3,  1,
-		1,  5,  9,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
-		2,  6,  10, 5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
-		1,  5,  5,  5,  5,  5,  9,  12, 1,  5,  5,  5,  9,  1,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
-		1,  5,  5,  5,  5,  6,  10, 12, 2,  6,  6,  6,  10, 2,  5,  9,  3,  3,  3,  3,  3,  3,  3,  3,  1,
-		1,  5,  5,  5,  9,  12, 12, 12, 13, 13, 13, 13, 13, 14, 2,  10, 3,  3,  3,  3,  3,  3,  3,  3,  1,
-		2,  6,  6,  6,  10, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 3,  3,  3,  3,  3,  3,  3,  3,  1,
-		12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 3,  3,  3,  3,  3,  3,  3,  3,  1,
-		12, 12, 12, 12, 12, 12, 12, 0,  4,  4,  4,  8,  14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  9,  14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  8,  13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  9,  13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 1,  5,  5,  5,  5,  9,  13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 2,  6,  6,  6,  6,  10, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 1,
-		4,  4,  4,  4,  4,  4,  8,  13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 0,  8,
-		5,  5,  5,  5,  5,  5,  5,  4,  4,  8,  13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  4,  4,  4,  4,  4,  4,  4,  4,  4,  8,  14, 14, 14, 1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  4,  4,  4,  1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  1,  9,
-		5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  1,  9,
-		6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  2,  10
-	};
-
-	level = l;
-
-	WWIDTH = level[0] * TILESIZE_X;
-	WHEIGHT = level[1] * TILESIZE_Y;
 
 	initEntityMap();
 	initManagers(rWindow);
-	createWorld();
+	createWorld("Resources/maps/map.vhmap", 2);
 	/* QUICK CHECKS FOR CLASS SIZES (empty lists)
 	std::cout << "ResourceManager : " << sizeof(ResourceManager) << "\tCollisionGrid: " << sizeof(CollisionGrid) << "\n";
 	std::cout << "GameWindow : " << sizeof(GameWindow) << "\tInputController: " << sizeof(InputController) << "\n";
@@ -73,57 +42,77 @@ void Game::initEntityMap() {
 void Game::initManagers(RenderWindow *rWindow) {
 	rm_master = new ResourceManager();
 	window = new GameWindow(rWindow, 640.f, 480.f, true);
-	player = new Player(200, 200, rm_master);
 	// Setup manager relationships
 	spr_renderer.setView(window->getView());
-	controller.addControllable(player);
 	cMaster.initialize(&entityList);
 }
 
 /*
- *	Eventually, this will load a world from a file. maybe?
+ *	Load 
  */
-void Game::createWorld() {
-	// All dis gon b loaded in txt file <3 <3 <3
-	for (int i = 0; i <= level[0] / SSX; i++) {
-		for (int j = 0; j <= level[1] / SSY; j++) {
-			Vector2u offset = Vector2u(i, j);
-			spr_renderer.addTile(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), level, offset, rm_master));
+void Game::createWorld(const std::string &filename, const int &levelnum) {
+	std::fstream mapfile(filename, std::ios::binary | std::ios::in);
+	if (mapfile.is_open()) {
+		std::cout << "Reading from " << filename << "...\n";
+		
+		int mapnum;
+		std::vector<long> mapsize;
+		mapfile.read((char*)&mapnum, sizeof(int));
+		mapsize.resize(mapnum);
+		mapfile.read((char*)mapsize.data(), mapnum * sizeof(long));
+
+		if (levelnum > 0) 
+			mapfile.seekg(mapsize.at(std::max(0, levelnum - 1)) + levelnum*sizeof(int), std::ios::beg);
+		
+
+		std::vector<int> level;
+		int size;
+		// Read level information first and foremost
+		mapfile.read((char*)&size, sizeof(int));
+		level.resize(size);
+		mapfile.read((char*)level.data(), size * sizeof(int));
+		const int *l = &level[0]; // Do this cuz im a bad boy
+
+		// Resize world and set cGrid to proper size
+		WWIDTH = level.at(0) * TILESIZE_X;
+		WHEIGHT = level.at(1) * TILESIZE_Y;
+		cGrid.build();
+
+		// Create tiles from level info
+		for (int i = 0; i <= level.at(0) / SSX; i++)
+			for (int j = 0; j <= level.at(1) / SSY; j++)
+				spr_renderer.addTile(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), l, Vector2u(i, j), rm_master));
+
+		int toDo;
+		while ((mapfile.tellg() < mapsize.at(levelnum)) && !mapfile.eof()) {
+			int l, t, w, h;
+			float x, y; //boundx, boundy, bsizex, bsizey;
+			std::string name;
+			int slen;
+			mapfile.read((char*)&toDo, sizeof(int));
+			switch (toDo) {
+			//case 3: // Create AI entity with bounds
+			case 2:
+				mapfile.read((char*)&slen, sizeof(slen));
+				name.resize(slen);
+				mapfile.read((char*)&name[0], slen);
+				mapfile.read((char*)&x, sizeof(float));
+				mapfile.read((char*)&y, sizeof(float));
+				createEntity(name, Vector2f(x, y));
+				break;
+			case 1:
+				mapfile.read((char*)&l, sizeof(int));
+				mapfile.read((char*)&t, sizeof(int));
+				mapfile.read((char*)&w, sizeof(int)); 
+				mapfile.read((char*)&h, sizeof(int));
+				addObject(new Collidable(l, t, w, h));
+				break;
+			default: std::cout << "invalid toDo.";
+			}
 		}
-	}
-
-	cGrid.build(); // build after setting level size.
-
-	addEntity(player);
-	addEntity(new Slime(100, 100, rm_master));
-	addEntity(new Slime(50, 100, rm_master));
-	addEntity(new Slime(150, 100, rm_master));
-	addEntity(new Slime(200, 100, rm_master));
-	addEntity(new Slime(250, 100, rm_master));
-	addEntity(new Slime(300, 100, rm_master));
-	addEntity(new Slime(140, 140, rm_master));
-	addEntity(new Slime(40, 140, rm_master));
-	addEntity(new Slime(250, 140, rm_master));
-	addEntity(new Slime(300, 140, rm_master));
-	addEntity(new Slime(190, 250, rm_master));
-	addEntity(new Slime(340, 340, rm_master));
-
-	addEntity(new BabySlime(300, 160, rm_master));
-	addEntity(new BabySlime(300, 170, rm_master));
-	addEntity(new BabySlime(300, 180, rm_master));
-	addEntity(new BabySlime(300, 190, rm_master));
-	addEntity(new BabySlime(320, 160, rm_master));
-	addEntity(new BabySlime(320, 170, rm_master));
-	addEntity(new BabySlime(320, 180, rm_master));
-	addEntity(new BabySlime(320, 190, rm_master));
-	addEntity(new BabySlime(340, 160, rm_master));
-	addEntity(new BabySlime(340, 170, rm_master));
-	addEntity(new BabySlime(340, 180, rm_master));
-	addEntity(new BabySlime(340, 190, rm_master));
-
-	addObject(new Collidable(370, 140, 40, 240));
-	addObject(new Collidable(80, 290, 210, 20));
-	addObject(new Collidable(140, 270, 60, 60));
+		mapfile.close();
+		std::cout << "Finished reading map file.\n";
+	} else std::cout << "Error reading from " << filename << "\n";
 }
 
 /*
@@ -153,8 +142,9 @@ void Game::destroyWorld() {
  *	Create an entity from a passed in string, and position.
  */
 Entity *Game::createEntity(std::string entityName, Vector2f pos) {
+	std::cout << "Adding " << entityName << "... ";
 	Entity *newEntity = nullptr;
-	EntityType type = UNKNOWN_e;
+	EntityType type = ENTITY;
 	std::map<std::string, EntityType>::iterator it = entityMap.find(entityName);
 	if (it != entityMap.end())
 		type = it->second;
@@ -162,14 +152,12 @@ Entity *Game::createEntity(std::string entityName, Vector2f pos) {
 	case PLAYER: newEntity = new Player(pos.x, pos.y, rm_master); break;
 	case SLIME: newEntity = new Slime(pos.x, pos.y, rm_master); break;
 	case BABYSLIME: newEntity = new BabySlime(pos.x, pos.y, rm_master); break;
-	default: std::cout << "Unable to create entity: " + entityName + "\n";
+	default: std::cout << "Unable to create entity: " << entityName << "\n"; return nullptr;
 	}
-	if (newEntity != nullptr) {
-		_CHECK_CONTROLLABLE_FLAG
-		addEntity(newEntity);
-		return newEntity;
-	}
-	return nullptr;
+	_CHECK_PLAYER_FLAG
+	_CHECK_CONTROLLABLE_FLAG
+	addEntity(newEntity);
+	return newEntity;
 }
 
 //https://www.etsy.com/listing/211967784/bulbasaur-life-sized-plush
@@ -179,6 +167,18 @@ void Game::runLoop() {
 	render();					// Draw everything
 	window->end();				// Update the window
 	spr_renderer.clearList();	// Clear list of drawable sprites
+}
+
+/*
+ *	Delete an Entity from all lists related to the Entity.
+ */
+void Game::deleteEntity(unsigned short int _ID) {
+	std::map<unsigned short int, Entity *>::iterator it = entityList.find(_ID);
+	if (it == entityList.end())
+		return;
+	cGrid.deleteEntity(it->second);
+	delete it->second;
+	entityList.erase(it);
 }
 
 /*
@@ -259,20 +259,17 @@ void Game::render() {
  *	Perform all necessary functions to have a newly created Entity interact in the game world.
  */
 void Game::addEntity(Entity *entity) {
+	if (entity == nullptr)
+		return;
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
 }
 
-/*
- *	Delete an Entity from all lists related to the Entity.
- */
-void Game::deleteEntity(unsigned short int _ID) {
-	std::map<unsigned short int, Entity *>::iterator it = entityList.find(_ID);
-	if (it == entityList.end())
-		return;
-	cGrid.deleteEntity(it->second);
-	delete it->second;
-	entityList.erase(it);
+Entity *Game::getEntityById(unsigned short int &id) {
+	std::map<unsigned short int, Entity *>::iterator it = entityList.find(id);
+	if (it != entityList.end())
+		return it->second;
+	return nullptr;
 }
 
 /*
@@ -285,8 +282,8 @@ void Game::addObject(Collidable *object) {
 }
 
 /*
-*	Delete a static Collidable from all lists related to the Collidable.
-*/
+ *	Delete a static Collidable from all lists related to the Collidable.
+ */
 void Game::deleteObject(unsigned short int _ID) {
 	std::map<unsigned short int, Collidable *>::iterator it = objectList.find(_ID);
 	if (it == objectList.end())

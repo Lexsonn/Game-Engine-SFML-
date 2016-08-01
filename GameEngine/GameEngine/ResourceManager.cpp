@@ -47,45 +47,41 @@ texType ResourceManager::getTextureType(const std::string &texPath) {
 
 Texture *ResourceManager::getTexture(const std::string &texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
-	std::cout << "LOADING " << fullpath << " ... ";
 	texType type = getTextureType(texPath);
-	if (type == UNKNOWN_t) {
-		std::cout << "No such texture defined.\n";
+
+	if (type == UNKNOWN_t)
 		return nullptr;
-	}
 
 	std::map<texType, Texture*>::iterator it = textureList.find(type);
-	if (it == textureList.end()) {
-		std::cout << "Texture not found.\n";
+	if (it == textureList.end()) 
 		return nullptr;
-	}
 
-	std::cout << "Texture successfully loaded.\n";
 	return textureList[type];
 }
 
 bool ResourceManager::addTexture(const std::string &texPath) {
 	std::string fullpath = std::string(TEXTURE_PATH) + texPath;
+	std::cout << "LOADING " << fullpath << " ... ";
 	texType type = getTextureType(texPath);
 	if (type == UNKNOWN_t) {
-		std::cout << "No texture " << fullpath << " defined.\n";
+		std::cout << "No texture defined.\n";
 		return false;
 	}
 	
 	Texture *tx = new Texture();
 	if (!tx->loadFromFile(fullpath)) { // Load new texture from path
-		std::cout << "No texture " << fullpath << " found!\n";
+		std::cout << "No texture found!\n";
 		delete tx;
 		return false;
 	}
 
 	if (textureList.insert(std::pair<texType, Texture*>(type, tx)).second == false) {
-		std::cout << "Texture " << fullpath << " is already loaded in memory.\n";
+		std::cout << "Texture is already loaded in memory.\n";
 		delete tx;
 		return false;
 	}
 
-	std::cout << "Sucessfully added " << fullpath << " to memory.\n";
+	std::cout << "Sucess!\n";
 	return true;
 }
 
@@ -123,20 +119,14 @@ sfxType ResourceManager::getSoundType(const std::string &sfxPath) {
 
 Sound ResourceManager::getSound(const std::string &sfxPath) { 
 	std::string fullpath = std::string(SOUND_PATH) + sfxPath;
-	std::cout << "LOADING " << fullpath << " ... ";
 	sfxType type = getSoundType(sfxPath);
-	if (type == UNKNOWN_s) {
-		std::cout << "No sound " << fullpath << " defined.\n";
+	if (type == UNKNOWN_s) 
 		return Sound();
-	}
 
 	std::map<sfxType, SoundBuffer>::iterator it = soundList.find(type);
-	if (it == soundList.end()) {
-		std::cout << "Sound not found.\n";
+	if (it == soundList.end())
 		return Sound();
-	}
 
-	std::cout << "Sound successfully loaded.\n";
 	return Sound(soundList[type]);
 }
 
@@ -196,20 +186,14 @@ musicType ResourceManager::getMusicType(const std::string &musicPath) {
 
 Music *ResourceManager::getMusic(const std::string &musicPath) {
 	std::string fullpath = std::string(MUSIC_PATH) + musicPath;
-	std::cout << "LOADING " << fullpath << " ... ";
 	musicType type = getMusicType(musicPath);
-	if (type == UNKNOWN_m) {
-		std::cout << "No music " << fullpath << " defined.\n";
+	if (type == UNKNOWN_m)
 		return nullptr;
-	}
 
 	std::map<musicType, Music *>::iterator it = songList.find(type);
-	if (it == songList.end()) {
-		std::cout << "Music not found.\n";
+	if (it == songList.end())
 		return nullptr;
-	}
 
-	std::cout << "Music successfully loaded.\n";
 	return songList[type];
 }
 

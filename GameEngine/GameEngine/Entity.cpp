@@ -6,7 +6,7 @@ extern int WWIDTH;
 extern int WHEIGHT;
 extern Game *game;
 
-const int Entity::entityType = 0;
+const unsigned int Entity::entityType = 0x00000000;
 
 void Entity::init() { 
 	for (unsigned short int i = 0; i < 4; i++)
@@ -32,7 +32,7 @@ Entity::Entity(float startX, float startY, ResourceManager *rm) : life(100), max
 	init();
 }
 
-int Entity::getType() {
+unsigned int Entity::getType() {
 	return Entity::entityType;
 }
 
@@ -322,6 +322,10 @@ Entity* Entity::getEntityAt(std::pair<Vector2f, Vector2f> line) {
 		}
 	}
 	return nullptr;
+}
+
+Entity *Entity::getEntityById(unsigned short int id) {
+	return game->getEntityById(id);
 }
 
 void Entity::idle() { }

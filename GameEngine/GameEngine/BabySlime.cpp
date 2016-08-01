@@ -28,7 +28,6 @@ void BabySlime::init() {
 	animationList[deathE] = new Animation(tx2, 0.f, 0.f, 50, 50, 8, 0.1f, true); animationList[deathE]->setScale(0.35f, 0.35f);
 }
 
-BabySlime::~BabySlime() { }
 BabySlime::BabySlime(ResourceManager *rm) {
 	rm_master = rm;
 	init();

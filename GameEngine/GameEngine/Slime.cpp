@@ -25,8 +25,6 @@ void Slime::init() {
 	animationList[deathE] = new Animation(tx2, 0.f, 0.f, 50, 50, 8, 0.1f, true); animationList[deathE]->setScale(0.75, 0.75);
 }
 
-Slime::~Slime() { }
-Slime::Slime() { std::cout << "en tity init\n"; Entity::init(); init(); }
 Slime::Slime(ResourceManager *rm) { 
 	rm_master = rm;
 	init();

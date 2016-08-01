@@ -8,7 +8,6 @@ using namespace sf;
 
 class BabySlime : public Entity, public AI {
 public:
-	~BabySlime();
 	BabySlime(ResourceManager *rm);
 	BabySlime(float startX, float startY, ResourceManager *rm);
 

@@ -28,7 +28,7 @@
 #define AREC_ANIM 64
 #define DAMG_ANIM 72
 #define DASH_ANIM 8 //80
-#define DEAD_ANIM 88 //88
+#define DEAD_ANIM 88
 
 // Faces for 8 Directions
 enum dir {
@@ -74,8 +74,8 @@ public:
 
 	virtual void render(RenderWindow *window);
 
-	const static int entityType;
-	virtual int getType();
+	const static unsigned int entityType;
+	virtual unsigned int getType();
 protected:
 	std::map<animType, Animation *> animationList;
 	ResourceManager *rm_master;
@@ -109,6 +109,7 @@ protected:
 	std::pair<Vector2f, Vector2f> createNormalLineFromAngle(float length, float distance, float angle);
 
 	Entity *getEntityAt(std::pair<Vector2f, Vector2f> line);
+	Entity *getEntityById(unsigned short int id);
 
 	virtual void idle();
 	virtual void walk();

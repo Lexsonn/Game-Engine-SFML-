@@ -36,12 +36,12 @@ bool SpriteEffect::update() {
 	if (--currentLife <= 0) 
 		return false;
 	
-	if (type & 1) fade();			// Bit 0
+	if (type & 0x0001) fade();			// Bit 0
 	else fastFade();				// Default
-	if (type & 2) rainbow();		// Bit 1
-	if (type & 4) scale();			// Bit 2
-	if (type & 8) rotation();		// Bit 3
-	if (type & 16) flash();			// Bit 4
+	if (type & 0x0002) rainbow();		// Bit 1
+	if (type & 0x0004) scale();			// Bit 2
+	if (type & 0x0008) rotation();		// Bit 3
+	if (type & 0x0010) flash();			// Bit 4
 
 	return true;
 }

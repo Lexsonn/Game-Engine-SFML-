@@ -10,7 +10,7 @@
 #define ATT_FORCE 2.f
 #define ATT_BASE_STR 10
 
-const int Player::entityType = 1;
+const unsigned int Player::entityType = 0x80000001;
 
 void Player::init() {
 	// Initialize inherited variables
@@ -129,7 +129,7 @@ Player::Player(float startX, float startY, ResourceManager *rm) {
 	init();
 }
 
-int Player::getType() {
+unsigned int Player::getType() {
 	return Player::entityType;
 }
 
@@ -369,9 +369,14 @@ void Player::keyPress(Keyboard::Key key) {
 		//* ENTITY INTERACTION TESTS
 		// Access entity at position. For things like text box conversations, or pressing a button.
 		Entity * t = getEntityAt(createNormalLine(8.f, float(cWidth/2 + 8)));
-		if (t == nullptr)
+		if (t == nullptr) {
+			t = getEntityById(25);
+			if (t == nullptr)
+				return;
+			std::cout << "Entity is: " << t->name << " (" << t->ID << "), life: (" << t->life <<
+				"/" << t->maxLife << ")\n";
 			return;
-
+		}
 		std::cout << "Entity is: " << t->name << " (" << t->ID << "), life: (" << t->life <<
 			"/" << t->maxLife << ")\n";
 	}
