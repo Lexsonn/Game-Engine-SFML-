@@ -2,19 +2,25 @@
 
 using namespace sf;
 
+extern int globalSeed;
+
+std::mt19937 AI::mt(globalSeed);
 float AI::decisionSpeed = 0.05f;
 
 AI::~AI() { }
 AI::AI() : moves(false) { }
 
 void AI::generateRND(unsigned int seed, int maxRange) {
-	srand(seed);
+	mt_local = std::mt19937(seed);
 	decisionRange = std::uniform_int_distribution<int>(0, maxRange);
-	//randomNumbers = std::mt19937(rd());
 }
 
 int AI::getDecision() {
-	return decisionRange(rd);
+	return decisionRange(mt);
+}
+
+int AI::getSiblingDecision() {
+	return decisionRange(mt_local);
 }
 
 void AI::setBounds(int x, int y, unsigned int w, unsigned int h) {

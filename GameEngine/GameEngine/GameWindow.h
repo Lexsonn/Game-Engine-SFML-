@@ -19,6 +19,7 @@ public:
 	View *getView();
 
 	void setLimit(bool limit);
+	void updateView(Vector2f center);
 	void updateView(Entity *entity);
 	void setViewBounds(const unsigned int width, const unsigned int height);
 	void setLetterboxView();

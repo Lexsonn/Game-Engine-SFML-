@@ -11,9 +11,6 @@ const unsigned int Entity::entityType = 0x00000000;
 void Entity::init() { 
 	for (unsigned short int i = 0; i < 4; i++)
 		gridPos[i] = -1;
-	isDead = false;
-	direction = EAST;
-	state = IDLE;
 }
 
 Entity::~Entity() {

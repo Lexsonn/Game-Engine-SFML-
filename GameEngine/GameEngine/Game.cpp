@@ -7,9 +7,10 @@
 #define _CHECK_PLAYER_FLAG if (newEntity->getType() & 0X80000000) player = dynamic_cast<Player *>(newEntity);
 #define _CHECK_CONTROLLABLE_FLAG if (newEntity->getType() & 0X00000001) controller.addControllable(dynamic_cast<Controllable *>(newEntity));
 
-int WWIDTH(800);
-int WHEIGHT(800);
+int WWIDTH(160);
+int WHEIGHT(160);
 Game *game(nullptr);
+int globalSeed = int(time(NULL));
 
 Game::~Game() { }
 Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
@@ -26,6 +27,7 @@ Game::Game(RenderWindow* rWindow) : debug(_DEBUG_MODE) {
 	std::cout << "AttackManager : " << sizeof(AttackManager) << "\tAttack: " << sizeof(Attack) << "\n";
 	std::cout << "Player : " << sizeof(Player) << "\t\tEntity: " << sizeof(Entity) << "\n";
 	std::cout << "Game : " << sizeof(Game) << "\t\tTileMap " << sizeof(TileMap) << "\n";
+	std::cout << "UID : " << sizeof(std::uniform_int_distribution<int>) << "\t\tRandom device : " << sizeof(std::random_device) << "\n";
 	//*/
 }
 
@@ -48,22 +50,20 @@ void Game::initManagers(RenderWindow *rWindow) {
 }
 
 /*
- *	Load 
+ *	Load map by file and position in file.
  */
 void Game::createWorld(const std::string &filename, const int &levelnum) {
 	std::fstream mapfile(filename, std::ios::binary | std::ios::in);
 	if (mapfile.is_open()) {
-		std::cout << "Reading from " << filename << "...\n";
+		std::cout << "Reading from " << filename << "... level=" << levelnum << "\n";
 		
-		int mapnum;
+		int mapnum, tileset;
 		std::vector<long> mapsize;
 		mapfile.read((char*)&mapnum, sizeof(int));
 		mapsize.resize(mapnum);
 		mapfile.read((char*)mapsize.data(), mapnum * sizeof(long));
 
-		if (levelnum > 0) 
-			mapfile.seekg(mapsize.at(std::max(0, levelnum - 1)) + levelnum*sizeof(int), std::ios::beg);
-		
+		if (levelnum > 0) mapfile.seekg(mapsize.at(std::max(0, levelnum - 1)), std::ios::beg);
 
 		std::vector<int> level;
 		int size;
@@ -71,17 +71,19 @@ void Game::createWorld(const std::string &filename, const int &levelnum) {
 		mapfile.read((char*)&size, sizeof(int));
 		level.resize(size);
 		mapfile.read((char*)level.data(), size * sizeof(int));
-		const int *l = &level[0]; // Do this cuz im a bad boy
+		mapfile.read((char*)&tileset, sizeof(int));
 
 		// Resize world and set cGrid to proper size
 		WWIDTH = level.at(0) * TILESIZE_X;
 		WHEIGHT = level.at(1) * TILESIZE_Y;
 		cGrid.build();
 
+		window->updateView(Vector2f(WWIDTH / 2.f, WHEIGHT / 2.f));
+
 		// Create tiles from level info
 		for (int i = 0; i <= level.at(0) / SSX; i++)
 			for (int j = 0; j <= level.at(1) / SSY; j++)
-				spr_renderer.addTile(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), l, Vector2u(i, j), rm_master));
+				spr_renderer.addTile(TileMap("Tilesets/tileset1.png", Vector2u(TILESIZE_X, TILESIZE_Y), (int*)&level[0], Vector2u(i, j), rm_master));
 
 		int toDo;
 		while ((mapfile.tellg() < mapsize.at(levelnum)) && !mapfile.eof()) {
@@ -103,8 +105,9 @@ void Game::createWorld(const std::string &filename, const int &levelnum) {
 			case 1:
 				mapfile.read((char*)&l, sizeof(int));
 				mapfile.read((char*)&t, sizeof(int));
-				mapfile.read((char*)&w, sizeof(int)); 
+				mapfile.read((char*)&w, sizeof(int));
 				mapfile.read((char*)&h, sizeof(int));
+				std::cout << "Creating collidable pos=(" << l << ", " << t << ") size=(" << w << ", " << h << ")\n";
 				addObject(new Collidable(l, t, w, h));
 				break;
 			default: std::cout << "invalid toDo.";
@@ -263,6 +266,7 @@ void Game::addEntity(Entity *entity) {
 		return;
 	entityList.insert(std::pair<unsigned short int, Entity *>(eID, entity));
 	entity->ID = eID++;
+	std::cout << "initialized with ID=" << eID - 1 << "\n";
 }
 
 Entity *Game::getEntityById(unsigned short int &id) {

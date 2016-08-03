@@ -13,7 +13,6 @@ public:
 	AI();
 
 	void generateRND(unsigned int seed, int maxRange);
-	int getDecision();
 
 	void setBounds(int x, int y, unsigned int w, unsigned int h);
 	void setDestination();
@@ -23,11 +22,13 @@ public:
 protected:
 	Vector2i destination, bound, maxBound;
 	float decisionMake;
-	
-	std::uniform_int_distribution<int> decisionRange;
-	std::random_device rd;
-
 	bool moves;
-	//std::mt19937 randomNumbers;
+	
+	int getDecision();
+	int getSiblingDecision();
+
+	std::uniform_int_distribution<int> decisionRange;
+	std::mt19937 mt_local;
+	static std::mt19937 mt;
 };
 #endif

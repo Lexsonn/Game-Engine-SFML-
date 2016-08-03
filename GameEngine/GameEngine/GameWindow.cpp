@@ -35,11 +35,16 @@ void GameWindow::setLimit(bool limit) {
 	limited = limit;
 }
 
+void GameWindow::updateView(Vector2f center) {
+	view.setCenter(center);
+	nativeRenderer->setView(view);
+}
+
 void GameWindow::updateView(Entity *entity) {
-	if (entity == nullptr || (view.getSize().x > WWIDTH && view.getSize().y > WHEIGHT))
+	if (entity == nullptr)
 		return;
-	boundViewX(entity->x);
-	boundViewY(entity->y);
+	if (view.getSize().x < WWIDTH) boundViewX(entity->x);
+	if (view.getSize().y < WHEIGHT) boundViewY(entity->y);
 	nativeRenderer->setView(view);
 }
 
