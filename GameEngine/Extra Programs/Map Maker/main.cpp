@@ -1,16 +1,17 @@
-
 #include <SFML/System.hpp>
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <map>
+#include <tuple>
 
 #define CREATE_MAP false;	// true to create map, false to test created map.
 
-#define _entity tuple<int, string, float, float>
-#define _object tuple<int, int, int, int>
-#define _bound tuple<float, float, float, float>
-//#define _eName string
+#define _object tuple<int, int, int, int>			//	1
+#define _entity tuple<int, string, float, float>	//	2
+#define __entity tuple<int, string, float, float	// *********************** GENERIC ***********************
+#define _bound tuple<float, float, float, float>	// 3rd bit 0x00000004 (AI bounded objects)
+#define _rel  unsigned short int					// 4th bit 0x00000008 (stuff like buttons, levers, etc.)
+#define _name string								// 5th bit 0x00000010 (named entities)
 
 using namespace std;
 
@@ -19,9 +20,23 @@ int main() {
 	string op = "";
 
 	vector<vector<int>> levels;			// list of level size/tile data to include in mapfile
+	vector<int> tilesets;
 	vector<vector<_entity>> entities;	// list of entities to include in each level
 	vector<vector<_object>> objects;	// list of objects to include in each level
 	vector<long> mapsize;				// metadata to keep track of # of levels and filesize
+
+	/******************************************** SPECIAL LIST TYPE BIT OPERATIONS ********************************************\
+	*																														  *
+	*	First int in the generic tuple __entity specifies what information is written:										  *
+	*																														  *
+	*	Bit 1 & 2:	Reserved for collidable and generic Entity																  *
+	*	Bit 3:		(0x00000004) Bounded AI entities. consists of 4 floats.													  *
+	*	Bit 4:		(0x00000008) Relational entities tied to another entity by ID.											  *
+	*	Bit 5:		(0x00000010) Specially Named entities.																	  *
+	*																														  *
+	\**************************************************************************************************************************/
+
+	vector<vector<__entity, _bound, _rel, _name>>> specialList;	// All the non-default specific cases go here. 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////// LEVELS //////////////////////////////////////////////////////////
@@ -74,6 +89,10 @@ int main() {
 			12, 12, 12, 12, 12, 12, 12, 13, 13, 13
 		});
 
+		tilesets.push_back(0);
+		tilesets.push_back(0);
+		tilesets.push_back(0);
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////// ENTITIES AND OBJECTS ///////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,8 +109,8 @@ int main() {
 
 		oList.push_back(_object(0, 0, 200, 20));
 		oList.push_back(_object(0, 0, 20, 200));
-		oList.push_back(_object(0, 180, 20, 200));
-		oList.push_back(_object(180, 0, 240, 20));
+		oList.push_back(_object(0, 180, 200, 20));
+		oList.push_back(_object(180, 0, 20, 200));
 
 		entities.push_back(eList); objects.push_back(oList); //////////////////////////////////////////////////////////////////////
 		eList.clear(); oList.clear(); /////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,8 +152,8 @@ int main() {
 
 		eList.push_back(_entity(2, "Player", 100.f, 100.f));
 
-		oList.push_back(_object(0, 0, 240, 20));
-		oList.push_back(_object(380, 0, 240, 20));
+		oList.push_back(_object(0, 0, 380, 20));
+		oList.push_back(_object(380, 0, 20, 240));
 
 		entities.push_back(eList); objects.push_back(oList); //////////////////////////////////////////////////////////////////////
 		eList.clear(); oList.clear(); /////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +161,9 @@ int main() {
 		// Create mapsize for finding positions of map data.
 		long fsize = 0;
 		for (int i = 0; i < levels.size(); i++) {
+			fsize += sizeof(int);
 			fsize += (levels.at(i).at(0) * levels.at(i).at(1) + 2) * sizeof(int);
+			fsize += sizeof(int);
 			for (auto entity : entities.at(i)) {
 				fsize += sizeof(std::get<0>(entity));
 				string name = std::get<1>(entity);
@@ -196,9 +217,10 @@ int main() {
 			std::cout << "\n**** LEVEL " << i << " ****\n\n";
 			mapfile.write((char*)&size, sizeof(int)); std::cout << size << " ";
 			mapfile.write((char*)&level[0], size*sizeof(int));
+			mapfile.write((char*)&tilesets.at(i), sizeof(int));
 
 			for (int j = 0; j < size; j++) std::cout << levels.at(i).at(j) << " ";
-			std::cout << '\n';
+			std::cout << "tileset=" << tilesets.at(i) << '\n';
 
 			for (auto entity : entities.at(i)) {
 				int toDo = std::get<0>(entity);
@@ -243,12 +265,14 @@ int main() {
 				std::cout << "\n\n" << mapfile.tellg() << ": LEVEL " << i << "\n\n";
 				vector<int> level;
 				int size;
+				int tileset;
 				mapfile.read((char*)&size, sizeof(size)); std::cout << size << '\n';
 				level.resize(size);
 				mapfile.read((char*)level.data(), size * sizeof(int));
+				mapfile.read((char*)&tileset, sizeof(int));
 
 				for (int i = 0; i < size; i++) std::cout << level[i] << " ";
-				std::cout << '\n';
+				std::cout << "tileset=" << tileset << '\n';
 				//*
 				int toDo;
 				while ((mapfile.tellg() < msize.at(i)) && !mapfile.eof()) {
